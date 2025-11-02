@@ -1,0 +1,72 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2147483646 # 2147483647 - 1
+
+
+# Logging ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.copy]
+target = "main.lua"
+position = "prepend"
+sources = ["pre-init.lua"]
+
+
+# File loader ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "main.lua"
+pattern = '''cs = bs.load(project.initState)'''
+position = "after"
+payload = '''
+if true then -- Utilitools file loader
+	local chunk, e = love.filesystem.load(mods.utilitools.config.modPath .. "/utilitools/fileManager.lua")
+	if e then
+		log(mods.utilitools, "Error while loading file Mods/utilitools/fileManager.lua of Utilitools: " .. e)
+	else
+		utilitools.fileManager = setfenv(chunk, setmetatable({}, { __index = _G }))()
+	end
+end
+utilitoolsRegisterMods()
+if utilitools.modChecks.general then -- mod checks failed (dependency/incompatibility)
+	log(mods.utilitools, "Mod checks failed")
+	cs = bs.load("UtilitoolsModCheck")
+end
+'''
+match_indent = true
+
+
+# Prompts ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "main.lua"
+pattern = '''prof.pop("fg draw")'''
+position = "before"
+payload = '''
+	if utilitools.prompts then utilitools.prompts.imgui() end
+'''
+match_indent = true
+
+
+# Hotkeys ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+target = "main.lua"
+pattern = '''i = { "key:i" },'''
+position = "after"
+payload = '''
+tab = { "key:tab" },
+'''
+match_indent = true
+
+# [[patches]]
+# [patches.pattern]
+# target = "main.lua"
+# pattern = '''PopupManager.update(dt)'''
+# position = "after"
+# payload = '''
+# if maininput:pressed("tab") then
+# 	utilitools.suggest.handleKeys()
+# end
+# '''
+# match_indent = true

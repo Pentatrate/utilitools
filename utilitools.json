@@ -1,0 +1,38 @@
+{
+	"short": "UT",
+	"dependencies": {},
+	"incompatibilities": {},
+	"files": {
+		"imguiHelpers": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"configHelpers": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"prompts": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"suggest": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"configOptions": {
+			"extension": "json",
+			"load": true
+		},
+		"documentation": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		}
+	},
+	"config": true,
+	"cullConfig": true
+}

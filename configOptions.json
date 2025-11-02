@@ -1,0 +1,44 @@
+{
+	"documentation": {
+		"type": "combo",
+		"name": "Documentation",
+		"tooltips": { "short": "How to explain the mod in the menu" },
+		"values": [ "long", "short", "none" ],
+		"valueTooltips": [
+			{ "long": "Thoroughly explains all noteworthy modifications with great detail\nMay require you to scroll a lot", "short": "Show detailed explanation" },
+			{ "short": "Shorten explanation" }
+		],
+		"default": "none"
+	},
+	"tooltips": {
+		"type": "combo",
+		"name": "Tooltips",
+		"tooltips": { "short": "Tooltip length when hovering" },
+		"values": [ "long", "short", "none" ],
+		"valueTooltips": [
+			{ "long": "When hovering over menu options, display a detailed tooltip", "short": "Display detailed tooltip" },
+			{ "short": "Shorten tooltip" }
+		],
+		"default": "long"
+	},
+	"isolateLogs": {
+		"type": "bool",
+		"name": "Isolate Logs",
+		"tooltips": { "short": "Hides logs from unsupported mods" },
+		"default": false,
+		"off": false
+	},
+	"modPath": {
+		"type": "text",
+		"name": "Mod Path",
+		"tooltips": { "short": "The folder mods are located" },
+		"default": "Mods"
+	},
+	"search": {
+		"type": "text",
+		"name": "Search",
+		"tooltips": { "short": "Search for configs" },
+		"default": "",
+		"off": ""
+	}
+}

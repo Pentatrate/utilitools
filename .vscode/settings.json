@@ -1,0 +1,13 @@
+{
+	"Lua.diagnostics.globals": [
+		"mod",
+		"imgui",
+		"utilitools",
+		"Gamestate"
+	],
+	"Lua.diagnostics.disable": [
+		"undefined-global",
+		"lowercase-global",
+		"unused-function"
+	]
+}
