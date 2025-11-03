@@ -2,16 +2,22 @@ return { -- Penta: this is in lua and not json because i wanted the multiline st
 	-- Penta: when unspecified, it will default to json and try to load this file by default
 	fullDescription = {
 		short = [[
-!!!TODO!!! finish this:
+!!!TODO!!!
+1.0.0:
 Save configs
 Config searching
-Config Helpers
-ImGui Helpers
+Config helpers
+ImGui helpers
 File (re)loading
-Mod Interaction (Dependency/Incompatibility)
+Mod interactions (Dependency/Incompatibility)
 Catching errors
 Logging
 Prompts
+1.1.0:
+Version comparing
+Mod version interactions
+Keybinds (+ Additions to imgui/config helpers)
+Prompt overhaul
 ]]
 	},
 	--[[ general_menuOptions = { -- Rest from beattools

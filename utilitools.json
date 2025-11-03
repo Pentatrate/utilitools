@@ -1,7 +1,12 @@
 {
 	"short": "UT",
 	"dependencies": {},
-	"incompatibilities": {},
+	"incompatibilities": {
+		"beattools": {
+			"versions": [["fromTil", "3.0.0", "3.0.1"]],
+			"reason": "Beattols uses outdated functions"
+		}
+	},
 	"files": {
 		"imguiHelpers": {
 			"extension": "lua",
@@ -19,6 +24,16 @@
 			"call": true
 		},
 		"suggest": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"versions": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"keybinds": {
 			"extension": "lua",
 			"load": true,
 			"call": true

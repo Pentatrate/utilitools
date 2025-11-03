@@ -40,5 +40,12 @@
 		"tooltips": { "short": "Search for configs" },
 		"default": "",
 		"off": ""
+	},
+	"reloadHotkey": {
+		"type": "key",
+		"name": "Reload Hotkey",
+		"tooltips": { "short": "Hotkey to reload all files" },
+		"default": [],
+		"off": []
 	}
 }

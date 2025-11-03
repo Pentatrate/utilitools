@@ -11,11 +11,26 @@ st:setInit(function(self)
 	if utilitools.modChecks.dependencies then
 		addToError("\n--==--\n\nDependencies:\n")
 		for modId, mods2 in pairs(utilitools.dependencies) do
-			addToError("\n" .. mods[modId].name .. " (" .. modId .. ") " .. mods[modId].version .. " by " .. mods[modId].author .. " requires:\n")
+			addToError("\n[" .. modId .. "] " .. mods[modId].name .. " (" .. mods[modId].version .. ") by " .. mods[modId].author .. " requires:\n")
 			for modId2, data in pairs(mods2) do
 				addToError("-> " .. modId2)
-				if data.reason then
-					addToError(": " .. data.reason)
+                if data.reason then
+                    addToError(": " .. data.reason)
+                end
+				if data.versions then
+                    addToError("\nVersion must be ")
+                    for i, v in ipairs(data.versions) do
+                        if i ~= 1 then addToError(" or ") end
+						if v[1] == "fromTil" then
+							addToError("from " .. v[2] .. " til " .. v[3])
+						elseif v[1] == "between" then
+							addToError("between " .. v[2] .. " and " .. v[3])
+						elseif v[1] == "=" or v[1] == "equal" then
+							addToError(v[2])
+						else
+							addToError(v[1] ..  v[2])
+						end
+					end
 				end
 				addToError("\n")
 			end
@@ -29,6 +44,21 @@ st:setInit(function(self)
 				addToError("-> " .. modId2 .. " (" .. mods[modId2].name .. ") " .. mods[modId2].version .. " by " .. mods[modId2].author)
 				if data.reason then
 					addToError(": " .. data.reason)
+				end
+				if data.versions then
+                    addToError("\nVersion cannot be ")
+                    for i, v in ipairs(data.versions) do
+                        if i ~= 1 then addToError(" or ") end
+						if v[1] == "fromTil" then
+							addToError("from " .. v[2] .. " til " .. v[3])
+						elseif v[1] == "between" then
+							addToError("between " .. v[2] .. " and " .. v[3])
+						elseif v[1] == "=" or v[1] == "equal" then
+							addToError(v[2])
+						else
+							addToError(v[1] .. " " ..  v[2])
+						end
+					end
 				end
 				addToError("\n")
 			end

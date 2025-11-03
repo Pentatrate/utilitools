@@ -9,7 +9,7 @@ priority = 2147483646 # 2147483647 - 1
 [patches.copy]
 target = "main.lua"
 position = "prepend"
-sources = ["pre-init.lua"]
+sources = ["init.lua"]
 
 
 # File loader ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
@@ -28,6 +28,7 @@ if true then -- Utilitools file loader
 	end
 end
 utilitoolsRegisterMods()
+updateControls()
 if utilitools.modChecks.general then -- mod checks failed (dependency/incompatibility)
 	log(mods.utilitools, "Mod checks failed")
 	cs = bs.load("UtilitoolsModCheck")
@@ -59,14 +60,14 @@ tab = { "key:tab" },
 '''
 match_indent = true
 
-# [[patches]]
-# [patches.pattern]
-# target = "main.lua"
-# pattern = '''PopupManager.update(dt)'''
-# position = "after"
-# payload = '''
-# if maininput:pressed("tab") then
-# 	utilitools.suggest.handleKeys()
-# end
-# '''
-# match_indent = true
+[[patches]]
+[patches.pattern]
+target = "main.lua"
+pattern = '''PopupManager.update(dt)'''
+position = "after"
+payload = '''
+if maininput:pressed(utilitools.keybinds.keyName(mods.utilitools, "reloadHotkey")) then
+	utilitools.fileManager.loadAll(true)
+end
+'''
+match_indent = true

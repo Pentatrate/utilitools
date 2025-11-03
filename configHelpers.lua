@@ -210,6 +210,16 @@ configHelpers.inputList = function(key)
 		mod.config[key .. "_temp"], configOptions[key].size
 	)
 end
+configHelpers.inputKey = function(key)
+	if not configHelpers.exists(key) then
+		imgui.Text("Failed.")
+		return
+	end
+	utilitools.imguiHelpers.inputKey(
+		configHelpers.convertLabel(key), utilitools.keybinds.getModCategory(mod),
+		utilitools.keybinds.keyName(mod, key), configHelpers.tooltip(key)
+	)
+end
 configHelpers.condTreeNode = function(label, key, target, same, func, flags)
 	if not configHelpers.exists(key) then return end
 	utilitools.imguiHelpers.condTreeNode(
@@ -245,9 +255,12 @@ configHelpers.registerMod = function(mod2)
 	configHelpers.setMod(mod2)
 	for k, v in pairs(configOptions) do
 		if configHelpers.exists(k) or configHelpers.failReason(k) == "Hidden" then
-			if mod.config[k] == nil then
-				mod.config[k] = v.default
-				log(mod, "Initializing config option: " .. k)
+            if mod.config[k] == nil then
+                mod.config[k] = v.default
+                log(mod, "Initializing config option: " .. k)
+            end
+			if v.type == "key" then
+				utilitools.keybinds.registerKey(mod, k, v.default)
 			end
 		else
 			log(mod, "Invalid config option: " .. k)
@@ -270,11 +283,11 @@ configHelpers.presets = {
 	end,
 	menuButtons = function()
 		if imgui.Button("Default") then
-			utilitools.prompts.confirm.open("You will reset all configs for this mod to default", configHelpers.default)
+			utilitools.prompts.confirm("You will reset all configs for this mod to default", configHelpers.default)
 		end
 		imgui.SameLine()
 		if imgui.Button("Off") then
-			utilitools.prompts.confirm.open("You will turn all mod features off", configHelpers.off)
+			utilitools.prompts.confirm("You will turn all mod features off", configHelpers.off)
 		end
 		if mod == mods.utilitools then
 			if imgui.Button("Reload All Files") then

@@ -1,123 +1,132 @@
 local prompts = {
 	active = false,
+	doOpen = false,
 	random = 0,
-	error = {
-		message = ""
-	},
-	confirm = {
-		message = "",
-		func = function()
-		end
-	},
-	prompt = {
-		message = ""
-	}
+	func = nil,
+	title = "",
+	message = "",
+	isError = false,
+	confirm = nil,
+	buttons = nil,
+	listening = false
 }
 
 prompts.randomize = function()
+	prompts.close()
 	prompts.active = true
+	prompts.doOpen = true
 	prompts.random = math.random()
 end
 prompts.close = function()
+	if prompts.listening then
+		utilitools.keybinds.stopListening()
+	end
+
 	prompts.active = false
-	prompts.error.doOpen = nil
-	prompts.confirm.doOpen = nil
-	prompts.prompt.doOpen = nil
-	prompts.error.message = ""
-	prompts.confirm.message = ""
-	prompts.prompt.message = ""
-	prompts.confirm.func = function() end
-	prompts.prompt.buttons = nil
+    prompts.doOpen = false
+	prompts.random = 0
+	prompts.func = nil
+	prompts.title = ""
+	prompts.message = ""
+	prompts.isError = false
+	prompts.confirm = nil
+	prompts.buttons = nil
+	prompts.listening = nil
 end
 
-prompts.error.open = function(mod, message)
+prompts.error = function(mod, message)
 	prompts.randomize()
-	prompts.error.doOpen = true
-	prompts.error.message = message
+    prompts.isError = true
+	prompts.message = message
+
 	log(mod, message)
 end
-prompts.confirm.open = function(message, func)
+prompts.confirm = function(message, func)
 	prompts.randomize()
-	prompts.confirm.doOpen = true
-	prompts.confirm.message = message
-	prompts.confirm.func = func
+    prompts.title = "Are you sure?"
+	prompts.message = message
+	prompts.confirm = func
 end
-prompts.prompt.open = function(message, buttons)
+prompts.buttons = function(message, buttons)
 	prompts.randomize()
-	prompts.prompt.doOpen = true
-	prompts.prompt.message = message
-	prompts.prompt.buttons = buttons
+	prompts.message = message
+	prompts.buttons = buttons
+end
+prompts.key = function(mod, key)
+	prompts.randomize()
+	prompts.message = "Listening for key..."
+    prompts.listening = {
+		category = utilitools.keybinds.getModCategory(mod), key = utilitools.keybinds.keyName(mod, key)
+	}
+end
+prompts.keyRaw = function(category, key)
+	prompts.randomize()
+	prompts.message = "Listening for key..."
+    prompts.listening = {
+		category = category, key = key
+	}
+end
+prompts.custom = function(t)
+	prompts.randomize()
+	for k, v in pairs(t) do
+		prompts[k] = v
+	end
 end
 
 prompts.imgui = function()
-    if prompts.active then
-        if prompts.error.doOpen then
-            if not imgui.IsPopupOpen("utilitoolsError") then imgui.OpenPopup_Str("utilitoolsError") end
-            prompts.error.doOpen = nil
-        end
-        if prompts.confirm.doOpen then
-            if not imgui.IsPopupOpen("utilitoolsConfirm") then imgui.OpenPopup_Str("utilitoolsConfirm") end
-            prompts.confirm.doOpen = nil
-        end
-        if prompts.prompt.doOpen then
-            if not imgui.IsPopupOpen("utilitoolsPrompt") then imgui.OpenPopup_Str("utilitoolsPrompt") end
-            prompts.prompt.doOpen = nil
-        end
-
-        local open = false
-
-        if imgui.BeginPopup("utilitoolsError") then
-            open = true
+	if prompts.active then
+		if prompts.doOpen then
+			if not imgui.IsPopupOpen("utilitoolsPrompt") then imgui.OpenPopup_Str("utilitoolsPrompt") end
+            if prompts.isError then
+                local errorTexts = {
+                    "Error", "Curses!", "Dammit!", "Darn!", "Dang!", "Dangit!", "Task failed successfully.",
+                    ":(", "):", ":C", ":c",
+                    --[[ k4kadu: ]] "naurr!", "That can't be healthy...",
+                    --[[ something4803: ]] "This error sucks:",
+                    --[[ irember135: "ypu fked upo the beat blokc you" ]] "you fked up the beat blocked you",
+                }
+                table.insert(
+                    errorTexts, 1, "Error Code " .. tostring(math.floor(prompts.random * (#errorTexts + 1) * 999))
+                )
+                prompts.title = tostring(errorTexts[math.floor(prompts.random * #errorTexts) + 1])
+                prompts.isError = false
+            end
+			if prompts.listening then
+				utilitools.keybinds.forceListen(prompts.listening.category, prompts.listening.key)
+			end
+			prompts.doOpen = false
+		end
+        if imgui.BeginPopup("utilitoolsPrompt") then
             imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
-            local errorTexts = { "Error", "Curses!", "Dammit!", "Darn!", "Dang!", "Dangit!", "Task failed successfully.",
-                ":(", "):", ":C", ":c", --[[ k4kadu: ]] "naurr!", "That can't be healthy...", --[[ something4803: ]]
-                "This error sucks:", --[[ irember135: "ypu fked upo the beat blokc you" ]]
-                "you fked up the beat blocked you" }
-            table --[[stop wrong injection]].insert(errorTexts, 1,
-                "Error Code " .. tostring(math.floor(prompts.random * (#errorTexts + 1) * 999)))
 
-            imgui.Text(tostring(errorTexts[math.floor(prompts.random * #errorTexts) + 1]))
-            imgui.Separator()
-            imgui.Text(tostring(prompts.error.message))
-
-            imgui.PopTextWrapPos()
-            imgui.EndPopup("utilitoolsError")
-        elseif prompts.error.message ~= "" then
-            prompts.error.message = ""
-        end
-
-        if imgui.BeginPopup("utilitoolsConfirm") then
-            open = true
-            imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
-            local confirmationTexts = { "Confirm", "Accept", "Yes", "Yeah", "Ye", "Sure", "True", "Positive", "Okay",
-                "Ok",
-                "Do it", "Ready", "Yippee!" }
-
-            imgui.Text("Are you sure?")
-            imgui.Text(tostring(prompts.confirm.message))
-
-            if imgui.Button(tostring(confirmationTexts[math.floor(prompts.random * #confirmationTexts) + 1]) .. "##utilitoolsComfirm") then
-                local tempFunc = prompts.confirm.func
-                prompts.close()
-                imgui.CloseCurrentPopup()
-                if tempFunc then tempFunc() end
+            if prompts.title ~= "" then
+                imgui.Text(tostring(prompts.title))
+                imgui.Separator()
             end
 
-            imgui.PopTextWrapPos()
-            imgui.EndPopup("utilitoolsConfirm")
-        elseif prompts.confirm.message ~= "" then
-            prompts.confirm.message = ""
-            prompts.confirm.func = function() end
-        end
+            if prompts.message ~= "" then
+                imgui.Text(tostring(prompts.message))
+            end
 
-        if imgui.BeginPopup("utilitoolsPrompt") then
-            open = true
-            imgui.PushTextWrapPos(imgui.GetFontSize() * 35)
+			if prompts.func then
+				prompts.func()
+			end
 
-            imgui.Text(tostring(prompts.prompt.message))
+			if prompts.confirm then
+				local confirmationTexts = { "Confirm", "Accept", "Yes", "Yeah", "Ye", "Sure", "True", "Positive", "Okay",
+					"Ok",
+					"Do it", "Ready", "Yippee!" }
 
-            if prompts.prompt.buttons then
-                for i, v in ipairs(prompts.prompt.buttons) do
+				if imgui.Button(tostring(confirmationTexts[math.floor(prompts.random * #confirmationTexts) + 1]) .. "##utilitoolsComfirm") then
+					local temp = prompts.confirm
+					prompts.close()
+					imgui.CloseCurrentPopup()
+					if temp then temp() end
+				end
+			end
+
+            if prompts.buttons then
+                for i, v in ipairs(prompts.buttons) do
                     if i ~= 1 then imgui.SameLine() end
                     if imgui.Button(tostring(v[1])) then
                         prompts.close()
@@ -127,17 +136,12 @@ prompts.imgui = function()
                 end
             end
 
-            imgui.PopTextWrapPos()
-            imgui.EndPopup("utilitoolsPrompt")
-        elseif prompts.prompt.message ~= "" then
-            prompts.prompt.message = ""
-            prompts.prompt.buttons = nil
-        end
-
-        if not open then
-            prompts.close()
-        end
-    end
+			imgui.PopTextWrapPos()
+			imgui.EndPopup("utilitoolsPrompt")
+		else
+			prompts.close()
+		end
+	end
 end
 
 if false then

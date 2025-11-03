@@ -65,12 +65,21 @@ end
 local function utilitoolsRegisterMods()
 	if not love.filesystem.getInfo(mods.utilitools.config.modPath, "directory") then return end
 
-	local function checkForMod(modId)
-		return not not (mods[modId])
+    local function checkForMod(modId, data)
+        if not not (mods[modId]) then
+            if data.versions == nil then return true end
+			log(mods.utilitools, "Checking for versions")
+            for _, v in ipairs(data.versions) do
+				if utilitools.versions.compare(mods[modId].version, v[1], v[2], v[3]) then
+					return true
+				end
+            end
+		end
+		return false
 	end
 	local function handleModChecks(mod, mods2, requires)
 		for modId, data in pairs(mods2) do
-			if checkForMod(modId) ~= requires then
+			if checkForMod(modId, data) ~= requires then
 				utilitools.modChecks.general = true
 				if requires then
 					utilitools.modChecks.dependencies = true
@@ -91,33 +100,34 @@ local function utilitoolsRegisterMods()
 		if b == "utilitools" then return false end
 		return a < b
 	end)
-	for _, modId in ipairs(modFolders) do
-		local path = mods.utilitools.config.modPath .. "/" .. modId
-		if love.filesystem.getInfo(path, "directory") then
-			if love.filesystem.getInfo(path .. "/utilitools.json", "file") then
-				local data = dpf.loadJson(path .. "/utilitools.json")
+    for _, modId in ipairs(modFolders) do
+        local path = mods.utilitools.config.modPath .. "/" .. modId
+        if love.filesystem.getInfo(path, "directory") then
+            if love.filesystem.getInfo(path .. "/utilitools.json", "file") then
+                local data = dpf.loadJson(path .. "/utilitools.json")
 
-				utilitools.mods[modId] = {}
-				for _, v in ipairs({ "short" }) do
-					utilitools.mods[modId][v] = data[v]
-				end
-				if data.dependencies and type(data.dependencies) == "table" then
-					handleModChecks(mods[modId], data.dependencies, true)
-				end
-				if data.incompatibilities and type(data.incompatibilities) == "table" then
-					handleModChecks(mods[modId], data.incompatibilities, false)
-				end
-				if data.files and type(data.files) == "table" then
-					utilitools.fileManager.registerMod(mods[modId], data.files)
-				end
-				if data.config then
-					utilitools.fileManager.utilitools.configHelpers.load()
-					utilitools.configHelpers.registerMod(mods[modId], data.files)
-				end
-				log(mods.utilitools, "Registering " .. modId)
-			end
-		end
-	end
+                utilitools.mods[modId] = {}
+                for _, v in ipairs({ "short", "config", "cullConfig" }) do
+                    utilitools.mods[modId][v] = data[v]
+                end
+                if data.files and type(data.files) == "table" then
+                    utilitools.fileManager.registerMod(mods[modId], data.files)
+                end
+                if data.dependencies and type(data.dependencies) == "table" then
+                    handleModChecks(mods[modId], data.dependencies, true)
+                end
+                if data.incompatibilities and type(data.incompatibilities) == "table" then
+                    handleModChecks(mods[modId], data.incompatibilities, false)
+                end
+                if data.config then
+                    utilitools.fileManager.utilitools.configHelpers.load()
+                    utilitools.configHelpers.registerMod(mods[modId], data.files)
+                end
+                log(mods.utilitools, "Registering " .. modId)
+            end
+        end
+    end
+	utilitools.keybinds.finishRegistering()
 end
 
 -- Penta: just putting this here...
