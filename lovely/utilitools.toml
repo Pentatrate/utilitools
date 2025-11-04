@@ -1,7 +1,7 @@
 [manifest]
 version = "1.0.0"
 dump_lua = true
-priority = 2147483646 # 2147483647 - 1
+priority = 2147483645 # 2147483647 - 2
 
 
 # Logging ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
@@ -9,7 +9,7 @@ priority = 2147483646 # 2147483647 - 1
 [patches.copy]
 target = "main.lua"
 position = "prepend"
-sources = ["init.lua"]
+sources = ["prepend/init.lua"]
 
 
 # File loader ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
@@ -20,7 +20,7 @@ pattern = '''cs = bs.load(project.initState)'''
 position = "after"
 payload = '''
 if true then -- Utilitools file loader
-	local chunk, e = love.filesystem.load(mods.utilitools.config.modPath .. "/utilitools/fileManager.lua")
+	local chunk, e = love.filesystem.load(mods.utilitools.config.modPath .. "/utilitools/files/fileManager.lua")
 	if e then
 		log(mods.utilitools, "Error while loading file Mods/utilitools/fileManager.lua of Utilitools: " .. e)
 	else
@@ -30,7 +30,6 @@ end
 utilitoolsRegisterMods()
 updateControls()
 if utilitools.modChecks.general then -- mod checks failed (dependency/incompatibility)
-	log(mods.utilitools, "Mod checks failed")
 	cs = bs.load("UtilitoolsModCheck")
 end
 '''
@@ -43,9 +42,7 @@ match_indent = true
 target = "main.lua"
 pattern = '''prof.pop("fg draw")'''
 position = "before"
-payload = '''
-	if utilitools.prompts then utilitools.prompts.imgui() end
-'''
+payload = '''	if utilitools.prompts then utilitools.prompts.imgui() end'''
 match_indent = true
 
 
@@ -55,9 +52,7 @@ match_indent = true
 target = "main.lua"
 pattern = '''i = { "key:i" },'''
 position = "after"
-payload = '''
-tab = { "key:tab" },
-'''
+payload = '''tab = { "key:tab" },'''
 match_indent = true
 
 [[patches]]

@@ -68,7 +68,6 @@ local function utilitoolsRegisterMods()
     local function checkForMod(modId, data)
         if not not (mods[modId]) then
             if data.versions == nil then return true end
-			log(mods.utilitools, "Checking for versions")
             for _, v in ipairs(data.versions) do
 				if utilitools.versions.compare(mods[modId].version, v[1], v[2], v[3]) then
 					return true

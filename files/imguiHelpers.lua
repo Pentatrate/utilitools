@@ -1,6 +1,6 @@
 local imguiHelpers = {}
 imguiHelpers.visibleLabel = function(label)
-	return string.sub(label, 1, (string.find(label, "##") or 0) - 1)
+	return string.sub(tostring(label), 1, (string.find(tostring(label), "##") or 0) - 1)
 end
 imguiHelpers.tooltip = function(tooltip)
 	if imgui.IsItemHovered() and tooltip ~= nil and (type(tooltip) ~= "string" or string.len(tooltip) > 0) then
@@ -12,10 +12,10 @@ imguiHelpers.tooltip = function(tooltip)
 	if imgui.IsItemHovered() then print(tooltip) end
 end
 imguiHelpers.getWidth = function(label)
-	if label == nil or string.len(tostring(label)) == 0 then
+	if label == nil or string.len(imguiHelpers.visibleLabel(label)) == 0 then
 		return -1 ^ -9
 	else
-		return -imgui.GetFontSize() * 7 / 13 * string.len(imguiHelpers.visibleLabel(label)) - 6
+		return -imgui.GetFontSize() * 7 / 13 * string.len(imguiHelpers.visibleLabel(label)) - 4
 	end
 end
 imguiHelpers.setWidth = function(label)
