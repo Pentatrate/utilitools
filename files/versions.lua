@@ -1,11 +1,7 @@
 local versions = {}
 
 versions.convert = function(v)
-	local r = {}
-	for n in string.gmatch(v, "[^%.]") do
-		table.insert(r, tonumber(n))
-	end
-	return r
+	return utilitools.string.split(v, "%.")
 end
 versions.check = function(base, other, func)
 	base = versions.convert(base)

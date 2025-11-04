@@ -5,19 +5,19 @@ utilitools = {
 	incompatibilities = {},
 	modChecks = { general = false, dependencies = false, incompatibilities = false },
 	config = {
-        foldAll = false,
+		foldAll = false,
 		save = function(mod)
 			local configRenderer = mod.configRenderer
 			mod.configRenderer = nil
 			dpf.saveJson(mods.utilitools.config.modPath .. "/" .. mod.id .. "/mod.json", mod)
 			mod.configRenderer = configRenderer
-        end,
+		end,
 		search = {}
-    },
-	try = function (mod, func)
-        local success, e = pcall(func)
+	},
+	try = function(mod, func)
+		local success, e = pcall(func)
 		if not success then log(mod, e) end
-    end,
+	end,
 	eases = { -- Copied from kakadus-demo-mods
 		"linear",
 		"inSine", "outSine", "inOutSine",
@@ -31,11 +31,24 @@ utilitools = {
 		"inBack", "outBack", "inOutBack",
 		"inSquaredCirc", "outSquaredCirc", "inOutSquaredCirc",
 		"inBounce", "outBounce", "inOutBounce"
-    },
-    table = {
-		keysToValues = function (t)
-            local r = {}
-            for k, _ in pairs(t) do table.insert(r, k) end
+	},
+	table = {
+		keysToValues = function(t)
+			local r = {}
+			for k, _ in pairs(t) do table.insert(r, k) end
+			return r
+		end
+	},
+	string = {
+		split = function(s, c) -- only splits using chars
+			if string.sub(c, 1, 1) ~= "%" and #c ~= 1 then
+				error("utilitools.string.split: second parameter must be a single character")
+			end
+			if string.sub(c, 1, 1) ~= "%" and #c ~= 2 then
+				error("utilitools.string.split: second parameter must be a single character (+ escaping character)")
+			end
+			local r = {}
+			for w in string.gmatch(s, "[^" .. c .. "]+") do table.insert(r, w) end
 			return r
 		end
 	}
@@ -65,14 +78,14 @@ end
 local function utilitoolsRegisterMods()
 	if not love.filesystem.getInfo(mods.utilitools.config.modPath, "directory") then return end
 
-    local function checkForMod(modId, data)
-        if not not (mods[modId]) then
-            if data.versions == nil then return true end
-            for _, v in ipairs(data.versions) do
+	local function checkForMod(modId, data)
+		if not not (mods[modId]) then
+			if data.versions == nil then return true end
+			for _, v in ipairs(data.versions) do
 				if utilitools.versions.compare(mods[modId].version, v[1], v[2], v[3]) then
 					return true
 				end
-            end
+			end
 		end
 		return false
 	end
@@ -99,33 +112,33 @@ local function utilitoolsRegisterMods()
 		if b == "utilitools" then return false end
 		return a < b
 	end)
-    for _, modId in ipairs(modFolders) do
-        local path = mods.utilitools.config.modPath .. "/" .. modId
-        if love.filesystem.getInfo(path, "directory") then
-            if love.filesystem.getInfo(path .. "/utilitools.json", "file") then
-                local data = dpf.loadJson(path .. "/utilitools.json")
+	for _, modId in ipairs(modFolders) do
+		local path = mods.utilitools.config.modPath .. "/" .. modId
+		if love.filesystem.getInfo(path, "directory") then
+			if love.filesystem.getInfo(path .. "/utilitools.json", "file") then
+				local data = dpf.loadJson(path .. "/utilitools.json")
 
-                utilitools.mods[modId] = {}
-                for _, v in ipairs({ "short", "config", "cullConfig" }) do
-                    utilitools.mods[modId][v] = data[v]
-                end
-                if data.files and type(data.files) == "table" then
-                    utilitools.fileManager.registerMod(mods[modId], data.files)
-                end
-                if data.dependencies and type(data.dependencies) == "table" then
-                    handleModChecks(mods[modId], data.dependencies, true)
-                end
-                if data.incompatibilities and type(data.incompatibilities) == "table" then
-                    handleModChecks(mods[modId], data.incompatibilities, false)
-                end
-                if data.config then
-                    utilitools.fileManager.utilitools.configHelpers.load()
-                    utilitools.configHelpers.registerMod(mods[modId], data.files)
-                end
-                log(mods.utilitools, "Registering " .. modId)
-            end
-        end
-    end
+				utilitools.mods[modId] = {}
+				for _, v in ipairs({ "short", "config", "cullConfig" }) do
+					utilitools.mods[modId][v] = data[v]
+				end
+				if data.files and type(data.files) == "table" then
+					utilitools.fileManager.registerMod(mods[modId], data.files)
+				end
+				if data.dependencies and type(data.dependencies) == "table" then
+					handleModChecks(mods[modId], data.dependencies, true)
+				end
+				if data.incompatibilities and type(data.incompatibilities) == "table" then
+					handleModChecks(mods[modId], data.incompatibilities, false)
+				end
+				if data.config then
+					utilitools.fileManager.utilitools.configHelpers.load()
+					utilitools.configHelpers.registerMod(mods[modId], data.files)
+				end
+				log(mods.utilitools, "Registering " .. modId)
+			end
+		end
+	end
 	utilitools.keybinds.finishRegistering()
 end
 
