@@ -24,7 +24,7 @@ keybinds.saveControls = function()
 end
 
 keybinds.getKeys = function(category)
-    return savedata.options.bindings[category]
+	return savedata.options.bindings[category]
 end
 
 keybinds.forceSaveKey = function(category, key, values)
@@ -38,13 +38,13 @@ keybinds.forceAddKeyValue = function(category, key, value)
 	keybinds.saveControls()
 end
 keybinds.forceRemoveKeyValue = function(category, key, value)
-    for i = #keybinds.getKeys(category)[key], 1, -1 do
-        local v = keybinds.getKeys(category)[key][i]
-        if v == value then
-            table.remove(keybinds.getKeys(category)[key], i)
-        end
-    end
-    keybinds.saveControls()
+	for i = #keybinds.getKeys(category)[key], 1, -1 do
+		local v = keybinds.getKeys(category)[key][i]
+		if v == value then
+			table.remove(keybinds.getKeys(category)[key], i)
+		end
+	end
+	keybinds.saveControls()
 end
 
 keybinds.forceListen = function(category, key)
@@ -77,9 +77,9 @@ keybinds.getModCategory = function(mod)
 	return "utilitools_" .. mod.id
 end
 keybinds.getModKeys = function(mod)
-    return keybinds.getKeys(keybinds.getModCategory(mod))
+	return keybinds.getKeys(keybinds.getModCategory(mod))
 end
-keybinds.keyName = function (mod, key)
+keybinds.keyName = function(mod, key)
 	return mod.id .. "_" .. key
 end
 

@@ -6,8 +6,8 @@ local prompts = {
 	title = "",
 	message = "",
 	isError = false,
-	confirm = nil,
-	buttons = nil,
+	confirmFunc = nil,
+	buttonsTable = nil,
 	listening = false
 }
 
@@ -29,8 +29,8 @@ prompts.close = function()
 	prompts.title = ""
 	prompts.message = ""
 	prompts.isError = false
-	prompts.confirm = nil
-	prompts.buttons = nil
+	prompts.confirmFunc = nil
+	prompts.buttonsTable = nil
 	prompts.listening = nil
 end
 
@@ -45,12 +45,12 @@ prompts.confirm = function(message, func)
 	prompts.randomize()
     prompts.title = "Are you sure?"
 	prompts.message = message
-	prompts.confirm = func
+	prompts.confirmFunc = func
 end
 prompts.buttons = function(message, buttons)
 	prompts.randomize()
 	prompts.message = message
-	prompts.buttons = buttons
+	prompts.buttonsTable = buttons
 end
 prompts.key = function(mod, key)
 	prompts.randomize()
@@ -112,21 +112,21 @@ prompts.imgui = function()
 				prompts.func()
 			end
 
-			if prompts.confirm then
+			if prompts.confirmFunc then
 				local confirmationTexts = { "Confirm", "Accept", "Yes", "Yeah", "Ye", "Sure", "True", "Positive", "Okay",
 					"Ok",
 					"Do it", "Ready", "Yippee!" }
 
 				if imgui.Button(tostring(confirmationTexts[math.floor(prompts.random * #confirmationTexts) + 1]) .. "##utilitoolsComfirm") then
-					local temp = prompts.confirm
+					local temp = prompts.confirmFunc
 					prompts.close()
 					imgui.CloseCurrentPopup()
 					if temp then temp() end
 				end
 			end
 
-            if prompts.buttons then
-                for i, v in ipairs(prompts.buttons) do
+            if prompts.buttonsTable then
+                for i, v in ipairs(prompts.buttonsTable) do
                     if i ~= 1 then imgui.SameLine() end
                     if imgui.Button(tostring(v[1])) then
                         prompts.close()
@@ -142,9 +142,6 @@ prompts.imgui = function()
 			prompts.close()
 		end
 	end
-end
-
-if false then
 end
 
 return prompts

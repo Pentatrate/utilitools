@@ -44,13 +44,16 @@ utilitools = {
 			if string.sub(c, 1, 1) ~= "%" and #c ~= 1 then
 				error("utilitools.string.split: second parameter must be a single character")
 			end
-			if string.sub(c, 1, 1) ~= "%" and #c ~= 2 then
+			if string.sub(c, 1, 1) == "%" and #c ~= 2 then
 				error("utilitools.string.split: second parameter must be a single character (+ escaping character)")
 			end
 			local r = {}
 			for w in string.gmatch(s, "[^" .. c .. "]+") do table.insert(r, w) end
 			return r
 		end
+	},
+	imgui = {
+		color = function(...) return imgui.ColorConvertFloat4ToU32(imgui.ImVec4_Float(...)) end
 	}
 }
 
