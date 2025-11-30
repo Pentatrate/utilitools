@@ -47,5 +47,12 @@
 		"tooltips": { "short": "Hotkey to reload all files" },
 		"default": [],
 		"off": []
+	},
+	"unknownPrints": {
+		"type": "bool",
+		"name": "Find prints",
+		"tooltips": { "short": "Fake an error for every print" },
+		"default": false,
+		"off": false
 	}
 }

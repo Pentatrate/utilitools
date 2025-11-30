@@ -14,7 +14,7 @@ suggest.suggest = function(current, list)
 			suggest.list = {}
 			if #current > 0 then
 				for _, v in ipairs(list) do
-					local find = string.find(string.lower(v), string.lower(current), nil, true)
+					local find = v:lower():find(current:lower(), nil, true)
 					if find then
 						table.insert(suggest.list, { v, find == 1 })
 					end
@@ -127,7 +127,6 @@ suggest.dial = function(current, id, snap)
 		})
 	end
 	if suggest.dials[id] then
-		log(mod, current .. " " .. suggest.dials[id])
 		current = suggest.dials[id]
 		suggest.dials[id] = nil
 	end

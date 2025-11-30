@@ -3,8 +3,8 @@
 	"dependencies": {},
 	"incompatibilities": {
 		"beattools": {
-			"versions": [["fromTil", "3.0.0", "3.0.3"]],
-			"reason": "Beattols uses outdated functions"
+			"versions": [["fromTil", "3.0.0", "3.1.1"]],
+			"reason": "You need to update this mod."
 		}
 	},
 	"files": {
@@ -43,6 +43,11 @@
 			"load": true
 		},
 		"documentation": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"keys": {
 			"extension": "lua",
 			"load": true,
 			"call": true

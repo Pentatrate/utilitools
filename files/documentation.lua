@@ -88,6 +88,10 @@ suggest expansion
 	rename suggest.run(...) to suggest.suggest(...)
 	add suggest.dial(...)
 
+1.1.4
+
+keybinds full rework
+
 ]]
 	}
 }

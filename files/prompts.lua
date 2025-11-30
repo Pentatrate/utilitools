@@ -19,7 +19,7 @@ prompts.randomize = function()
 end
 prompts.close = function()
 	if prompts.listening then
-		utilitools.keybinds.stopListening()
+		utilitools.keybinds.listening.stop()
 	end
 
 	prompts.active = false
@@ -52,18 +52,25 @@ prompts.buttons = function(message, buttons)
 	prompts.message = message
 	prompts.buttonsTable = buttons
 end
-prompts.key = function(mod, key)
+prompts.key = function(category, keyId, modded)
 	prompts.randomize()
-	prompts.message = "Listening for key..."
+	prompts.func = function()
+		local pressed = false
+		if modded then for k, _ in pairs(utilitools.keybinds.listening.keysPressed) do pressed = true break end end
+		if pressed then
+			local temp = ""
+			local first = true
+			for k, _ in pairs(utilitools.keybinds.listening.keysPressed) do
+				temp = temp .. (first and "" or " + ") .. k:sub(#"key:" + 1)
+				first = false
+			end
+			imgui.Text(temp)
+		else
+			imgui.Text("Listening for key...")
+		end
+	end
     prompts.listening = {
-		category = utilitools.keybinds.getModCategory(mod), key = utilitools.keybinds.keyName(mod, key)
-	}
-end
-prompts.keyRaw = function(category, key)
-	prompts.randomize()
-	prompts.message = "Listening for key..."
-    prompts.listening = {
-		category = category, key = key
+		category = category, keyId = keyId, modded = modded
 	}
 end
 prompts.custom = function(t)
@@ -92,7 +99,7 @@ prompts.imgui = function()
                 prompts.isError = false
             end
 			if prompts.listening then
-				utilitools.keybinds.forceListen(prompts.listening.category, prompts.listening.key)
+				utilitools.keybinds.listening.listen(prompts.listening.category, prompts.listening.keyId, prompts.listening.modded)
 			end
 			prompts.doOpen = false
 		end

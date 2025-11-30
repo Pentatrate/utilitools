@@ -7,16 +7,17 @@ utilitools = {
 	config = {
 		foldAll = false,
 		save = function(mod)
-			local configRenderer = mod.configRenderer
-			mod.configRenderer = nil
-			dpf.saveJson(mods.utilitools.config.modPath .. "/" .. mod.id .. "/mod.json", mod)
-			mod.configRenderer = configRenderer
+			if beatblockPlus2_0Update then
+				dpf.saveJson(mod.path .. "/config.json", mod.config)
+			else
+				dpf.saveJson((beatblockPlus2_0Update and mod.path or mods.utilitools.config.modPath .. "/" .. mod.id) .. "/mod.json", { id = mod.id, name = mod.name, author = mod.author, description = mod.description, version = mod.version, enabled = mod.enabled, config = mod.config })
+			end
 		end,
 		search = {}
 	},
 	try = function(mod, func)
 		local success, e = pcall(func)
-		if not success then log(mod, e) end
+		if not success then log(mod, debug.traceback(e, 1)) end
 	end,
 	eases = { -- Copied from kakadus-demo-mods
 		"linear",
@@ -41,14 +42,14 @@ utilitools = {
 	},
 	string = {
 		split = function(s, c) -- only splits using chars
-			if string.sub(c, 1, 1) ~= "%" and #c ~= 1 then
+			if c:sub(1, 1) ~= "%" and #c ~= 1 then
 				error("utilitools.string.split: second parameter must be a single character")
 			end
-			if string.sub(c, 1, 1) == "%" and #c ~= 2 then
+			if c:sub(1, 1) == "%" and #c ~= 2 then
 				error("utilitools.string.split: second parameter must be a single character (+ escaping character)")
 			end
 			local r = {}
-			for w in string.gmatch(s, "[^" .. c .. "]+") do table.insert(r, w) end
+			for w in s:gmatch("[^" .. c .. "]+") do table.insert(r, w) end
 			return r
 		end
 	},
@@ -65,7 +66,7 @@ log = function(mod, text)
 			(
 				mod and mod.id and (
 					(
-						utilitools.mods[mod.id] and tostring(utilitools.mods[mod.id].short)
+						utilitools.mods[mod.id] and utilitools.mods[mod.id].short and tostring(utilitools.mods[mod.id].short)
 					) or mod.id
 				)
 			) or "??"
@@ -73,13 +74,19 @@ log = function(mod, text)
 	)
 end
 print = function(...)
-	if mods and mods.utilitools and mods.utilitools.config and mods.utilitools.config.isolateLogs ~= nil and not mods.utilitools.config.isolateLogs then
-		forceprint(...)
+	if mods and mods.utilitools and mods.utilitools.config then
+		if mods.utilitools.config.isolateLogs ~= nil and not mods.utilitools.config.isolateLogs then
+			forceprint(...)
+		end
+		if mods.utilitools.config.unknownPrints == true then
+			forceprint(debug.traceback(nil, 1))
+		end
 	end
 end
 
 local function utilitoolsRegisterMods()
-	if not love.filesystem.getInfo(mods.utilitools.config.modPath, "directory") then return end
+	if not beatblockPlus2_0Update and not love.filesystem.getInfo(mods.utilitools.config.modPath, "directory") then return end
+	local modsData = {}
 
 	local function checkForMod(modId, data)
 		if not not (mods[modId]) then
@@ -95,6 +102,7 @@ local function utilitoolsRegisterMods()
 	local function handleModChecks(mod, mods2, requires)
 		for modId, data in pairs(mods2) do
 			if checkForMod(modId, data) ~= requires then
+				log(mod, "Mod checks failed")
 				utilitools.modChecks.general = true
 				if requires then
 					utilitools.modChecks.dependencies = true
@@ -108,41 +116,49 @@ local function utilitoolsRegisterMods()
 			end
 		end
 	end
-
-	local modFolders = love.filesystem.getDirectoryItems(mods.utilitools.config.modPath)
-	table.sort(modFolders, function(a, b)
-		if a == "utilitools" then return true end
-		if b == "utilitools" then return false end
-		return a < b
-	end)
-	for _, modId in ipairs(modFolders) do
-		local path = mods.utilitools.config.modPath .. "/" .. modId
+	local function registerMod(mod, onlyCompat)
+		local path = beatblockPlus2_0Update and mod.path or mods.utilitools.config.modPath .. "/" .. mod.id
 		if love.filesystem.getInfo(path, "directory") then
 			if love.filesystem.getInfo(path .. "/utilitools.json", "file") then
-				local data = dpf.loadJson(path .. "/utilitools.json")
-
-				utilitools.mods[modId] = {}
-				for _, v in ipairs({ "short", "config", "cullConfig" }) do
-					utilitools.mods[modId][v] = data[v]
+				if modsData[mod.id] == nil then modsData[mod.id] = dpf.loadJson(path .. "/utilitools.json") end
+				utilitools.mods[mod.id] = utilitools.mods[mod.id] or {}
+				if onlyCompat then
+					for _, v in ipairs({ "short", "config", "cullConfig" }) do
+						utilitools.mods[mod.id][v] = modsData[mod.id][v]
+					end
+					if modsData[mod.id].files and type(modsData[mod.id].files) == "table" then
+						utilitools.fileManager.registerMod(mod, modsData[mod.id].files)
+					end
+					if modsData[mod.id].dependencies and type(modsData[mod.id].dependencies) == "table" then
+						handleModChecks(mod, modsData[mod.id].dependencies, true)
+					end
+					if modsData[mod.id].incompatibilities and type(modsData[mod.id].incompatibilities) == "table" then
+						handleModChecks(mod, modsData[mod.id].incompatibilities, false)
+					end
+				else
+					if modsData[mod.id].config then
+						utilitools.fileManager.utilitools.configHelpers.load()
+						utilitools.configHelpers.registerMod(mod, modsData[mod.id].files)
+					end
+					log(mod, "Registering " .. mod.id)
 				end
-				if data.files and type(data.files) == "table" then
-					utilitools.fileManager.registerMod(mods[modId], data.files)
-				end
-				if data.dependencies and type(data.dependencies) == "table" then
-					handleModChecks(mods[modId], data.dependencies, true)
-				end
-				if data.incompatibilities and type(data.incompatibilities) == "table" then
-					handleModChecks(mods[modId], data.incompatibilities, false)
-				end
-				if data.config then
-					utilitools.fileManager.utilitools.configHelpers.load()
-					utilitools.configHelpers.registerMod(mods[modId], data.files)
-				end
-				log(mods.utilitools, "Registering " .. modId)
 			end
+		else
+			log(mod, "No folder found for " .. mod.id)
 		end
 	end
-	utilitools.keybinds.finishRegistering()
+
+	registerMod(mods.utilitools, true)
+	registerMod(mods.utilitools)
+	for k, v in pairs(mods) do
+		if k ~= "utilitools" then registerMod(v, true) end
+	end
+	if not utilitools.modChecks.general then
+		for k, v in pairs(mods) do
+			if k ~= "utilitools" then registerMod(v) end
+		end
+	end
+	utilitools.keybinds.register.finish()
 end
 
 -- Penta: just putting this here...

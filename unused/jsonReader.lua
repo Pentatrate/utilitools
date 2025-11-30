@@ -9,10 +9,10 @@ local numberChars = {}
 local readNext
 
 local function getIndent()
-	return string.rep(" ", 3 * indent)
+	return (" "):rep(3 * indent)
 end
 local function advance()
-	while allowed[string.sub(contents, index + 1, index + 1)] do
+	while allowed[contents:sub(index + 1, index + 1)] do
 		index = index + 1
 	end
 end
@@ -21,11 +21,8 @@ local function lookFor(s, requireDataBetween, expect)
 	local firstIndex
 	nextIndex = nil
 	if not requireDataBetween then
-		--[[ while allowed[string.sub(contents, tempIndex + 1, tempIndex + 1)] do
-			tempIndex = tempIndex + 1
-		end ]]
-		-- forceprint(getIndent() .. s .. " | " .. string.sub(contents, tempIndex + 1, tempIndex + #s))
-		if string.sub(contents, tempIndex + 1, tempIndex + #s) == s then
+		-- forceprint(getIndent() .. s .. " | " .. contents:sub(tempIndex + 1, tempIndex + #s))
+		if contents:sub(tempIndex + 1, tempIndex + #s) == s then
 			firstIndex = tempIndex + 1
 			nextIndex = tempIndex + #s
 		end

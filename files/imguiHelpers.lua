@@ -1,21 +1,19 @@
 local imguiHelpers = {}
 imguiHelpers.visibleLabel = function(label)
-	return string.sub(tostring(label), 1, (string.find(tostring(label), "##") or 0) - 1)
+	return tostring(label):sub(1, (tostring(label):find("##", nil, true) or 0) - 1)
 end
 imguiHelpers.tooltip = function(tooltip)
-	if imgui.IsItemHovered() and tooltip ~= nil and (type(tooltip) ~= "string" or string.len(tooltip) > 0) then
+	if imgui.IsItemHovered() and tooltip ~= nil and (type(tooltip) ~= "string" or tooltip:len() > 0) then
 		imgui.PushTextWrapPos(imgui.GetFontSize() * 7 / 13 * 65)
 		imgui.SetItemTooltip(tostring(tooltip))
 		imgui.PopTextWrapPos()
-		return
 	end
-	if imgui.IsItemHovered() then print(tooltip) end
 end
 imguiHelpers.getWidth = function(label)
-	if label == nil or string.len(imguiHelpers.visibleLabel(label)) == 0 then
+	if label == nil or imguiHelpers.visibleLabel(label):len() == 0 then
 		return -1 ^ -9
 	else
-		return -imgui.GetFontSize() * 7 / 13 * string.len(imguiHelpers.visibleLabel(label)) - 4
+		return -imgui.GetFontSize() * 7 / 13 * imguiHelpers.visibleLabel(label):len() - imgui.GetStyle().ItemInnerSpacing.x
 	end
 end
 imguiHelpers.setWidth = function(label)
@@ -59,7 +57,7 @@ imguiHelpers.inputMultiline = function(label, current, default, tooltip, flags, 
 	size = size or (2 ^ 16)
 
 	local lines = 1
-	for _ in string.gmatch(current, "\n") do
+	for _ in current:gmatch("\n") do
 		lines = lines + 1
 	end
 	local size2d = imgui.ImVec2_Float(imguiHelpers.getWidth(label), imgui.GetFontSize() * lines + 6)
@@ -136,7 +134,7 @@ imguiHelpers.inputList = function(label, current, default, tooltip, flags, temp,
 	if formatted ~= val and val ~= temp then
 		rv[1] = {}
 		rv[2] = val
-		for n in string.gmatch(val, "(%d+)") do
+		for n in val:gmatch("(%d+)") do
 			local s = tonumber(n)
 			if s ~= nil and s ~= 0 then
 				table.insert(rv[1], s)
@@ -145,16 +143,31 @@ imguiHelpers.inputList = function(label, current, default, tooltip, flags, temp,
 	end
 	return rv[1], rv[2]
 end
-imguiHelpers.inputKey = function(label, category, key, tooltip)
-	for _, v in ipairs(utilitools.keybinds.getKeys(category)[key]) do
-		if imgui.Button(string.sub(v, #"key:" + 1)) then
-			utilitools.keybinds.forceRemoveKeyValue(category, key, v)
+imguiHelpers.inputKey = function(label, category, keyId, tooltip, modded)
+	for _, v in ipairs(modded and (utilitools.keybinds.mod.getKeybinds(category, keyId) or {}) or savedata.options.bindings[category][keyId]) do
+		local keyLabel = ""
+		if modded then
+			local first = true
+			for k, _ in pairs(v[1]) do
+				keyLabel = keyLabel .. (first and "" or " + ") .. k:sub(#"key:" + 1)
+				first = false
+			end
+			keyLabel = keyLabel .. (first and "" or " + ") .. v[2]:sub(#"key:" + 1)
+		else
+			keyLabel = v:sub(#"key:" + 1)
+		end
+		if imgui.Button(keyLabel .. "##" .. label) then
+			if modded then
+				utilitools.keybinds.mod.removeKeybind(category, keyId, v)
+			else
+				utilitools.keybinds.raw.removeKeybind(category, keyId, v)
+			end
 		end
 		imguiHelpers.tooltip(tooltip)
 		imgui.SameLine()
 	end
-	if imgui.Button("Add") then
-		utilitools.prompts.keyRaw(category, key)
+	if imgui.Button("Add##" .. label) then
+		utilitools.prompts.key(category, keyId, modded)
 	end
 	imguiHelpers.tooltip(tooltip)
 	imgui.SameLine()

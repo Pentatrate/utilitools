@@ -1,68 +1,64 @@
 [manifest]
-version = "1.0.0"
 dump_lua = true
 priority = 2147483645 # 2147483647 - 2
-
+version = "1.0.0"
 
 # Logging ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.copy]
-target = "main.lua"
 position = "prepend"
 sources = ["prepend/init.lua"]
-
+target = "main.lua"
 
 # File loader ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "main.lua"
-pattern = '''cs = bs.load(project.initState)'''
-position = "after"
+match_indent = true
+pattern = "cs = bs.load(project.initState)"
 payload = '''
+beatblockPlus2_0Update = tableContains == nil
 if true then -- Utilitools file loader
-	local chunk, e = love.filesystem.load(mods.utilitools.config.modPath .. "/utilitools/files/fileManager.lua")
+	local chunk, e = love.filesystem.load((beatblockPlus2_0Update and mods.utilitools.path or mods.utilitools.config.modPath .. "/utilitools") .. "/files/fileManager.lua")
 	if e then
-		log(mods.utilitools, "Error while loading file Mods/utilitools/fileManager.lua of Utilitools: " .. e)
+		log(mods.utilitools, "Error while loading file " .. (beatblockPlus2_0Update and mods.utilitools.path or mods.utilitools.config.modPath .. "/utilitools") .. "/fileManager.lua of Utilitools: " .. e)
 	else
 		utilitools.fileManager = setfenv(chunk, setmetatable({}, { __index = _G }))()
 	end
 end
 utilitoolsRegisterMods()
-updateControls()
 if utilitools.modChecks.general then -- mod checks failed (dependency/incompatibility)
 	cs = bs.load("UtilitoolsModCheck")
+else
+	updateControls()
 end
 '''
-match_indent = true
-
+position = "after"
+target = "main.lua"
 
 # Prompts ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "main.lua"
-pattern = '''prof.pop("fg draw")'''
-position = "before"
-payload = '''	if utilitools.prompts then utilitools.prompts.imgui() end'''
 match_indent = true
-
+pattern = 'prof.pop("fg draw")'
+payload = "	if utilitools.prompts then utilitools.prompts.imgui() end"
+position = "before"
+target = "main.lua"
 
 # Hotkeys ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
 [patches.pattern]
-target = "main.lua"
-pattern = '''i = { "key:i" },'''
-position = "after"
-payload = '''tab = { "key:tab" },'''
 match_indent = true
-
-[[patches]]
-[patches.pattern]
-target = "main.lua"
-pattern = '''PopupManager.update(dt)'''
-position = "after"
+pattern = "PopupManager.update(dt)"
 payload = '''
-if maininput:pressed(utilitools.keybinds.keyName(mods.utilitools, "reloadHotkey")) then
-	utilitools.fileManager.loadAll(true)
+for modId, modFiles in pairs(utilitools.files) do
+	if modFiles.keys then
+		for key, func in pairs(modFiles.keys) do
+			if utilitools.keybinds.pressed(mods[modId], key) then
+				if type(func) == "function" then func() end
+			end
+		end
+	end
 end
 '''
-match_indent = true
+position = "after"
+target = "main.lua"

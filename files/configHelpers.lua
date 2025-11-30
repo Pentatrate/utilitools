@@ -1,7 +1,7 @@
 local mod, configOptions, docs
 local configHelpers = {}
 configHelpers.convertType = function(type)
-	return "input" .. string.upper(string.sub(type, 1, 1)) .. string.sub(type, 2)
+	return "input" .. type:sub(1, 1):upper() .. type:sub(2)
 end
 configHelpers.exists = function(key)
 	if key == nil then return false end
@@ -37,8 +37,8 @@ configHelpers.failReason = function(key)
 end
 configHelpers.checkTemp = function(key)
 	if configHelpers.failReason(key) ~= "No setting" then return false end
-	if string.sub(key, - #"_temp") == "_temp" then
-		return configHelpers.exists(string.sub(key, 1, -1 - #"_temp"))
+	if key:sub(-#"_temp") == "_temp" then
+		return configHelpers.exists(key:sub(1, -1 - #"_temp"))
 	else
 		return false
 	end
@@ -216,8 +216,8 @@ configHelpers.inputKey = function(key)
 		return
 	end
 	utilitools.imguiHelpers.inputKey(
-		configHelpers.convertLabel(key), utilitools.keybinds.getModCategory(mod),
-		utilitools.keybinds.keyName(mod, key), configHelpers.tooltip(key)
+		configHelpers.convertLabel(key), mod,
+		key, configHelpers.tooltip(key), true
 	)
 end
 configHelpers.condTreeNode = function(label, key, target, same, func, flags)
@@ -260,7 +260,7 @@ configHelpers.registerMod = function(mod2)
                 log(mod, "Initializing config option: " .. k)
             end
 			if v.type == "key" then
-				utilitools.keybinds.registerKey(mod, k, v.default)
+				utilitools.keybinds.register.newKey(mod, k, v.default)
 			end
 		else
 			log(mod, "Invalid config option: " .. k)
@@ -305,7 +305,7 @@ configHelpers.presets = {
 		if mod.config.search ~= "" and prevSearch ~= mod.config.search then
 			utilitools.config.search[mod.id] = { {}, {}, {}, {}, {} }
 			local function find(s)
-				return string.find(string.lower(s), string.lower(mod.config.search), nil, true)
+				return s:lower():find(mod.config.search:lower(), nil, true)
 			end
 			for k, v in pairs(configOptions) do
 				if configHelpers.exists(k) and k ~= "search" then
