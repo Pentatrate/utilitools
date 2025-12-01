@@ -92,6 +92,14 @@ suggest expansion
 
 keybinds full rework
 
+1.1.5
+
+utilitools.request(url, type)
+
+1.1.6
+
+utilitools.table.valuesToKeys(...)
+
 ]]
 	}
 }

@@ -38,6 +38,11 @@ utilitools = {
 			local r = {}
 			for k, _ in pairs(t) do table.insert(r, k) end
 			return r
+		end,
+		valuesToKeys = function(t)
+			local r = {}
+			for _, v in ipairs(t) do r[v] = true end
+			return r
 		end
 	},
 	string = {
