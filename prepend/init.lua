@@ -55,7 +55,20 @@ utilitools = {
 	},
 	imgui = {
 		color = function(...) return imgui.ColorConvertFloat4ToU32(imgui.ImVec4_Float(...)) end
-	}
+	},
+	request = function(url, type)
+		local code, body = require("https").request(url)
+
+		if code == 200 then
+			if type == "json" then
+				return json.decode(body)
+			else
+				return body
+			end
+		else
+			error("Request error: http code " .. code .. " | url: " .. tostring(url))
+		end
+	end
 }
 
 forceprint = print
