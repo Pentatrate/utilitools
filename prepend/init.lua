@@ -108,7 +108,7 @@ utilitools = {
 							fileExtention = ({ lua = true, json = true, md = true, toml = true })[fileExtention[#fileExtention]]
 						end
 						local fromFileData = love.filesystem.read(fileExtention and "string" or "data", fromFile)
-						if isMod and fileExtention then
+						if isMod and fileExtention and hasGit then
 							fromFileData = fromFileData:gsub(string.char(13) .. string.char(10), string.char(10)):gsub(string.char(10), string.char(13) .. string.char(10))
 						end
 						love.filesystem.write(toFile, fromFileData)
