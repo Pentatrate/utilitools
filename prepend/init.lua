@@ -73,7 +73,101 @@ utilitools = {
 		else
 			error("Request error: http code " .. code .. " | url: " .. tostring(url))
 		end
-	end
+	end,
+	relaunch = function()
+		local launchArgs = table.concat(arg, " ")
+
+		local osName = love.system.getOS()
+		local command = ""
+
+		if osName == "Windows" then
+			command = "start beatblock.exe " .. launchArgs
+		elseif osName == "OS X" then
+			command = "open beatblock.app " .. launchArgs .. " &"
+		else -- assume Linux
+			command = "./beatblock " .. launchArgs .. " &"
+		end
+
+		love.window.close()
+		os.execute(command)
+		love.event.quit()
+	end,
+	folderManager = {
+		ignoreFiles = { [".git"] = true, [".gitignore"] = true, [".vscode"] = true, [".lovelyignore"] = true, [".nolovelyignore"] = true, ["config.json"] = true, unused = true },
+		copy = function(to, from, isMod, hasGit)
+			if isMod and not hasGit and mods.utilitools.config.gitFix and love.filesystem.exists(to .. "/.git") then hasGit = true forceprint("Has git") end
+			for i, fileName in ipairs(love.filesystem.getDirectoryItems(from)) do
+				local toFile = to .. "/" .. fileName
+				local fromFile = from .. "/" .. fileName
+				local fromFileInfo = love.filesystem.getInfo(fromFile)
+				if fromFileInfo and (not isMod or not utilitools.folderManager.ignoreFiles[fileName]) then
+					if fromFileInfo.type == "file" then
+						local fileExtention
+						if isMod then
+							fileExtention = utilitools.string.split(fromFile, "%.")
+							fileExtention = ({ lua = true, json = true, md = true, toml = true })[fileExtention[#fileExtention]]
+						end
+						local fromFileData = love.filesystem.read(fileExtention and "string" or "data", fromFile)
+						if isMod and fileExtention then
+							fromFileData = fromFileData:gsub(string.char(13) .. string.char(10), string.char(10)):gsub(string.char(10), string.char(13) .. string.char(10))
+						end
+						love.filesystem.write(toFile, fromFileData)
+					elseif fromFileInfo.type == "directory" then
+						love.filesystem.createDirectory(toFile)
+						utilitools.folderManager.copy(toFile, fromFile, isMod, hasGit)
+					end
+				end
+			end
+		end,
+		delete = function(path, isMod)
+			for _, fileName in ipairs(love.filesystem.getDirectoryItems(path)) do
+				local filePath = path .. "/" .. fileName
+				local fileInfo = love.filesystem.getInfo(filePath)
+				if fileInfo and (not isMod or not utilitools.folderManager.ignoreFiles[fileName]) then
+					if fileInfo.type == "file" then
+						if not love.filesystem.remove(filePath) then forceprint("failed to delete " .. filePath) end
+					elseif fileInfo.type == "directory" then
+						utilitools.folderManager.delete(filePath, isMod)
+					end
+				end
+			end
+			if not love.filesystem.remove(path) then forceprint("failed to delete " .. path) end
+		end,
+		compare = function(path, path2, isMod, prints)
+			if love.filesystem.getInfo(path) == nil then if prints then forceprint("No directory: " .. tostring(path)) end return false end
+			if love.filesystem.getInfo(path2) == nil then if prints then forceprint("No directory: " .. tostring(path2)) end return false end
+
+			for _, fileName in ipairs(love.filesystem.getDirectoryItems(path)) do
+				local filePath = path .. "/" .. fileName
+				local fileInfo = love.filesystem.getInfo(filePath)
+				local filePath2 = path2 .. "/" .. fileName
+				local fileInfo2 = love.filesystem.getInfo(filePath2)
+				if fileInfo and (not isMod or not utilitools.folderManager.ignoreFiles[fileName]) then
+					if fileInfo2 == nil then if prints then forceprint("No file: " .. tostring(filePath2)) end return false end
+					if fileInfo.type ~= fileInfo2.type then if prints then forceprint("Different file types: " .. tostring(fileInfo.type) .. " " .. tostring(fileInfo2.type)) end return false end
+
+					if fileInfo.type == "file" then
+						local content, size = love.filesystem.read(filePath)
+						local content2, size2 = love.filesystem.read(filePath2)
+						content = content:gsub(string.char(13) .. string.char(10), string.char(10))
+						content2 = content2:gsub(string.char(13) .. string.char(10), string.char(10))
+						if content ~= content2 then if prints then
+							forceprint("Different file content: " .. tostring(filePath) .. " (" .. size .. ") " .. tostring(filePath2) .. " (" .. size2 .. ") => " .. (size - size2))
+							for i = 1, #content do
+								if content:sub(i, i) ~= content2:sub(i, i) then
+									forceprint("Char " .. i .. ": \"" .. tostring(content:sub(i, i)) .. '" | "' .. tostring(content2:sub(i, i)) .. '" | '  .. tostring(content:sub(i, i):byte()) .. " " .. tostring(content2:sub(i, i):byte()))
+									break
+								end
+							end
+						end return false end
+					elseif fileInfo.type == "directory" then
+						return utilitools.folderManager.compare(filePath, filePath2, isMod, prints)
+					end
+				end
+			end
+			return true
+		end
+	}
 }
 
 forceprint = print

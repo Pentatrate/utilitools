@@ -48,10 +48,24 @@
 		"default": [],
 		"off": []
 	},
+	"relaunchHotkey": {
+		"type": "key",
+		"name": "Relaunch Hotkey",
+		"tooltips": { "short": "Hotkey to relaunch the game" },
+		"default": [],
+		"off": []
+	},
 	"unknownPrints": {
 		"type": "bool",
 		"name": "Find prints",
 		"tooltips": { "short": "Fake an error for every print" },
+		"default": false,
+		"off": false
+	},
+	"gitFix": {
+		"type": "bool",
+		"name": "Git Fix",
+		"tooltips": { "short": "Fixes the visual bug in git where invisble changes get indicated when a version has been downloaded via utilitools" },
 		"default": false,
 		"off": false
 	}
