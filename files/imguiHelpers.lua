@@ -174,6 +174,29 @@ imguiHelpers.inputKey = function(label, category, keyId, tooltip, modded)
 	imgui.Text(imguiHelpers.visibleLabel(label))
 	imguiHelpers.tooltip(tooltip)
 end
+imguiHelpers.inputBranch = function(mod, tooltip)
+	if utilitools.modLinks[version][mod.id] == nil then return end
+
+	local values = { "main" }
+	local valueTooltips = { "Use the latest commit on the main branch" }
+	if utilitools.modUpdater.releaseData(mod).name ~= nil then
+		table.insert(values, 1, "      ")
+		table.insert(valueTooltips, 1, "Use the latest release")
+	end
+
+	for k, _ in pairs(utilitools.modLinks[version][mod.id].branch) do
+		if not (beatblockPlus2_0Update and bbp.utils.tableContains or tableContains)(values, k) then
+			table.insert(values, k)
+			table.insert(valueTooltips, "Use the latest commit on the " .. k .. " branch")
+		end
+	end
+
+	return utilitools.modUpdater.branch(mod, utilitools.imguiHelpers.inputCombo(
+		"Branch##" .. mod.id .. "Config_branch", mods.utilitools.config.branches[mod.id], mods.utilitools.config.defaultBranch,
+		tooltip, utilitools.files.utilitools.configOptions.branches.flags,
+		values, valueTooltips
+	))
+end
 imguiHelpers.condTreeNode = function(label, name, current, target, same, func, flags)
 	local condition = (current == target) == same
 	if not condition then

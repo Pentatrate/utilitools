@@ -6,7 +6,7 @@ local function load(mod, file, reload)
 		if reload then utilitools.files[mod.id][file.name] = nil end
 
 		if utilitools.files[mod.id][file.name] == nil then
-			local path = (beatblockPlus2_0Update and mod.path or mods.utilitools.config.modPath .. "/" .. mod.id) .. "/"
+			local path = utilitools.folderManager.modPath(mod) .. "/"
 			if file.name ~= "config" or file.extension ~= "lua" then path = path .. "files/" end
 			path = path .. file.name .. "."
 			if file.extension == "lua" then

@@ -4,94 +4,6 @@ utilitools = {
 	dependencies = {},
 	incompatibilities = {},
 	modChecks = { general = false, dependencies = false, incompatibilities = false },
-	config = {
-		foldAll = false,
-		save = function(mod)
-			if beatblockPlus2_0Update then
-				dpf.saveJson(mod.path .. "/config.json", mod.config)
-			else
-				dpf.saveJson((beatblockPlus2_0Update and mod.path or mods.utilitools.config.modPath .. "/" .. mod.id) .. "/mod.json", { id = mod.id, name = mod.name, author = mod.author, description = mod.description, version = mod.version, enabled = mod.enabled, config = mod.config })
-			end
-		end,
-		search = {}
-	},
-	try = function(mod, func)
-		local success, e = pcall(func)
-		if not success then log(mod, debug.traceback(e, 1)) end
-	end,
-	eases = { -- Copied from kakadus-demo-mods
-		"linear",
-		"inSine", "outSine", "inOutSine",
-		"inQuad", "outQuad", "inOutQuad",
-		"inCubic", "outCubic", "inOutCubic",
-		"inQuart", "outQuart", "inOutQuart",
-		"inQuint", "outQuint", "inOutQuint",
-		"inExpo", "outExpo", "inOutExpo",
-		"inCirc", "outCirc", "inOutCirc",
-		"inElastic", "outElastic", "inOutElastic",
-		"inBack", "outBack", "inOutBack",
-		"inSquaredCirc", "outSquaredCirc", "inOutSquaredCirc",
-		"inBounce", "outBounce", "inOutBounce"
-	},
-	table = {
-		keysToValues = function(t)
-			local r = {}
-			for k, _ in pairs(t) do table.insert(r, k) end
-			return r
-		end,
-		valuesToKeys = function(t)
-			local r = {}
-			for _, v in ipairs(t) do r[v] = true end
-			return r
-		end
-	},
-	string = {
-		split = function(s, c) -- only splits using chars
-			if c:sub(1, 1) ~= "%" and #c ~= 1 then
-				error("utilitools.string.split: second parameter must be a single character")
-			end
-			if c:sub(1, 1) == "%" and #c ~= 2 then
-				error("utilitools.string.split: second parameter must be a single character (+ escaping character)")
-			end
-			local r = {}
-			for w in s:gmatch("[^" .. c .. "]+") do table.insert(r, w) end
-			return r
-		end
-	},
-	imgui = {
-		color = function(...) return imgui.ColorConvertFloat4ToU32(imgui.ImVec4_Float(...)) end
-	},
-	request = function(url, type)
-		local code, body = require("https").request(url)
-
-		if code == 200 then
-			if type == "json" then
-				return json.decode(body)
-			else
-				return body
-			end
-		else
-			error("Request error: http code " .. code .. " | url: " .. tostring(url))
-		end
-	end,
-	relaunch = function()
-		local launchArgs = table.concat(arg, " ")
-
-		local osName = love.system.getOS()
-		local command = ""
-
-		if osName == "Windows" then
-			command = "start beatblock.exe " .. launchArgs
-		elseif osName == "OS X" then
-			command = "open beatblock.app " .. launchArgs .. " &"
-		else -- assume Linux
-			command = "./beatblock " .. launchArgs .. " &"
-		end
-
-		love.window.close()
-		os.execute(command)
-		love.event.quit()
-	end,
 	folderManager = {
 		ignoreFiles = { [".git"] = true, [".gitignore"] = true, [".vscode"] = true, [".lovelyignore"] = true, [".nolovelyignore"] = true, ["config.json"] = true, unused = true },
 		copy = function(to, from, isMod, hasGit)
@@ -110,6 +22,11 @@ utilitools = {
 						local fromFileData = love.filesystem.read(isMod and fileExtention and hasGit and "string" or "data", fromFile)
 						if isMod and fileExtention and hasGit then
 							fromFileData = fromFileData:gsub(string.char(13) .. string.char(10), string.char(10)):gsub(string.char(10), string.char(13) .. string.char(10))
+						end
+						if isMod and not beatblockPlus2_0Update and fromFile == "mod.json" then
+							fromFileData = json.decode(fromFileData)
+							fromFileData.config = mod.config
+							fromFileData = json.encode(fromFileData)
 						end
 						love.filesystem.write(toFile, fromFileData)
 					elseif fromFileInfo.type == "directory" then
@@ -166,8 +83,192 @@ utilitools = {
 				end
 			end
 			return true
+		end,
+		modPath = function(mod) return beatblockPlus2_0Update and mod.path or mods.utilitools.config.modPath .. "/" .. mod.id end
+	},
+	config = {
+		foldAll = false,
+		save = function(mod)
+			if beatblockPlus2_0Update then
+				dpf.saveJson(mod.path .. "/config.json", mod.config)
+			else
+				dpf.saveJson(utilitools.folderManager.modPath(mod) .. "/mod.json", { id = mod.id, name = mod.name, author = mod.author, description = mod.description, version = mod.version, enabled = mod.enabled, config = mod.config })
+			end
+		end,
+		search = {}
+	},
+	try = function(mod, func)
+		local success, e = pcall(func)
+		if not success then log(mod, debug.traceback(e, 1)) end
+	end,
+	eases = { -- Copied from kakadus-demo-mods
+		"linear",
+		"inSine", "outSine", "inOutSine",
+		"inQuad", "outQuad", "inOutQuad",
+		"inCubic", "outCubic", "inOutCubic",
+		"inQuart", "outQuart", "inOutQuart",
+		"inQuint", "outQuint", "inOutQuint",
+		"inExpo", "outExpo", "inOutExpo",
+		"inCirc", "outCirc", "inOutCirc",
+		"inElastic", "outElastic", "inOutElastic",
+		"inBack", "outBack", "inOutBack",
+		"inSquaredCirc", "outSquaredCirc", "inOutSquaredCirc",
+		"inBounce", "outBounce", "inOutBounce"
+	},
+	table = {
+		keysToValues = function(t)
+			local r = {}
+			for k, _ in pairs(t) do table.insert(r, k) end
+			return r
+		end,
+		valuesToKeys = function(t)
+			local r = {}
+			for _, v in ipairs(t) do r[v] = true end
+			return r
 		end
-	}
+	},
+	string = {
+		split = function(s, c) -- only splits using chars
+			if c:sub(1, 1) ~= "%" and #c ~= 1 then
+				error("utilitools.string.split: second parameter must be a single character")
+			end
+			if c:sub(1, 1) == "%" and #c ~= 2 then
+				error("utilitools.string.split: second parameter must be a single character (+ escaping character)")
+			end
+			local r = {}
+			for w in s:gmatch("[^" .. c .. "]+") do table.insert(r, w) end
+			return r
+		end
+	},
+	imgui = {
+		color = function(...) return imgui.ColorConvertFloat4ToU32(imgui.ImVec4_Float(...)) end
+	},
+	internet = {
+		cache = {},
+		httpCodes = {
+			[1] = { "Info", {
+				[0] = "Continue",
+				[1] = "Switching Protocols",
+				[2] = "Processing",
+				[3] = "Early Hints"
+			} },
+			[2] = { "Success", {
+				[0] = "Ok",
+				[1] = "Created",
+				[2] = "Accepted",
+				[3] = "Non-Authoritative Info",
+				[4] = "No Content",
+				[5] = "Reset Content",
+				[6] = "Partial Content",
+				[7] = "Multi Status",
+				[8] = "Already Reported",
+				[26] = "IM used"
+			} },
+			[3] = { "Redirect", {
+				[0] = "Multiple Choices",
+				[1] = "Moved Permanently",
+				[2] = "Found",
+				[3] = "See Other",
+				[4] = "Not Modified",
+				[5] = "Use Proxy (deprecated)",
+				[6] = "(unused)",
+				[7] = "Temporary Redirect",
+				[8] = "Permanent Redirect"
+			} },
+			[4] = { "Client Error", {
+				[0] = "Bad Request",
+				[1] = "Unauthorized",
+				[2] = "Payment Required",
+				[3] = "Forbidden",
+				[4] = "Not Found",
+				[5] = "Method Not Allowed",
+				[6] = "Not Acceptible",
+				[7] = "Proxy Authentification Required",
+				[8] = "Request Timeout",
+				[9] = "Conflict",
+				[10] = "Gone",
+				[11] = "Length Required",
+				[12] = "Precondition Failed",
+				[13] = "Content Too Large",
+				[14] = "URI Too Long",
+				[15] = "Unsupported Media Type",
+				[16] = "Range Not Satisfiable",
+				[17] = "Expectation Failed",
+				[18] = "I'm a teapot",
+				[21] = "Misdirected Request",
+				[22] = "Unprocessable Content",
+				[23] = "Locked",
+				[24] = "Failed Dependency",
+				[25] = "Too Early",
+				[26] = "Upgrade Required",
+				[28] = "Precondition Required",
+				[29] = "Too Many Requests",
+				[31] = "Request Header Fields Too Large",
+				[51] = "Unavaliable For Legal Reasons"
+			} },
+			[5] = { "Server Error", {
+				[0] = "Internal Server Error",
+				[1] = "Not Implemented",
+				[2] = "Bad Gateway",
+				[3] = "Service Unavaliable",
+				[4] = "Gateway Timeout",
+				[5] = "HTTP Version Not Supported",
+				[6] = "Variant Also Negotiates",
+				[7] = "Insufficient Storage",
+				[8] = "Loop Detected",
+				[10] = "Not Extended",
+				[11] = "Network Authentification Required",
+			} }
+		},
+		request = function(url, type, rerequest)
+			local code, body
+			if not rerequest and utilitools.internet.cache[url] then
+				code, body = 200, utilitools.internet.cache[url]
+			else
+				code, body = require("https").request(url, { headers = { ["User-Agent"] = "utilitools/" .. mods.utilitools.version } })
+			end
+
+			if code == 200 then
+				utilitools.internet.cache[url] = body
+				if type == "json" then
+					return json.decode(body)
+				else
+					return body
+				end
+			else
+				log(mod, "Request error: http code " .. tostring(code) .. ": " .. utilitools.internet.httpCodes[math.floor(code / 100)][1] .. ": " .. utilitools.internet.httpCodes[math.floor(code / 100)][2][code % 100] .. " | url: " .. tostring(url) .. " | ")
+			end
+		end
+	},
+	doRelaunch = false,
+	relaunch = function(crash)
+		local launchArgs = table.concat(arg, " ")
+
+		local osName = love.system.getOS()
+		local command = ""
+
+		if osName == "Windows" then
+			command = "start beatblock.exe " .. launchArgs
+		elseif osName == "OS X" then
+			command = "open beatblock.app " .. launchArgs .. " &"
+		else -- assume Linux
+			command = "./beatblock " .. launchArgs .. " &"
+		end
+
+		local success = false
+		utilitools.try(mod, function()
+			love.window.close()
+			os.execute(command)
+			love.event.quit()
+			success = true
+		end)
+		if not success then
+			utilitools.doRelaunch = true
+			if crash then
+				error("Utilitools: Failed to quit")
+			end
+		end
+	end
 }
 
 forceprint = print
@@ -229,7 +330,7 @@ local function utilitoolsRegisterMods()
 		end
 	end
 	local function registerMod(mod, onlyCompat)
-		local path = beatblockPlus2_0Update and mod.path or mods.utilitools.config.modPath .. "/" .. mod.id
+		local path = utilitools.folderManager.modPath(mod)
 		if love.filesystem.getInfo(path, "directory") then
 			if love.filesystem.getInfo(path .. "/utilitools.json", "file") then
 				if modsData[mod.id] == nil then modsData[mod.id] = dpf.loadJson(path .. "/utilitools.json") end

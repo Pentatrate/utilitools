@@ -66,7 +66,59 @@
 		"type": "bool",
 		"name": "Git Fix",
 		"tooltips": { "short": "Fixes the visual bug in git where invisble changes get indicated when a version has been downloaded via utilitools" },
+		"default": false
+	},
+	"autoUpdate": {
+		"type": "bool",
+		"name": "Auto Update",
+		"tooltips": { "short": "Allow using the internet to update other mods\nNot scanning for viruses!" },
 		"default": false,
 		"off": false
+	},
+	"askUpdate": {
+		"type": "hidden",
+		"name": "[internal] askUpdate",
+		"default": true,
+		"off": false
+	},
+	"defaultBranch": {
+		"type": "combo",
+		"name": "Default Branch",
+		"tooltips": { "short": "Default for different ways to get different versions" },
+		"values": [ "      ", "main" ],
+		"valueTooltips": [
+			{ "short": "Use the latest release" },
+			{ "short": "Use the latest commit on the main branch" }
+		],
+		"default": "      "
+	},
+	"showCompareMod": {
+		"type": "bool",
+		"name": "Compare Mod Buttons",
+		"tooltips": { "short": "Buttons to compare mod files" },
+		"default": false
+	},
+	"showForceMod": {
+		"type": "bool",
+		"name": "Force Update Buttons",
+		"tooltips": { "short": "Buttons to force mod updates" },
+		"default": false
+	},
+	"branches": {
+		"type": "hidden",
+		"name": "[internal] branches",
+		"tooltips": { "short": "Different ways to get different versions" },
+		"default": {}
+	},
+	"updates": {
+		"type": "hidden",
+		"name": "[internal] updates",
+		"tooltips": { "short": "Allow the version for this mod to be autoupdated" },
+		"default": {}
+	},
+	"updated": {
+		"type": "hidden",
+		"name": "[internal] updated",
+		"default": {}
 	}
 }

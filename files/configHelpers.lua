@@ -64,13 +64,13 @@ configHelpers.off = function()
 		end
 	end
 end
-configHelpers.doc = function(key)
+configHelpers.doc = function(key, force, noSep)
 	if key == nil then return end
 	if mod == nil then return end
 	if docs == nil then return end
 	if docs[key] == nil then return end
 
-	if mod.config.documentation == nil or mod.config.documentation == "none" then return end
+	if not force and (mod.config.documentation == nil or mod.config.documentation == "none") then return end
 
 	local v = docs[key]
 	if type(v) == "table" then
@@ -82,7 +82,7 @@ configHelpers.doc = function(key)
 	end
 	if v then
 		imgui.TextWrapped(tostring(v))
-		imgui.Separator()
+		if not noSep then imgui.Separator() end
 	end
 end
 configHelpers.convertLabel = function(key)
@@ -219,6 +219,9 @@ configHelpers.inputKey = function(key)
 		configHelpers.convertLabel(key), mod,
 		key, configHelpers.tooltip(key), true
 	)
+end
+configHelpers.inputBranch = function()
+	mods.utilitools.config.branches[mod.id] = utilitools.imguiHelpers.inputBranch(mod, configHelpers.tooltip("branches"))
 end
 configHelpers.condTreeNode = function(label, key, target, same, func, flags)
 	if not configHelpers.exists(key) then return end
@@ -357,6 +360,13 @@ configHelpers.presets = {
 				end
 			end
 		end
+	end,
+	updateOptions = function()
+		mods.utilitools.config.updates[mod.id] = utilitools.imguiHelpers.inputBool(
+			"Updates##" .. mod.id, mods.utilitools.config.updates[mod.id], true,
+			configHelpers.tooltip("updates")
+		)
+		configHelpers.inputBranch()
 	end
 }
 

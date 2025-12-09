@@ -26,10 +26,44 @@ if true then -- Utilitools file loader
 	end
 end
 utilitoolsRegisterMods()
-if utilitools.modChecks.general then -- mod checks failed (dependency/incompatibility)
-	cs = bs.load("UtilitoolsModCheck")
+if mods.utilitools.config.askUpdate then
+	if not mods.utilitools.config.autoUpdate then
+		local buttonPressed = love.window.showMessageBox("Utilitools", "Welcome to Utilitools!\nDo you want to enable auto updating for mods?", { "Proceed", "Dont ask again" })
+		if buttonPressed == 1 then
+			mods.utilitools.config.autoUpdate = true
+		elseif buttonPressed == 2 then
+			mods.utilitools.config.askUpdate = false
+			utilitools.config.save(mods.utilitools)
+		end
+	end
+	if mods.utilitools.config.autoUpdate then
+		local buttonPressed = love.window.showMessageBox("Utilitools", "Auto updating will require internet access.\nMods will not be scanned for viruses.\nAre you sure?", { "Enable", "Nevermind" })
+		if buttonPressed == 1 then
+			mods.utilitools.config.askUpdate = false
+			utilitools.config.save(mods.utilitools)
+		elseif buttonPressed == 2 then
+			mods.utilitools.config.autoUpdate = false
+			mods.utilitools.config.askUpdate = false
+			utilitools.config.save(mods.utilitools)
+		end
+	end
+end
+if utilitools.modUpdater.updateMods() then
+	utilitools.doRelaunch = true
+	mods.utilitools.config.updated.hasUpdated = true
+	utilitools.config.save(mods.utilitools)
 else
-	updateControls()
+	if mods.utilitools.config.updated.hasUpdated then
+		if cs.name ~= project.initState then
+			mods.utilitools.config.updated.initState = cs.name
+		end
+		cs = bs.load("UtilitoolsUpdate")
+	elseif utilitools.modChecks.general then -- mod checks failed (dependency/incompatibility)
+		cs = bs.load("UtilitoolsModCheck")
+	else
+		updateControls()
+	end
+	mods.utilitools.config.updated.hasUpdated = false
 end
 '''
 position = "after"
@@ -59,6 +93,7 @@ for modId, modFiles in pairs(utilitools.files) do
 		end
 	end
 end
+if utilitools.doRelaunch then utilitools.relaunch(true) end
 '''
 position = "after"
 target = "main.lua"

@@ -1,5 +1,8 @@
 return { -- Penta: this is in lua and not json because i wanted the multiline string for the full description
 	-- Penta: when unspecified, it will default to json and try to load this file by default
+	autoUpdate = {
+		short = "You can manually manage versions for supported mods here"
+	},
 	fullDescription = {
 		short = [[
 ## How to set up your mod with utilitools:
@@ -56,50 +59,52 @@ return { -- Penta: this is in lua and not json because i wanted the multiline st
 # Version history
 
 1.0.0:
-
-(File) fileManager: File (re)loading
-(File) configHelpers
-(File) imguiHelpers
-(File) prompts
-mod interactions (Dependency/Incompatibility)
-utilitools.configs.save(mod)
-utilitools.try(mod, func)
-log(mod, string)
-forceprint(...)
+	(File) fileManager: File (re)loading
+	(File) configHelpers
+	(File) imguiHelpers
+	(File) prompts
+	mod interactions (Dependency/Incompatibility)
+	utilitools.configs.save(mod)
+	utilitools.try(mod, func)
+	log(mod, string)
+	forceprint(...)
 
 1.1.0:
-
-(File) versions: Version comparing
-mod interactions (respect versions)
-(File) keybinds (+ Additions to imgui/config helpers)
-prompts overhaul
+	(File) versions: Version comparing
+	mod interactions (respect versions)
+	(File) keybinds (+ Additions to imgui/config helpers)
+	prompts overhaul
 
 1.1.1
-
-Moved files to own folder (files) (affects fileManager)
+	Moved files to own folder (files) (affects fileManager)
 
 1.1.2
-
-utilitools.string.split(string, char)
+	utilitools.string.split(string, char)
 
 1.1.3
-
-suggest expansion
-	rename suggest.run(...) to suggest.suggest(...)
-	add suggest.dial(...)
+	suggest expansion
+		rename suggest.run(...) to suggest.suggest(...)
+		add suggest.dial(...)
 
 1.1.4
-
-keybinds full rework
+	keybinds full rework
 
 1.1.5
-
-utilitools.request(url, type)
+	utilitools.request(url, type)
 
 1.1.6
+	utilitools.table.valuesToKeys(...)
 
-utilitools.table.valuesToKeys(...)
+1.1.7
+	utilitools.relaunch()
+	utilitools.folderManager.copy(to, from, isMod, hasGit)
+	utilitools.folderManager.delete(path, isMod)
+	utilitools.folderManager.compare(path, path2, isMod, prints)
 
+1.1.10
+	utilitools.request(url, type) => utilitools.internet.request(url, type, rerequest)
+	(File) modLinks
+	(File) modUpdater
 ]]
 	}
 }

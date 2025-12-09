@@ -1,15 +1,10 @@
 {
-	"version": "1.1.9",
+	"version": "1.2.0",
 	"enabled": true,
 	"config": {
-		"isolateLogs": false,
-		"documentation": "none",
-		"tooltips": "long",
-		"search": "to",
-		"modPath": "Mods"
 	},
 	"id": "utilitools",
-	"description": "General mod API (made for beattools)",
+	"description": "General mod API (made for beattools)\nRestart code from eren",
 	"name": "Utilitools",
 	"author": "Pentatrate"
 }

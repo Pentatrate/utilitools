@@ -3,27 +3,27 @@
 (EA Mod)
 by Pentatrate
 
-## Info:
+## Info
 
-More up to date info about this mod can be found in the [beatblock modding discord server (click for invite)](https://discord.gg/VDvPUSCdGZ)
+More up to date info about this mod can be found in the [beatblock modding discord server (invite)](https://discord.gg/VDvPUSCdGZ)
 It has a dedicated post named `Utilitools` in the `ea-mods` forum
 
-## How to install:
+## How to install
 
 1. Download zip:
-   Either directly download the repository as a zip (I recommend this)
-   <img width="417" height="353" alt="image" src="https://github.com/user-attachments/assets/0653e3ef-cfe0-4b41-825f-a7e786feda4d" />
+	Either directly download the repository as a zip (I recommend this)
+	[Screenshot downloading as zip](https://github.com/user-attachments/assets/0653e3ef-cfe0-4b41-825f-a7e786feda4d)
 
-    or download the "latest" release (The latest release may not have features added in later commits)
-    <img width="354" height="145" alt="image" src="https://github.com/user-attachments/assets/2acbead3-fad3-476b-9525-43fb1d728cb6" />
+	or download the "latest" release (The latest release may not have features added in later commits)
+	[Screenshot to find releases](https://github.com/user-attachments/assets/2acbead3-fad3-476b-9525-43fb1d728cb6)
 
 2. Unzip and place in `beatblock/Mods/` folder (where all the other mods are)
 
-    **!!!Reminder!!!**: Make sure the mod.json file is in `beatblock/Mods/utilitools/mod.json` and **NOT** `beatblock/Mods/utilitools/utilitools/mod.json`
+	**!!!Reminder!!!**: Make sure the mod.json file is in `beatblock/Mods/utilitools/mod.json` and **NOT** `beatblock/Mods/utilitools/utilitools/mod.json`
 
 3. Relaunch modded beatblock
 
-## How to set up your mod with utilitools:
+## How to set up your mod with utilitools
 
 1. `utilitools.json` (bare minimum)
 
@@ -31,7 +31,7 @@ It has a dedicated post named `Utilitools` in the `ea-mods` forum
 
 	Create the `utilitools.json` file in the same folder next to the `mod.json` file with the following content.
 
-	```
+	```json
 	{ "dependencies": { "utilitools": { reason: "Required API", versions: [ [">=", "!!!current utilitools version, for example 1.1.2!!!"] ] } } }
 	```
 

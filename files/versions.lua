@@ -1,26 +1,28 @@
 local versions = {}
 
 versions.convert = function(v)
-	return utilitools.string.split(v, "%.")
+	local r = utilitools.string.split(v, "%.")
+	for i, n in ipairs(r) do
+		r[i] = tonumber(n:match("%d+"))
+	end
+	return r
 end
-versions.check = function(base, other, func)
+versions.check = function(base, other, func, notOther)
 	base = versions.convert(base)
 	other = versions.convert(other)
 	for i, a in ipairs(base) do
-		if func(a, other[i] or 0) then
-			return true
-		end
+		if func(a, other[i] or 0) then return true end
+		if not notOther and func(other[i] or 0, a) then return false end
 	end
 	if #base < #other then
 		for i = #base + 1, #other do
-			if func(0, other[i]) then
-				return true
-			end
+			if func(0, other[i]) then return true end
+			if not notOther and func(other[i], 0) then return false end
 		end
 	end
 	return false
 end
-versions.equal = function(base, other) return versions.check(base, other, function(a, b) return a == b end) end
+versions.equal = function(base, other) return not versions.check(base, other, function(a, b) return a ~= b end) end
 versions.less = function(base, other) return versions.check(base, other, function(a, b) return a < b end) end
 versions.more = function(base, other) return versions.check(base, other, function(a, b) return a > b end) end
 versions.lessEquals = function(...) return not versions.more(...) end
