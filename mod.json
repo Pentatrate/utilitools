@@ -1,10 +1,12 @@
 {
-	"version": "1.2.2",
+	"version": "1.2.3",
 	"enabled": true,
 	"config": {
 		"branches": {
-			"beattools": "main"
-		}
+			"beattools": "main",
+			"utilitools": "main"
+		},
+		"modPath": "Mods"
 	},
 	"id": "utilitools",
 	"description": "General mod API (made for beattools)\nRestart code from eren",

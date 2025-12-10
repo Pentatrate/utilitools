@@ -32,7 +32,7 @@ It has a dedicated post named `Utilitools` in the `ea-mods` forum
 	Create the `utilitools.json` file in the same folder next to the `mod.json` file with the following content.
 
 	```json
-	{ "dependencies": { "utilitools": { reason: "Required API", versions: [ [">=", "!!!current utilitools version, for example 1.1.2!!!"] ] } } }
+	{ "dependencies": { "utilitools": { reason: "Required API", versions: [ [">=", "!!!current utilitools version, for example 1.2.2!!!"] ] } } }
 	```
 
 	Obviously replace the placeholder string with the lowest utilitools version your mod is compatible with.

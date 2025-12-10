@@ -25,6 +25,14 @@ if true then -- Utilitools file loader
 		utilitools.fileManager = setfenv(chunk, setmetatable({}, { __index = _G }))()
 	end
 end
+if not beatblockPlus2_0Update then -- Check for unrenamed folders of commit downloads
+	for _, modId in ipairs({ "utilitools", "beattools", "test" }) do
+		if mods[modId] and love.filesystem.exists((mods.utilitools.config.modPath or "Mods") .. "/" .. modId .. "-main") then
+			utilitools.folderManager.copy((mods.utilitools.config.modPath or "Mods") .. "/" .. modId, (mods.utilitools.config.modPath or "Mods") .. "/" .. modId .. "-main")
+			utilitools.folderManager.delete((mods.utilitools.config.modPath or "Mods") .. "/" .. modId .. "-main")
+		end
+	end
+end
 utilitoolsRegisterMods()
 if mods.utilitools.config.askUpdate then
 	if not mods.utilitools.config.autoUpdate then
