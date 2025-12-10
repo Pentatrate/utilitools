@@ -78,8 +78,10 @@ modUpdater.directDownloadMod = function(mod, url, onlyCompare, force, redownload
 		local newConfigs
 		if not force or not beatblockPlus2_0Update then
 			newConfigs = dpf.loadJson(downloadPath .. "/mod.json")
-			newConfigs.config = mod.config
-			dpf.saveJson(downloadPath .. "/mod.json", newConfigs)
+			if not beatblockPlus2_0Update then
+				newConfigs.config = mod.config
+				dpf.saveJson(downloadPath .. "/mod.json", newConfigs)
+			end
 		end
 		if force or utilitools.versions.more(newConfigs.version, modUpdater.getModInfo(mod).version) then
 			if onlyCompare then
