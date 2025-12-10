@@ -58,6 +58,7 @@ utilitools.try(mod, function()
 				if utilitools.modUpdater.checkModVersion(mod) then
 					if imgui.Button("Update Version##" .. mod.id) then
 						utilitools.modUpdater.downloadMod(mod)
+						utilitools.config.save(mod)
 					end
 				else
 					if imgui.Button("Force Update Version Anyways##" .. mod.id) then

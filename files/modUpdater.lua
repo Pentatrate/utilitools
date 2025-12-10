@@ -37,17 +37,34 @@ modUpdater.getModInfo = function(mod, recheck)
 end
 
 -- downloading
+modUpdater.changeMessage = function(mod, branch, redownload)
+	if type(mod) ~= "table" then error("modUpdater.downloadLink: expected table for mod") end
+	branch = modUpdater.branch(mod, branch)
+
+	if branch == "      " then
+		if modUpdater.releaseData(mod, redownload) == nil then return end
+		return modUpdater.releaseData(mod).name .. "\n" .. modUpdater.releaseData(mod).body
+	else
+		return utilitools.internet.request("https://api.github.com/repos/" .. modUpdater.getSub(mod) .. "/commits/" .. branch, "json", redownload).commit.message
+	end
+end
 modUpdater.downloadLink = function(mod, branch)
 	if type(mod) ~= "table" then error("modUpdater.downloadLink: expected table for mod") end
 	branch = modUpdater.branch(mod, branch)
+
 	if branch == "      " then
 		if modUpdater.releaseData(mod) == nil then return end
+		for _, v in ipairs(modUpdater.releaseData(mod).assets) do
+			if v.name:sub(-#".zip") == ".zip" then
+				return v.browser_download_url
+			end
+		end
 		return modUpdater.releaseData(mod).assets[1].browser_download_url
 	else
 		return "https://github.com/" .. modUpdater.getSub(mod) .. "/archive/refs/heads/" .. branch .. ".zip"
 	end
 end
-modUpdater.directDownloadMod = function(mod, url, onlyCompare, force, redownload)
+modUpdater.directDownloadMod = function(mod, url, onlyCompare, force, redownload, message)
 	if type(mod) ~= "table" then error("modUpdater.directDownloadMod: expected table for mod") end
 
 	local rawData = utilitools.internet.request(url, nil, redownload)
@@ -66,18 +83,20 @@ modUpdater.directDownloadMod = function(mod, url, onlyCompare, force, redownload
 				forceprint("Same content: " .. tostring(utilitools.folderManager.compare(path, downloadPath, true, true)))
 				forceprint("Same content: " .. tostring(utilitools.folderManager.compare(downloadPath, path, true, true)))
 			else
-				modUpdater.fileCache[mod.id] = nil
+				mods.utilitools.config.updated.hasUpdated = true
 				mods.utilitools.config.updated.mods = mods.utilitools.config.updated.mods or {}
 				mods.utilitools.config.updated.mods[mod.id] = {
 					oldVersion = modUpdater.getModInfo(mod).version,
-					version = newVersion
+					version = newVersion,
+					message = message
 				}
 				utilitools.folderManager.delete(path, true)
 				utilitools.folderManager.copy(path, downloadPath, true)
+				modUpdater.fileCache[mod.id] = nil
 				forceprint("Downloaded mod " .. mod.id)
 			end
 		else
-			forceprint("No new mod version for " .. mod.id .. " (current: " .. modUpdater.getModInfo(mod).version .. " >= downloaded: " .. newVersion .. ")")
+			log(mod, "No new mod version for " .. mod.id .. " (current: " .. modUpdater.getModInfo(mod).version .. " >= downloaded: " .. newVersion .. ")")
 		end
 		break
 	end
@@ -86,7 +105,7 @@ end
 modUpdater.downloadMod = function(mod, branch, onlyCompare, force, redownload)
 	if type(mod) ~= "table" then error("modUpdater.downloadMod: expected table for mod") end
 	branch = modUpdater.branch(mod, branch)
-	modUpdater.directDownloadMod(mod, modUpdater.downloadLink(mod, branch), onlyCompare, force, redownload)
+	modUpdater.directDownloadMod(mod, modUpdater.downloadLink(mod, branch), onlyCompare, force, redownload, modUpdater.changeMessage(mod, branch, redownload))
 end
 
 -- scanning

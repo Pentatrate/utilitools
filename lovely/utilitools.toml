@@ -58,7 +58,6 @@ if mods.utilitools.config.askUpdate then
 end
 if utilitools.modUpdater.updateMods() then
 	utilitools.doRelaunch = true
-	mods.utilitools.config.updated.hasUpdated = true
 	utilitools.config.save(mods.utilitools)
 else
 	if mods.utilitools.config.updated.hasUpdated then
