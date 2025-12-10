@@ -75,9 +75,13 @@ modUpdater.directDownloadMod = function(mod, url, onlyCompare, force, redownload
 	for _, fileName in pairs(love.filesystem.getDirectoryItems("modZip")) do
 		local path = utilitools.folderManager.modPath(mod)
 		local downloadPath = "modZip/" .. fileName
-		local newVersion
-		if not force then newVersion = dpf.loadJson(downloadPath .. "/mod.json").version end
-		if force or utilitools.versions.more(newVersion, modUpdater.getModInfo(mod).version) then
+		local newConfigs
+		if not force or not beatblockPlus2_0Update then
+			newConfigs = dpf.loadJson(downloadPath .. "/mod.json")
+			newConfigs.config = mod.config
+			dpf.saveJson(downloadPath .. "/mod.json", newConfigs)
+		end
+		if force or utilitools.versions.more(newConfigs.version, modUpdater.getModInfo(mod).version) then
 			if onlyCompare then
 				forceprint("Comparing " .. mod.name .. " (" .. modUpdater.getModInfo(mod).version .. ") by " .. mod.author)
 				forceprint("Same content: " .. tostring(utilitools.folderManager.compare(path, downloadPath, true, true)))
@@ -87,7 +91,7 @@ modUpdater.directDownloadMod = function(mod, url, onlyCompare, force, redownload
 				mods.utilitools.config.updated.mods = mods.utilitools.config.updated.mods or {}
 				mods.utilitools.config.updated.mods[mod.id] = {
 					oldVersion = modUpdater.getModInfo(mod).version,
-					version = newVersion,
+					version = newConfigs.version,
 					message = message
 				}
 				utilitools.folderManager.delete(path, true)
@@ -96,7 +100,7 @@ modUpdater.directDownloadMod = function(mod, url, onlyCompare, force, redownload
 				forceprint("Downloaded mod " .. mod.id)
 			end
 		else
-			log(mod, "No new mod version for " .. mod.id .. " (current: " .. modUpdater.getModInfo(mod).version .. " >= downloaded: " .. newVersion .. ")")
+			log(mod, "No new mod version for " .. mod.id .. " (current: " .. modUpdater.getModInfo(mod).version .. " >= downloaded: " .. newConfigs.version .. ")")
 		end
 		break
 	end
