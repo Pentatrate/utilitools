@@ -84,7 +84,7 @@ utilitools = {
 			end
 			return true
 		end,
-		modPath = function(mod) return beatblockPlus2_0Update and mod.path or mods.utilitools.config.modPath .. "/" .. mod.id end
+		modPath = function(mod) return beatblockPlus2_0Update and mod.path or (mods.utilitools.config.modPath or "Mods") .. "/" .. mod.id end
 	},
 	config = {
 		foldAll = false,
@@ -101,20 +101,6 @@ utilitools = {
 		local success, e = pcall(func)
 		if not success then log(mod, debug.traceback(e, 1)) end
 	end,
-	eases = { -- Copied from kakadus-demo-mods
-		"linear",
-		"inSine", "outSine", "inOutSine",
-		"inQuad", "outQuad", "inOutQuad",
-		"inCubic", "outCubic", "inOutCubic",
-		"inQuart", "outQuart", "inOutQuart",
-		"inQuint", "outQuint", "inOutQuint",
-		"inExpo", "outExpo", "inOutExpo",
-		"inCirc", "outCirc", "inOutCirc",
-		"inElastic", "outElastic", "inOutElastic",
-		"inBack", "outBack", "inOutBack",
-		"inSquaredCirc", "outSquaredCirc", "inOutSquaredCirc",
-		"inBounce", "outBounce", "inOutBounce"
-	},
 	table = {
 		keysToValues = function(t)
 			local r = {}
@@ -298,7 +284,7 @@ print = function(...)
 end
 
 local function utilitoolsRegisterMods()
-	if not beatblockPlus2_0Update and not love.filesystem.getInfo(mods.utilitools.config.modPath, "directory") then return end
+	if not beatblockPlus2_0Update and not love.filesystem.getInfo(mods.utilitools.config.modPath or "Mods", "directory") then return end
 	local modsData = {}
 
 	local function checkForMod(modId, data)
