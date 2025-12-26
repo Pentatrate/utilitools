@@ -84,7 +84,20 @@ utilitools = {
 			end
 			return true
 		end,
-		modPath = function(mod) return beatblockPlus2_0Update and mod.path or (mods.utilitools.config.modPath or "Mods") .. "/" .. mod.id end
+		modPath = function(mod)
+			if beatblockPlus2_0Update then
+				return mod.path
+			else
+				local remap = {
+					["beatblock-plus"] = "BeatblockPlus",
+					["beatblock-plus-launcher"] = "BeatblockPlusLauncher"
+				}
+				if remap[mod.id] then
+					return (mods.utilitools.config.modPath or "Mods") .. "/" .. remap[mod.id]
+				end
+				return (mods.utilitools.config.modPath or "Mods") .. "/" .. mod.id
+			end
+		end
 	},
 	config = {
 		foldAll = false,
@@ -207,22 +220,26 @@ utilitools = {
 			} }
 		},
 		request = function(url, type, rerequest)
-			local code, body
-			if not rerequest and utilitools.internet.cache[url] then
-				code, body = 200, utilitools.internet.cache[url]
+			local code, body, time
+			local usedCache = false
+			if not rerequest and utilitools.internet.cache[url] and (utilitools.internet.cache[url][1] == 200 or love.timer.getTime() - utilitools.internet.cache[url][3] < 60) then
+				code, body, time = utilitools.internet.cache[url][1], utilitools.internet.cache[url][2], utilitools.internet.cache[url][3]
+				usedCache = true
 			else
 				code, body = require("https").request(url, { headers = { ["User-Agent"] = "utilitools/" .. mods.utilitools.version } })
+				-- code = 418 body = nil
+				time = love.timer.getTime()
 			end
 
+			utilitools.internet.cache[url] = { code, body, time }
 			if code == 200 then
-				utilitools.internet.cache[url] = body
 				if type == "json" then
 					return json.decode(body)
 				else
 					return body
 				end
-			else
-				log(mod, "Request error: http code " .. tostring(code) .. ": " .. utilitools.internet.httpCodes[math.floor(code / 100)][1] .. ": " .. utilitools.internet.httpCodes[math.floor(code / 100)][2][code % 100] .. " | url: " .. tostring(url) .. " | ")
+			elseif not usedCache then
+				log(mod, "Request error: http code " .. tostring(code) .. ": " .. (utilitools.internet.httpCodes[math.floor(code / 100)] or { code })[1] .. ": " .. (((utilitools.internet.httpCodes[math.floor(code / 100)] or {})[2] or {})[code % 100] or "not found") .. " | url: " .. tostring(url) .. " | ")
 			end
 		end
 	},

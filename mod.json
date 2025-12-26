@@ -1,10 +1,11 @@
 {
-	"version": "1.2.6",
+	"version": "1.2.7",
 	"enabled": true,
 	"config": {
 		"branches": {
 			"beattools": "main",
-			"utilitools": "main"
+			"utilitools": "main",
+			"beatblock-plus": "dev"
 		},
 		"modPath": "Mods"
 	},

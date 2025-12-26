@@ -88,9 +88,10 @@ prompts.imgui = function()
                 local errorTexts = {
                     "Error", "Curses!", "Dammit!", "Darn!", "Dang!", "Dangit!", "Task failed successfully.",
                     ":(", "):", ":C", ":c",
-                    --[[ k4kadu: ]] "naurr!", "That can't be healthy...",
+                    --[[ k4kadu: "I present this crashlog to thee, for thou hast met an unfortunate end to thine Beatblock session." ]] "naurr!", "That can't be healthy...", "I present this message to thee, for thou hast met an unfortunate end to thine fun.", "Now go forth and give Penatwate the necessary ingredients to perpend his next Beattools update.", "Be not too expedient to inherit the belief in this testy way of play. Despite **this message being sponsored by Beattools**, thou must still predict a sudden retirement of thine young charting progress.",
                     --[[ something4803: ]] "This error sucks:",
-                    --[[ irember135: "ypu fked upo the beat blokc you" ]] "you fked up the beat blocked you",
+                    --[[ irember135: "ypu fked upo the beat blokc you" ]] "You fked up the beat blocked you",
+					--[[ thatguytheman: ]] "Seriously?", "Damn it", "3:", "@penatwate Mod broke", "@penatwate Where were you when beatblock die",
                 }
                 table.insert(
                     errorTexts, 1, "Error Code " .. tostring(math.floor(prompts.random * (#errorTexts + 1) * 999))

@@ -43,7 +43,7 @@ utilitools.try(mod, function()
 	table.sort(modsSorted)
 	for _, modId in ipairs(modsSorted) do
 		local mod = mods[modId]
-		if utilitools.modLinks[version][modId] then
+		if utilitools.modLinks[modId] then
 			if modAmount ~= 0 then imgui.Separator() end
 			imgui.Indent()
 			imgui.TextWrapped(mod.name .. " (" .. mod.version .. ") by " .. mod.author)

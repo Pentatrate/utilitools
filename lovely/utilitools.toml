@@ -1,7 +1,7 @@
 [manifest]
-dump_lua = true
+dump_lua = true 
 priority = 2147483645 # 2147483647 - 2
-version = "1.0.0"
+version = "1.0.0" 
 
 # Logging ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -59,6 +59,7 @@ end
 if utilitools.modUpdater.updateMods() then
 	utilitools.doRelaunch = true
 	utilitools.config.save(mods.utilitools)
+	cs = bs.load("UtilitoolsEmpty")
 else
 	if mods.utilitools.config.updated.hasUpdated then
 		if cs.name ~= project.initState then
