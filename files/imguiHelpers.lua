@@ -177,25 +177,41 @@ end
 imguiHelpers.inputBranch = function(mod, tooltip)
 	if utilitools.modLinks[mod.id] == nil then return end
 
-	local values = { "main" }
+	local branchPrefix = "Latest commit to "
+
+	local values = { branchPrefix .. "main" }
 	local valueTooltips = { "Use the latest commit on the main branch" }
 	if (utilitools.modUpdater.releaseData(mod) or {}).name ~= nil then
-		table.insert(values, 1, "      ")
+		table.insert(values, 1, "Latest Release## ")
 		table.insert(valueTooltips, 1, "Use the latest release")
 	end
 
 	for k, _ in pairs(utilitools.modLinks[mod.id].branch) do
-		if not (beatblockPlus2_0Update and bbp.utils.tableContains or tableContains)(values, k) then
-			table.insert(values, k)
+		if not (beatblockPlus2_0Update and bbp.utils.tableContains or tableContains)(values, branchPrefix .. k) then
+			table.insert(values, branchPrefix .. k)
 			table.insert(valueTooltips, "Use the latest commit on the " .. k .. " branch")
 		end
 	end
 
-	return utilitools.modUpdater.branch(mod, utilitools.imguiHelpers.inputCombo(
-		"Branch##" .. mod.id .. "Config_branch", mods.utilitools.config.branches[mod.id], mods.utilitools.config.defaultBranch,
+	local temp = mods.utilitools.config.branches[mod.id]
+	local temp3 = mods.utilitools.config.defaultBranch
+
+	if temp ~= "Latest Release## " then
+		temp = branchPrefix .. temp
+	end
+	if temp3 ~= "Latest Release## " then
+		temp3 = branchPrefix .. temp
+	end
+
+	local temp2 = utilitools.imguiHelpers.inputCombo(
+		"Branch##" .. mod.id .. "Config_branch", temp, temp3,
 		tooltip, utilitools.files.utilitools.configOptions.branches.flags,
 		values, valueTooltips
-	))
+	)
+	if temp2 ~= "Latest Release## " then
+		temp2 = temp2:sub(#branchPrefix + 1)
+	end
+	return utilitools.modUpdater.branch(mod, temp2)
 end
 imguiHelpers.condTreeNode = function(label, name, current, target, same, func, flags)
 	local condition = (current == target) == same

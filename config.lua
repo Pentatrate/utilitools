@@ -68,12 +68,12 @@ utilitools.try(mod, function()
 				utilitools.modUpdater.downloadMod(mod, nil, true, true)
 			end
 			local space = imgui.GetContentRegionAvail().x
+			mods.utilitools.config.branches[mod.id] = utilitools.imguiHelpers.inputBranch(mods[modId], configHelpers.tooltip("branches"))
+			imgui.SameLine()
 			mods.utilitools.config.updates[mod.id] = utilitools.imguiHelpers.inputBool(
-				"Updates##" .. modId, mods.utilitools.config.updates[mod.id], true,
+				"Update " .. mod.name .. "##" .. modId, mods.utilitools.config.updates[mod.id], true,
 				configHelpers.tooltip("updates")
 			)
-			imgui.SameLine(math.max(0, imgui.GetContentRegionAvail().x - space / 2))
-			mods.utilitools.config.branches[mod.id] = utilitools.imguiHelpers.inputBranch(mods[modId], configHelpers.tooltip("branches"))
 			imgui.Unindent()
 			imgui.Unindent()
 			modAmount = modAmount + 1

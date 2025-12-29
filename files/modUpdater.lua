@@ -21,9 +21,9 @@ modUpdater.branch = function(mod, branch)
 	if type(mod) ~= "table" then error("modUpdater.branch: expected table for mod") end
 
 	branch = branch or mods.utilitools.config.branches[mod.id]
-	if branch and ((branch == "      " and modUpdater.releaseData(mod) and modUpdater.releaseData(mod).name ~= nil) or (branch ~= "      " and utilitools.modLinks[mod.id]["branch"][branch])) then return branch end
+	if branch and ((branch == "Latest Release## " and modUpdater.releaseData(mod) and modUpdater.releaseData(mod).name ~= nil) or (branch ~= "Latest Release## " and utilitools.modLinks[mod.id]["branch"][branch])) then return branch end
 	local defaultBranch = mod.config.branch or mods.utilitools.config.defaultBranch
-	if defaultBranch == "      " and (modUpdater.releaseData(mod) == nil or modUpdater.releaseData(mod).name == nil) then
+	if defaultBranch == "Latest Release## " and (modUpdater.releaseData(mod) == nil or modUpdater.releaseData(mod).name == nil) then
 		return "main"
 	end
 	return mod.config.branch or mods.utilitools.config.defaultBranch
@@ -43,7 +43,7 @@ modUpdater.changeMessage = function(mod, branch, redownload)
 	if type(mod) ~= "table" then error("modUpdater.downloadLink: expected table for mod") end
 	branch = modUpdater.branch(mod, branch)
 
-	if branch == "      " then
+	if branch == "Latest Release## " then
 		if modUpdater.releaseData(mod, redownload) == nil then return end
 		return modUpdater.releaseData(mod).name .. "\n" .. modUpdater.releaseData(mod).body
 	else
@@ -54,7 +54,7 @@ modUpdater.downloadLink = function(mod, branch)
 	if type(mod) ~= "table" then error("modUpdater.downloadLink: expected table for mod") end
 	branch = modUpdater.branch(mod, branch)
 
-	if branch == "      " then
+	if branch == "Latest Release## " then
 		if modUpdater.releaseData(mod) == nil then return end
 		for _, v in ipairs(modUpdater.releaseData(mod).assets) do
 			if v.name:sub(-#".zip") == ".zip" then
@@ -121,7 +121,7 @@ modUpdater.getModVersion = function (mod, branch, redownload)
 	if type(mod) ~= "table" then error("modUpdater.getModVersion: expected table for mod") end
 	branch = modUpdater.branch(mod, branch)
 
-	if branch ~= "      " then
+	if branch ~= "Latest Release## " then
 		local url = "https://raw.githubusercontent.com/" .. modUpdater.getSub(mod) .. "/refs/heads/" .. branch .. "/mod.json"
 
 		local rawData = utilitools.internet.request(url, "json", redownload)
