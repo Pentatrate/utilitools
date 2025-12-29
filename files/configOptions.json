@@ -2,76 +2,114 @@
 	"documentation": {
 		"type": "combo",
 		"name": "Documentation",
-		"tooltips": { "short": "How to explain the mod in the menu" },
-		"values": [ "long", "short", "none" ],
+		"tooltips": {
+			"short": "How to explain the mod in the menu"
+		},
+		"values": [
+			"long",
+			"short",
+			"none"
+		],
 		"valueTooltips": [
-			{ "long": "Thoroughly explains all noteworthy modifications with great detail\nMay require you to scroll a lot", "short": "Show detailed explanation" },
-			{ "short": "Shorten explanation" }
+			{
+				"long": "Thoroughly explains all noteworthy modifications with great detail\nMay require you to scroll a lot",
+				"short": "Show detailed explanation"
+			},
+			{
+				"short": "Shorten explanation"
+			}
 		],
 		"default": "none"
 	},
 	"tooltips": {
 		"type": "combo",
 		"name": "Tooltips",
-		"tooltips": { "short": "Tooltip length when hovering" },
-		"values": [ "long", "short", "none" ],
+		"tooltips": {
+			"short": "Tooltip length when hovering"
+		},
+		"values": [
+			"long",
+			"short",
+			"none"
+		],
 		"valueTooltips": [
-			{ "long": "When hovering over menu options, display a detailed tooltip", "short": "Display detailed tooltip" },
-			{ "short": "Shorten tooltip" }
+			{
+				"long": "When hovering over menu options, display a detailed tooltip",
+				"short": "Display detailed tooltip"
+			},
+			{
+				"short": "Shorten tooltip"
+			}
 		],
 		"default": "long"
 	},
 	"isolateLogs": {
 		"type": "bool",
 		"name": "Isolate Logs",
-		"tooltips": { "short": "Hides logs from unsupported mods" },
+		"tooltips": {
+			"short": "Hides logs from unsupported mods"
+		},
 		"default": false,
 		"off": false
 	},
 	"modPath": {
 		"type": "text",
 		"name": "Mod Path",
-		"tooltips": { "short": "The folder mods are located" },
+		"tooltips": {
+			"short": "The folder mods are located in"
+		},
 		"default": "Mods"
 	},
 	"search": {
 		"type": "text",
 		"name": "Search",
-		"tooltips": { "short": "Search for configs" },
+		"tooltips": {
+			"short": "Search for configs"
+		},
 		"default": "",
 		"off": ""
 	},
 	"reloadHotkey": {
 		"type": "key",
 		"name": "Reload Hotkey",
-		"tooltips": { "short": "Hotkey to reload all files" },
+		"tooltips": {
+			"short": "Hotkey to reload all files"
+		},
 		"default": [],
 		"off": []
 	},
 	"relaunchHotkey": {
 		"type": "key",
 		"name": "Relaunch Hotkey",
-		"tooltips": { "short": "Hotkey to relaunch the game" },
+		"tooltips": {
+			"short": "Hotkey to relaunch the game"
+		},
 		"default": [],
 		"off": []
 	},
 	"unknownPrints": {
 		"type": "bool",
 		"name": "Find prints",
-		"tooltips": { "short": "Fake an error for every print" },
+		"tooltips": {
+			"short": "Fake an error for every print"
+		},
 		"default": false,
 		"off": false
 	},
 	"gitFix": {
 		"type": "bool",
 		"name": "Git Fix",
-		"tooltips": { "short": "Fixes the visual bug in git where invisble changes get indicated when a version has been downloaded via utilitools" },
+		"tooltips": {
+			"short": "Fixes the visual bug in git where invisble changes get indicated when a version has been downloaded via utilitools"
+		},
 		"default": false
 	},
 	"autoUpdate": {
 		"type": "bool",
-		"name": "Auto Update",
-		"tooltips": { "short": "Allow using the internet to update other mods\nNot scanning for viruses!" },
+		"name": "Auto Update Mods",
+		"tooltips": {
+			"short": "Allow using the internet to update mods in general\nNot scanning for viruses!"
+		},
 		"default": false,
 		"off": false
 	},
@@ -84,36 +122,53 @@
 	"defaultBranch": {
 		"type": "combo",
 		"name": "Default Branch",
-		"tooltips": { "short": "Default for different ways to get different versions" },
-		"values": [ "      ", "main" ],
+		"tooltips": {
+			"short": "Default for different ways to get different versions"
+		},
+		"values": [
+			"      ",
+			"main"
+		],
 		"valueTooltips": [
-			{ "short": "Use the latest release" },
-			{ "short": "Use the latest commit on the main branch" }
+			{
+				"short": "Use the latest release"
+			},
+			{
+				"short": "Use the latest commit on the main branch"
+			}
 		],
 		"default": "      "
 	},
 	"showCompareMod": {
 		"type": "bool",
 		"name": "Compare Mod Buttons",
-		"tooltips": { "short": "Buttons to compare mod files" },
+		"tooltips": {
+			"short": "Buttons to compare mod files"
+		},
 		"default": false
 	},
 	"showForceMod": {
 		"type": "bool",
 		"name": "Force Update Buttons",
-		"tooltips": { "short": "Buttons to force mod updates" },
+		"tooltips": {
+			"short": "Buttons to force mod updates"
+		},
 		"default": false
 	},
 	"branches": {
 		"type": "hidden",
 		"name": "[internal] branches",
-		"tooltips": { "short": "Different ways to get different versions" },
+		"tooltips": {
+			"short": "Different ways to get different versions"
+		},
 		"default": {}
 	},
 	"updates": {
 		"type": "hidden",
 		"name": "[internal] updates",
-		"tooltips": { "short": "Allow the version for this mod to be autoupdated" },
+		"tooltips": {
+			"short": "Allow the version for only this mod to be autoupdated"
+		},
 		"default": {}
 	},
 	"updated": {

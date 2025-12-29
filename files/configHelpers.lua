@@ -363,8 +363,8 @@ configHelpers.presets = {
 	end,
 	updateOptions = function()
 		mods.utilitools.config.updates[mod.id] = utilitools.imguiHelpers.inputBool(
-			"Updates##" .. mod.id, mods.utilitools.config.updates[mod.id], true,
-			configHelpers.tooltip("updates")
+			"Update " .. mod.name .. "##" .. mod.id, mods.utilitools.config.updates[mod.id], true,
+			"Allow the version for only this mod to be autoupdated"
 		)
 		configHelpers.inputBranch()
 	end
