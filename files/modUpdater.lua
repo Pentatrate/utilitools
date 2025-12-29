@@ -78,13 +78,7 @@ modUpdater.directDownloadMod = function(mod, url, onlyCompare, force, redownload
 		local path = utilitools.folderManager.modPath(mod)
 		local downloadPath = "modZip/" .. fileName
 		local newConfigs
-		if not force or not beatblockPlus2_0Update then
-			newConfigs = dpf.loadJson(downloadPath .. "/mod.json")
-			if not beatblockPlus2_0Update then
-				newConfigs.config = mod.config
-				dpf.saveJson(downloadPath .. "/mod.json", newConfigs)
-			end
-		end
+		if not force or (not beatblockPlus2_0Update and not onlyCompare) then newConfigs = dpf.loadJson(downloadPath .. "/mod.json") end
 		if force or utilitools.versions.more(newConfigs.version, modUpdater.getModInfo(mod).version) then
 			if onlyCompare then
 				log(mod, "Comparing " .. mod.name .. " (" .. modUpdater.getModInfo(mod).version .. ") by " .. mod.author)
@@ -101,6 +95,12 @@ modUpdater.directDownloadMod = function(mod, url, onlyCompare, force, redownload
 				utilitools.folderManager.delete(path, true)
 				utilitools.folderManager.copy(path, downloadPath, true)
 				modUpdater.fileCache[mod.id] = nil
+				if not beatblockPlus2_0Update then
+					if not beatblockPlus2_0Update then
+						newConfigs.config = mod.config
+						dpf.saveJson(path .. "/mod.json", newConfigs)
+					end
+				end
 				log(mod, "Downloaded mod " .. mod.id)
 			end
 		else
