@@ -112,7 +112,7 @@ utilitools = {
 	},
 	try = function(mod, func)
 		local success, e = pcall(func)
-		if not success then log(mod, debug.traceback(e, 1)) end
+		if not success then modlog(mod, debug.traceback(e, 1)) end
 	end,
 	table = {
 		keysToValues = function(t)
@@ -239,7 +239,7 @@ utilitools = {
 					return body
 				end
 			elseif not usedCache then
-				log(mod, "Request error: http code " .. tostring(code) .. ": " .. (utilitools.internet.httpCodes[math.floor(code / 100)] or { code })[1] .. ": " .. (((utilitools.internet.httpCodes[math.floor(code / 100)] or {})[2] or {})[code % 100] or "not found") .. " | url: " .. tostring(url) .. " | ")
+				modlog(mod, "Request error: http code " .. tostring(code) .. ": " .. (utilitools.internet.httpCodes[math.floor(code / 100)] or { code })[1] .. ": " .. (((utilitools.internet.httpCodes[math.floor(code / 100)] or {})[2] or {})[code % 100] or "not found") .. " | url: " .. tostring(url) .. " | ")
 			end
 		end
 	},
@@ -275,23 +275,17 @@ utilitools = {
 }
 
 forceprint = print
-log = function(mod, text)
-	forceprint(
-		"[" ..
-		tostring(
-			(
-				mod and mod.id and (
-					(
-						utilitools.mods[mod.id] and utilitools.mods[mod.id].short and tostring(utilitools.mods[mod.id].short)
-					) or mod.id
-				)
-			) or "??"
-		) .. "] " .. tostring(text)
-	)
+modlog = function(mod, text)
+	local modLabel = tostring(mod and mod.id or "unknown-mod")
+	if log then
+		log(tostring(text), modLabel)
+	else
+		forceprint("[" .. modLabel .. "] " .. tostring(text))
+	end
 end
 print = function(...)
 	if mods and mods.utilitools and mods.utilitools.config then
-		if mods.utilitools.config.isolateLogs ~= nil and not mods.utilitools.config.isolateLogs then
+		if mods.utilitools.config.isolateLogs == false then
 			forceprint(...)
 		end
 		if mods.utilitools.config.unknownPrints == true then
@@ -318,7 +312,7 @@ local function utilitoolsRegisterMods()
 	local function handleModChecks(mod, mods2, requires)
 		for modId, data in pairs(mods2) do
 			if checkForMod(modId, data) ~= requires then
-				log(mod, "Mod checks failed")
+				modlog(mod, "Mod checks failed")
 				utilitools.modChecks.general = true
 				if requires then
 					utilitools.modChecks.dependencies = true
@@ -339,7 +333,7 @@ local function utilitoolsRegisterMods()
 				if modsData[mod.id] == nil then modsData[mod.id] = dpf.loadJson(path .. "/utilitools.json") end
 				utilitools.mods[mod.id] = utilitools.mods[mod.id] or {}
 				if onlyCompat then
-					for _, v in ipairs({ "short", "config", "cullConfig" }) do
+					for _, v in ipairs({ "config", "cullConfig" }) do
 						utilitools.mods[mod.id][v] = modsData[mod.id][v]
 					end
 					if modsData[mod.id].files and type(modsData[mod.id].files) == "table" then
@@ -352,15 +346,18 @@ local function utilitoolsRegisterMods()
 						handleModChecks(mod, modsData[mod.id].incompatibilities, false)
 					end
 				else
+					if log then
+						log:defineEnvironment(mod.id, 2, 2)
+					end
 					if modsData[mod.id].config then
 						utilitools.fileManager.utilitools.configHelpers.load()
 						utilitools.configHelpers.registerMod(mod, modsData[mod.id].files)
 					end
-					log(mod, "Registering " .. mod.id)
+					modlog(mod, "Registering " .. mod.id)
 				end
 			end
 		else
-			log(mod, "No folder found for " .. mod.id)
+			modlog(mod, "No folder found for " .. mod.id)
 		end
 	end
 

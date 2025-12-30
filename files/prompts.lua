@@ -39,7 +39,7 @@ prompts.error = function(mod, message)
     prompts.isError = true
 	prompts.message = message
 
-	log(mod, message)
+	modlog(mod, message)
 end
 prompts.confirm = function(message, func)
 	prompts.randomize()

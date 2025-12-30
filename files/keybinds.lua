@@ -7,7 +7,7 @@ local keybinds = {}
 local keys = savedata.utilitools.bindings
 
 local function saveControls()
-	log(mod, "Saving controls...")
+	modlog(mod, "Saving controls...")
 	keybinds.register.registered = false
 	sdfunc.save()
 	updateControls()
@@ -42,7 +42,7 @@ end
 keybinds.raw.removeKeybind = function(category, keyId, bind, dontSave)
 	assert(gameKeys[category], "keybinds.raw.removeKeybind: no category: " .. tostring(category))
 	local keyBindings = gameKeys[category][keyId]
-	if keyBindings == nil then log(mod, "keybinds.raw.removeKeybind: no key: " .. tostring(category) .. " " .. tostring(keyId)) return end
+	if keyBindings == nil then modlog(mod, "keybinds.raw.removeKeybind: no key: " .. tostring(category) .. " " .. tostring(keyId)) return end
 	for i = #keyBindings, 1, -1 do if keyBindings[i] == bind then table.remove(keyBindings, i) end end
 	if not dontSave then saveControls() end
 end

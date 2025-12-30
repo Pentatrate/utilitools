@@ -78,12 +78,12 @@ modUpdater.directDownloadMod = function(mod, url, onlyCompare, force, redownload
 		local path = utilitools.folderManager.modPath(mod)
 		local downloadPath = "modZip/" .. fileName
 		local newConfigs
-		if not force or not beatblockPlus2_0Update then newConfigs = dpf.loadJson(downloadPath .. "/mod.json") end
+		if not force then newConfigs = dpf.loadJson(downloadPath .. "/mod.json") end
 		if force or utilitools.versions.more(newConfigs.version, modUpdater.getModInfo(mod).version) then
 			if onlyCompare then
-				log(mod, "Comparing " .. mod.name .. " (" .. modUpdater.getModInfo(mod).version .. ") by " .. mod.author)
-				log(mod, "Same content: " .. tostring(utilitools.folderManager.compare(path, downloadPath, true, true)))
-				log(mod, "Same content: " .. tostring(utilitools.folderManager.compare(downloadPath, path, true, true)))
+				modlog(mod, "Comparing " .. mod.name .. " (" .. modUpdater.getModInfo(mod).version .. ") by " .. mod.author)
+				modlog(mod, "Same content: " .. tostring(utilitools.folderManager.compare(path, downloadPath, true, true)))
+				modlog(mod, "Same content: " .. tostring(utilitools.folderManager.compare(downloadPath, path, true, true)))
 			else
 				mods.utilitools.config.updated.hasUpdated = true
 				mods.utilitools.config.updated.mods = mods.utilitools.config.updated.mods or {}
@@ -96,15 +96,14 @@ modUpdater.directDownloadMod = function(mod, url, onlyCompare, force, redownload
 				utilitools.folderManager.copy(path, downloadPath, true)
 				modUpdater.fileCache[mod.id] = nil
 				if not beatblockPlus2_0Update then
-					if not beatblockPlus2_0Update then
-						newConfigs.config = mod.config
-						dpf.saveJson(path .. "/mod.json", newConfigs)
-					end
+					newConfigs = dpf.loadJson(path .. "/mod.json")
+					newConfigs.config = mod.config
+					dpf.saveJson(path .. "/mod.json", newConfigs)
 				end
-				log(mod, "Downloaded mod " .. mod.id)
+				modlog(mod, "Downloaded mod " .. mod.id)
 			end
 		else
-			log(mod, "No new mod version for " .. mod.id .. " (current: " .. modUpdater.getModInfo(mod).version .. " >= downloaded: " .. newConfigs.version .. ")")
+			modlog(mod, "No new mod version for " .. mod.id .. " (current: " .. modUpdater.getModInfo(mod).version .. " >= downloaded: " .. newConfigs.version .. ")")
 		end
 		break
 	end
@@ -146,7 +145,7 @@ modUpdater.checkModVersions = function(redownload)
 	for modId, mod in pairs(mods) do
 		if utilitools.modLinks[modId] then
 			if mods.utilitools.config.updates[modId] ~= false and modUpdater.checkModVersion(mod, nil, redownload) then
-				log(mod, modId .. " is outdated")
+				modlog(mod, modId .. " is outdated")
 				r1 = true
 				r2[modId] = true
 			end
@@ -156,17 +155,17 @@ modUpdater.checkModVersions = function(redownload)
 end
 modUpdater.updateMods = function(redownload)
 	if mod.config.autoUpdate == false then
-		log(mod, "modUpdater.updateMods: autoUpdate is false")
+		modlog(mod, "modUpdater.updateMods: autoUpdate is false")
 	end
 	local outdated, outdatedMods = modUpdater.checkModVersions(redownload)
 	if outdated then
 		for modId, _ in pairs(outdatedMods) do
-			log(mod, "modUpdater.updateMods: Updating " .. modId)
+			modlog(mod, "modUpdater.updateMods: Updating " .. modId)
 			modUpdater.downloadMod(mods[modId], nil, false, false, redownload)
 		end
 		return true
 	else
-		log(mod, "modUpdater.updateMods: All mods up to date")
+		modlog(mod, "modUpdater.updateMods: All mods up to date")
 	end
 end
 

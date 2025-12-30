@@ -17,10 +17,14 @@ match_indent = true
 pattern = "cs = bs.load(project.initState)"
 payload = '''
 beatblockPlus2_0Update = tableContains == nil
+if log then
+	log:defineEnvironment("unknown-mod", 2, 2)
+	log:defineEnvironment("utilitools", 2, 2)
+end
 if true then -- Utilitools file loader
 	local chunk, e = love.filesystem.load((beatblockPlus2_0Update and mods.utilitools.path or (mods.utilitools.config.modPath or "Mods") .. "/utilitools") .. "/files/fileManager.lua")
 	if e then
-		log(mods.utilitools, "Error while loading file " .. (beatblockPlus2_0Update and mods.utilitools.path or (mods.utilitools.config.modPath or "Mods") .. "/utilitools") .. "/fileManager.lua of Utilitools: " .. e)
+		modlog(mods.utilitools, "Error while loading file " .. (beatblockPlus2_0Update and mods.utilitools.path or (mods.utilitools.config.modPath or "Mods") .. "/utilitools") .. "/fileManager.lua of Utilitools: " .. e)
 	else
 		utilitools.fileManager = setfenv(chunk, setmetatable({}, { __index = _G }))()
 	end

@@ -14,7 +14,7 @@ local function load(mod, file, reload)
 				if love.filesystem.getInfo(path, "file") then
 					local chunk, e = love.filesystem.load(path)
 					if e then
-						log(mod, "Error while loading file " .. path .. " of " .. mod.name .. ":\n" .. e)
+						modlog(mod, "Error while loading file " .. path .. " of " .. mod.name .. ":\n" .. e)
 					else
 						utilitools.files[mod.id][file.name] = setfenv(chunk,
 							setmetatable({ mod = mod }, { __index = _G }))
@@ -24,7 +24,7 @@ local function load(mod, file, reload)
 						if mod == mods.utilitools and not ({ configOptions = true, documentation = true })[file.name] then
 							utilitools[file.name] = utilitools.files.utilitools[file.name]
 						end
-						log(mod, "Loaded " .. path)
+						modlog(mod, "Loaded " .. path)
 					end
 				end
 			elseif file.extension == "json" then
@@ -34,7 +34,7 @@ local function load(mod, file, reload)
 					if mod == mods.utilitools and not ({ configOptions = true, documentation = true })[file.name] then
 						utilitools[file.name] = utilitools.files.utilitools[file.name]
 					end
-					log(mod, "Loaded " .. path)
+					modlog(mod, "Loaded " .. path)
 				end
 			end
 		end

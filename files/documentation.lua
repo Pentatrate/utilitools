@@ -66,7 +66,7 @@ return { -- Penta: this is in lua and not json because i wanted the multiline st
 	mod interactions (Dependency/Incompatibility)
 	utilitools.configs.save(mod)
 	utilitools.try(mod, func)
-	log(mod, string)
+	modlog(mod, string)
 	forceprint(...)
 
 1.1.0:
