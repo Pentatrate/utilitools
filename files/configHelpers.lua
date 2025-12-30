@@ -258,13 +258,12 @@ configHelpers.registerMod = function(mod2)
 	configHelpers.setMod(mod2)
 	for k, v in pairs(configOptions) do
 		if configHelpers.exists(k) or configHelpers.failReason(k) == "Hidden" then
-            if mod.config[k] == nil then
+			if v.type == "key" then
+				utilitools.keybinds.register.newKey(mod, k, v.default)
+			elseif mod.config[k] == nil then
                 mod.config[k] = v.default
                 modlog(mod, "Initializing config option: " .. k)
             end
-			if v.type == "key" then
-				utilitools.keybinds.register.newKey(mod, k, v.default)
-			end
 		else
 			modlog(mod, "Invalid config option: " .. k)
 		end
@@ -272,7 +271,7 @@ configHelpers.registerMod = function(mod2)
 	if utilitools.mods[mod.id].cullConfig then
 		for k, _ in pairs(mod.config) do
 			-- Penta: Intentionally not using `configHelpers.exists(k)` here to preserve settings when an update accidentally invalides configs
-			if configOptions[k] == nil and not configHelpers.checkTemp(k) then
+			if (configOptions[k] == nil and not configHelpers.checkTemp(k)) or (configOptions[k] and configOptions[k].type == "key") then
 				mod.config[k] = nil
 				modlog(mod, "Unused config option: " .. k)
 			end
