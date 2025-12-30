@@ -1,7 +1,7 @@
 [manifest]
-dump_lua = true 
+dump_lua = true
 priority = 2147483645 # 2147483647 - 2
-version = "1.0.0" 
+version = "1.0.0"
 
 # Logging ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -38,6 +38,7 @@ if not beatblockPlus2_0Update then -- Check for unrenamed folders of commit down
 	end
 end
 utilitoolsRegisterMods()
+utilitools.backwardsCompat()
 if mods.utilitools.config.askUpdate then
 	if not mods.utilitools.config.autoUpdate then
 		local buttonPressed = love.window.showMessageBox("Utilitools", "Welcome to Utilitools!\nDo you want to enable auto updating for mods?", { "Proceed", "Dont ask again" })
