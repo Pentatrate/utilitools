@@ -79,7 +79,7 @@ modUpdater.directDownloadMod = function(mod, url, onlyCompare, force, redownload
 		local downloadPath = "modZip/" .. fileName
 		local newConfigs
 		if not force then newConfigs = dpf.loadJson(downloadPath .. "/mod.json") end
-		if force or utilitools.versions.more(newConfigs.version, modUpdater.getModInfo(mod).version) then
+		if force or utilitools.versions.greaterThan(newConfigs.version, modUpdater.getModInfo(mod).version) then
 			if onlyCompare then
 				modlog(mod, "Comparing " .. mod.name .. " (" .. modUpdater.getModInfo(mod).version .. ") by " .. mod.author)
 				modlog(mod, "Same content: " .. tostring(utilitools.folderManager.compare(path, downloadPath, true, true)))
@@ -137,7 +137,7 @@ modUpdater.checkModVersion = function (mod, branch, redownload)
 
 	local version = modUpdater.getModVersion(mod, branch, redownload)
 	if version == nil then return end
-	return utilitools.versions.more(version, modUpdater.getModInfo(mod).version)
+	return utilitools.versions.greaterThan(version, modUpdater.getModInfo(mod).version)
 end
 modUpdater.checkModVersions = function(redownload)
 	local r1 = false

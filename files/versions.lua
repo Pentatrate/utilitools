@@ -22,16 +22,16 @@ versions.check = function(base, other, func, notOther)
 	end
 	return false
 end
-versions.equal = function(base, other) return not versions.check(base, other, function(a, b) return a ~= b end) end
-versions.less = function(base, other) return versions.check(base, other, function(a, b) return a < b end) end
-versions.more = function(base, other) return versions.check(base, other, function(a, b) return a > b end) end
-versions.lessEquals = function(...) return not versions.more(...) end
-versions.moreEquals = function(...) return not versions.less(...) end
-versions["="] = versions.equal
-versions["<"] = versions.less
-versions[">"] = versions.more
-versions["<="] = versions.lessEquals
-versions[">="] = versions.moreEquals
+versions.equalTo = function(base, other) return not versions.check(base, other, function(a, b) return a ~= b end) end
+versions.lessThan = function(base, other) return versions.check(base, other, function(a, b) return a < b end) end
+versions.greaterThan = function(base, other) return versions.check(base, other, function(a, b) return a > b end) end
+versions.lessThanOrEqualTo = function(...) return not versions.greaterThan(...) end
+versions.moreThanOrEqualTo = function(...) return not versions.lessThan(...) end
+versions["="] = versions.equalTo
+versions["<"] = versions.lessThan
+versions[">"] = versions.greaterThan
+versions["<="] = versions.lessThanOrEqualTo
+versions[">="] = versions.moreThanOrEqualTo
 versions.fromTil = function(base, min, max) return versions["<="](min, base) and versions["<="](base, max) end
 versions.between = function(base, min, max) return versions["<"](min, base) and versions["<"](base, max) end
 versions.compare = function(base, operation, other, other2)

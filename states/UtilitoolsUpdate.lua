@@ -10,7 +10,7 @@ st:setInit(function(self)
 	local amount = 0
 	for k, v in pairs(mods.utilitools.config.updated.mods or {}) do
 		local mod = mods[k]
-		if mod and utilitools.versions.equal(v.version, mod.version) then
+		if mod and utilitools.versions.equalTo(v.version, mod.version) then
 			addText("\n\n- " .. mod.name .. " by " .. mod.author .. "\nupdated from " .. v.oldVersion .. " to " .. v.version)
 			if v.message then
 				addText("\n-----=====#=====-----\n")

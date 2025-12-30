@@ -46,10 +46,10 @@ utilitools.try(mod, function()
 			imgui.Indent()
 			imgui.TextWrapped(mod.name .. " (" .. mod.version .. ") by " .. mod.author)
 			imgui.Indent()
-			if not utilitools.versions.equal(utilitools.modUpdater.getModInfo(mod).version, mod.version) then
+			if not utilitools.versions.equalTo(utilitools.modUpdater.getModInfo(mod).version, mod.version) then
 				imgui.TextWrapped("Restart to finish mod version update to " .. utilitools.modUpdater.getModInfo(mod).version)
 			end
-			if not utilitools.versions.equal(utilitools.modUpdater.getModVersion(mod), utilitools.modUpdater.getModInfo(mod).version) or mods.utilitools.config.showForceMod then
+			if not utilitools.versions.equalTo(utilitools.modUpdater.getModVersion(mod), utilitools.modUpdater.getModInfo(mod).version) or mods.utilitools.config.showForceMod then
 				imgui.AlignTextToFramePadding()
 				imgui.TextWrapped("Latest version: " .. utilitools.modUpdater.getModVersion(mod))
 				imgui.SameLine()
