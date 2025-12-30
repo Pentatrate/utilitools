@@ -5,6 +5,10 @@ for k, v in pairs(mod.config.branches) do
 		changesToConfig = true
 	end
 end
+if mod.config.defaultBranch == "      " then
+	mod.config.defaultBranch = "Latest Release## "
+	changesToConfig = true
+end
 if changesToConfig then
 	utilitools.config.save(mods.utilitools)
 end
