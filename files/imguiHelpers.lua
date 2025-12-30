@@ -193,8 +193,8 @@ imguiHelpers.inputBranch = function(mod, tooltip)
 		end
 	end
 
-	local temp = mods.utilitools.config.branches[mod.id]
 	local temp3 = mods.utilitools.config.defaultBranch
+	local temp = mods.utilitools.config.branches[mod.id] or temp3
 
 	if temp ~= "Latest Release## " then
 		temp = branchPrefix .. temp
