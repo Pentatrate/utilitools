@@ -144,7 +144,7 @@ keybinds.listening.stop = function()
 	keybinds.listening.keysPressed = {}
 end
 
-keybinds.pressed = function(mod, keyName)
+keybinds.pressed = function(mod, keyName, hold)
 	for _, v in ipairs(keybinds.mod.getKeybinds(mod, keyName)) do
 		local holding = true
 		for k, _ in pairs(v[1]) do
@@ -153,11 +153,20 @@ keybinds.pressed = function(mod, keyName)
 				break
 			end
 		end
-		if holding and maininput:pressed("utilitools_" .. v[2]) then
+		if holding and ((not hold and maininput:pressed("utilitools_" .. v[2])) or (hold and maininput:down("utilitools_" .. v[2]))) then
 			return true
 		end
 	end
 	return false
+end
+
+keybinds.checkBinds = function(mod, binds, hold)
+	if type(binds) ~= "table" then return end
+	for key, func in pairs(binds) do
+		if utilitools.keybinds.pressed(mod, key, hold) then
+			if type(func) == "function" then func() end
+		end
+	end
 end
 
 return keybinds

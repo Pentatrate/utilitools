@@ -99,11 +99,7 @@ pattern = "PopupManager.update(dt)"
 payload = '''
 for modId, modFiles in pairs(utilitools.files) do
 	if modFiles.keys then
-		for key, func in pairs(modFiles.keys) do
-			if utilitools.keybinds.pressed(mods[modId], key) then
-				if type(func) == "function" then func() end
-			end
-		end
+		utilitools.keybinds.checkBinds(mods[modId], modFiles.keys)
 	end
 end
 if utilitools.doRelaunch then utilitools.relaunch(true) end
