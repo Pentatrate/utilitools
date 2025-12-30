@@ -1,7 +1,7 @@
 local changesToConfig = false
 for k, v in pairs(mod.config.branches) do
 	if v == "      " then
-		mod.config.branches = "Latest Release## "
+		mod.config.branches[k] = "Latest Release## "
 		changesToConfig = true
 	end
 end
