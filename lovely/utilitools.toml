@@ -21,20 +21,22 @@ if log then
 	log:defineEnvironment("unknown-mod", 2, 2)
 	log:defineEnvironment("utilitools", 2, 2)
 end
-if true then -- Utilitools file loader
-	local chunk, e = love.filesystem.load((beatblockPlus2_0Update and mods.utilitools.path or (mods.utilitools.config.modPath or "Mods") .. "/utilitools") .. "/files/fileManager.lua")
-	if e then
-		modlog(mods.utilitools, "Error while loading file " .. (beatblockPlus2_0Update and mods.utilitools.path or (mods.utilitools.config.modPath or "Mods") .. "/utilitools") .. "/fileManager.lua of Utilitools: " .. e)
-	else
-		utilitools.fileManager = setfenv(chunk, setmetatable({}, { __index = _G }))()
+if not beatblockPlus2_0Update then -- Check for unrenamed folders of commit downloads
+	for _, modId in ipairs({ "utilitools", "beattools", "beatblock-plus", "beatblock-plus-launcher" }) do
+		for _, v in ipairs({ "main", "dev", "devPenta" }) do
+			if mods[modId] and love.filesystem.exists(utilitools.folderManager.modPath(mods[modId]) .. "-" .. v) then
+				utilitools.folderManager.copy(utilitools.folderManager.modPath(mods[modId]), utilitools.folderManager.modPath(mods[modId]) .. "-" .. v)
+				utilitools.folderManager.delete(utilitools.folderManager.modPath(mods[modId]) .. "-" .. v)
+			end
+		end
 	end
 end
-if not beatblockPlus2_0Update then -- Check for unrenamed folders of commit downloads
-	for _, modId in ipairs({ "utilitools", "beattools", "test" }) do
-		if mods[modId] and love.filesystem.exists((mods.utilitools.config.modPath or "Mods") .. "/" .. modId .. "-main") then
-			utilitools.folderManager.copy((mods.utilitools.config.modPath or "Mods") .. "/" .. modId, (mods.utilitools.config.modPath or "Mods") .. "/" .. modId .. "-main")
-			utilitools.folderManager.delete((mods.utilitools.config.modPath or "Mods") .. "/" .. modId .. "-main")
-		end
+if true then -- Utilitools file loader
+	local chunk, e = love.filesystem.load(utilitools.folderManager.modPath(mods.utilitools) .. "/files/fileManager.lua")
+	if e then
+		error("Error while loading file " .. utilitools.folderManager.modPath(mods.utilitools) .. "/files/fileManager.lua of Utilitools: " .. e)
+	else
+		utilitools.fileManager = setfenv(chunk, setmetatable({}, { __index = _G }))()
 	end
 end
 utilitoolsRegisterMods()
