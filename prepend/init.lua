@@ -291,6 +291,8 @@ print = function(...)
 		if mods.utilitools.config.unknownPrints == true then
 			forceprint(debug.traceback(nil, 1))
 		end
+	else
+		forceprint(...)
 	end
 end
 

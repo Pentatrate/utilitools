@@ -55,5 +55,12 @@ return {
 		branch = {
 			main = true
 		}
+	},
+	["test-dummy"] = {
+		organisation = "Pentatrate",
+		repository = "test-dummy",
+		branch = {
+			main = true
+		}
 	}
 }

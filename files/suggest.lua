@@ -43,7 +43,7 @@ suggest.suggest = function(current, list)
 		if imgui.IsKeyPressed(imgui.ImGuiKey_DownArrow, false) or imgui.IsKeyPressed(imgui.ImGuiKey_Keypad2, false) then -- down
 			suggest.index = (suggest.index % #suggest.list) + 1
 		end
-		if imgui.IsKeyPressed(imgui.ImGuiKey_Tab, false) then -- tab
+		if imgui.IsKeyPressed(imgui.ImGuiKey_Tab, false) and #suggest.list > 0 then -- tab
 			suggest.last = suggest.list[suggest.index][1]
 			return suggest.list[suggest.index][1]
 		end

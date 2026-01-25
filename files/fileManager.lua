@@ -24,7 +24,7 @@ local function load(mod, file, reload)
 						if mod == mods.utilitools and not ({ configOptions = true, documentation = true })[file.name] then
 							utilitools[file.name] = utilitools.files.utilitools[file.name]
 						end
-						modlog(mod, "Loaded " .. path)
+						-- modlog(mod, "Loaded " .. path)
 					end
 				end
 			elseif file.extension == "json" then
@@ -34,7 +34,7 @@ local function load(mod, file, reload)
 					if mod == mods.utilitools and not ({ configOptions = true, documentation = true })[file.name] then
 						utilitools[file.name] = utilitools.files.utilitools[file.name]
 					end
-					modlog(mod, "Loaded " .. path)
+					-- modlog(mod, "Loaded " .. path)
 				end
 			end
 		end
