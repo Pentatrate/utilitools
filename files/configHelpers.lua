@@ -223,6 +223,30 @@ end
 configHelpers.inputBranch = function()
 	mods.utilitools.config.branches[mod.id] = utilitools.imguiHelpers.inputBranch(mod, configHelpers.tooltip("branches"))
 end
+configHelpers.inputSliderInt = function(key)
+	if not configHelpers.exists(key) then
+		imgui.Text("Failed.")
+		return
+	end
+	mod.config[key] = utilitools.imguiHelpers.inputSliderInt(
+		configHelpers.convertLabel(key), mod.config[key], configOptions[key].default,
+		configHelpers.tooltip(key), configOptions[key].flags,
+		configOptions[key].min, configOptions[key].max,
+		configOptions[key].innerLabel
+	)
+end
+configHelpers.inputSliderFloat = function(key)
+	if not configHelpers.exists(key) then
+		imgui.Text("Failed.")
+		return
+	end
+	mod.config[key] = utilitools.imguiHelpers.inputSliderFloat(
+		configHelpers.convertLabel(key), mod.config[key], configOptions[key].default,
+		configHelpers.tooltip(key), configOptions[key].flags,
+		configOptions[key].min, configOptions[key].max,
+		configOptions[key].innerLabel
+	)
+end
 configHelpers.condTreeNode = function(label, key, target, same, func, flags)
 	if not configHelpers.exists(key) then return end
 	utilitools.imguiHelpers.condTreeNode(

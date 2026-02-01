@@ -213,6 +213,22 @@ imguiHelpers.inputBranch = function(mod, tooltip)
 	end
 	return utilitools.modUpdater.branch(mod, temp2)
 end
+imguiHelpers.inputSliderInt = function(label, current, default, tooltip, flags, min, max, innerLabel)
+	if current == nil then current = default end
+	local v = ffi.new("int[1]", { current })
+	imguiHelpers.setWidth(label)
+	imgui.SliderInt(label, v, min, max, innerLabel, flags)
+	imguiHelpers.tooltip(tooltip)
+	return v[0]
+end
+imguiHelpers.inputSliderFloat = function(label, current, default, tooltip, flags, min, max, innerLabel)
+	if current == nil then current = default end
+	local v = ffi.new("float[1]", { current })
+	imguiHelpers.setWidth(label)
+	imgui.SliderFloat(label, v, min, max, innerLabel, flags)
+	imguiHelpers.tooltip(tooltip)
+	return v[0]
+end
 imguiHelpers.condTreeNode = function(label, name, current, target, same, func, flags)
 	local condition = (current == target) == same
 	if not condition then
