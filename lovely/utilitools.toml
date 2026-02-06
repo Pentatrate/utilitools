@@ -41,27 +41,32 @@ if true then -- Utilitools file loader
 end
 utilitoolsRegisterMods()
 utilitools.backwardsCompat()
-if mods.utilitools.config.askUpdate then
-	if not mods.utilitools.config.autoUpdate then
-		local buttonPressed = love.window.showMessageBox("Utilitools", "Welcome to Utilitools!\nDo you want to enable auto updating for mods?", { "Proceed", "Dont ask again" })
-		if buttonPressed == 1 then
-			mods.utilitools.config.autoUpdate = true
-		elseif buttonPressed == 2 then
-			mods.utilitools.config.askUpdate = false
-			utilitools.config.save(mods.utilitools)
+if beatblockPlus2_0Update then
+	if mods.utilitools.config.askUpdate then
+		if not mods.utilitools.config.autoUpdate then
+			local buttonPressed = love.window.showMessageBox("Utilitools", "Welcome to Utilitools!\nDo you want to enable auto updating for mods?", { "Proceed", "No, dont ask again" })
+			if buttonPressed == 1 then
+				mods.utilitools.config.autoUpdate = true
+			elseif buttonPressed == 2 then
+				mods.utilitools.config.askUpdate = false
+				utilitools.config.save(mods.utilitools)
+			end
+		end
+		if mods.utilitools.config.autoUpdate then
+			local buttonPressed = love.window.showMessageBox("Utilitools", "Auto updating will require internet access.\nMods will *not* be scanned for viruses.\nAre you sure?", { "Enable", "Nevermind" })
+			if buttonPressed == 1 then
+				mods.utilitools.config.askUpdate = false
+				utilitools.config.save(mods.utilitools)
+			elseif buttonPressed == 2 then
+				mods.utilitools.config.autoUpdate = false
+				mods.utilitools.config.askUpdate = false
+				utilitools.config.save(mods.utilitools)
+			end
 		end
 	end
-	if mods.utilitools.config.autoUpdate then
-		local buttonPressed = love.window.showMessageBox("Utilitools", "Auto updating will require internet access.\nMods will not be scanned for viruses.\nAre you sure?", { "Enable", "Nevermind" })
-		if buttonPressed == 1 then
-			mods.utilitools.config.askUpdate = false
-			utilitools.config.save(mods.utilitools)
-		elseif buttonPressed == 2 then
-			mods.utilitools.config.autoUpdate = false
-			mods.utilitools.config.askUpdate = false
-			utilitools.config.save(mods.utilitools)
-		end
-	end
+else
+	mods.utilitools.config.autoUpdate = false
+	mods.utilitools.config.askUpdate = false
 end
 if utilitools.modUpdater.updateMods() then
 	utilitools.doRelaunch = true

@@ -158,15 +158,23 @@ modUpdater.updateMods = function(redownload)
 		modlog(mod, "modUpdater.updateMods: autoUpdate is false")
 	end
 	local outdated, outdatedMods = modUpdater.checkModVersions(redownload)
+	local close = false
 	if outdated then
 		for modId, _ in pairs(outdatedMods) do
-			modlog(mod, "modUpdater.updateMods: Updating " .. modId)
-			modUpdater.downloadMod(mods[modId], nil, false, false, redownload)
+			if mod.config.autoUpdate == false then
+				modlog(mod, "modUpdater.updateMods: Requesting to update " .. modId)
+				local buttonPressed = love.window.showMessageBox("Utilitools", "The mod \"" .. mods[modId].name .. "\" is out of date.\nPlease update it manually", { "Ok", "No" })
+				if buttonPressed == 1 then close = true end
+			else
+				modlog(mod, "modUpdater.updateMods: Updating " .. modId)
+				modUpdater.downloadMod(mods[modId], nil, false, false, redownload)
+			end
 		end
 		return true
 	else
 		modlog(mod, "modUpdater.updateMods: All mods up to date")
 	end
+	if close then love.event.quit() end
 end
 
 return modUpdater
