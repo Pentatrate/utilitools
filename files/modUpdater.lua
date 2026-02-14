@@ -170,7 +170,7 @@ modUpdater.updateMods = function(redownload)
 				modUpdater.downloadMod(mods[modId], nil, false, false, redownload)
 			end
 		end
-		return true
+		if mod.config.autoUpdate ~= false then return true end
 	else
 		modlog(mod, "modUpdater.updateMods: All mods up to date")
 	end
