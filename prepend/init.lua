@@ -124,6 +124,11 @@ utilitools = {
 			local r = {}
 			for _, v in ipairs(t) do r[v] = true end
 			return r
+		end,
+		emptyTable = function(t)
+			if type(t) ~= "table" then return false end
+			for _, _ in pairs(t) do return false end
+			return true
 		end
 	},
 	string = {
