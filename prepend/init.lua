@@ -144,6 +144,11 @@ utilitools = {
 			return r
 		end
 	},
+	number = {
+		round = function(x, multiplier)
+			return helpers.round(x * multiplier) / multiplier
+		end
+	},
 	imgui = {
 		color = function(...) return imgui.ColorConvertFloat4ToU32(imgui.ImVec4_Float(...)) end
 	},
