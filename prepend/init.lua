@@ -142,6 +142,13 @@ utilitools = {
 			local r = {}
 			for w in s:gmatch("[^" .. c .. "]+") do table.insert(r, w) end
 			return r
+		end,
+		toClipboard = function(t)
+			t = tostring(t)
+			modlog(mods.beattools, "Copied to clipboard: ", t)
+			love.system.setClipboardText(t)
+			if cs and cs.p and cs.p.hurtPulse then cs.p:hurtPulse() end
+			utilitools.prompts.custom({ title = "Copied to clipboard!", message = t })
 		end
 	},
 	number = {
