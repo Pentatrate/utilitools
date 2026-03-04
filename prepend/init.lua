@@ -112,7 +112,7 @@ utilitools = {
 	},
 	try = function(mod, func)
 		local success, e = pcall(func)
-		if not success then modlog(mod, debug.traceback(e, 1)) end
+		if not success then modwarn(mod, e) end
 	end,
 	table = {
 		keysToValues = function(t)
@@ -285,12 +285,36 @@ utilitools = {
 }
 
 forceprint = print
-modlog = function(mod, text)
+modlog = function(mod, ...)
 	local modLabel = tostring(mod and mod.id or "unknown-mod")
+
+	local text = ""
+
+	for i, t in ipairs(...) do
+		if i ~= 1 and type(t) ~= "string" and type((...)[i - 1]) ~= string then text = text .. " " end
+		text = text .. tostring(t)
+	end
+
 	if log then
-		log(tostring(text), modLabel)
+		log(text, modLabel)
 	else
-		forceprint("[" .. modLabel .. "] " .. tostring(text))
+		forceprint("[" .. modLabel .. "] " .. text)
+	end
+end
+modwarn = function(mod, ...)
+	local modLabel = tostring(mod and mod.id or "unknown-mod")
+
+	local text = ""
+
+	for i, t in ipairs(...) do
+		if i ~= 1 and type(t) ~= "string" and type((...)[i - 1]) ~= string then text = text .. " " end
+		text = text .. tostring(t)
+	end
+
+	if log then
+		log(debug.traceback(text), modLabel)
+	else
+		forceprint(debug.traceback("[" .. modLabel .. "] " .. text))
 	end
 end
 print = function(...)
