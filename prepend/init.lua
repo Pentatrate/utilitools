@@ -290,9 +290,13 @@ modlog = function(mod, ...)
 
 	local text = ""
 
-	for i, t in ipairs(...) do
-		if i ~= 1 and type(t) ~= "string" and type((...)[i - 1]) ~= string then text = text .. " " end
-		text = text .. tostring(t)
+	if type(...) == table then
+		for i, t in ipairs(...) do
+			if i ~= 1 and type(t) ~= "string" and type((...)[i - 1]) ~= string then text = text .. " " end
+			text = text .. tostring(t)
+		end
+	else
+		text = tostring(...)
 	end
 
 	if log then
@@ -306,9 +310,13 @@ modwarn = function(mod, ...)
 
 	local text = ""
 
-	for i, t in ipairs(...) do
-		if i ~= 1 and type(t) ~= "string" and type((...)[i - 1]) ~= string then text = text .. " " end
-		text = text .. tostring(t)
+	if type(...) == table then
+		for i, t in ipairs(...) do
+			if i ~= 1 and type(t) ~= "string" and type((...)[i - 1]) ~= string then text = text .. " " end
+			text = text .. tostring(t)
+		end
+	else
+		text = tostring(...)
 	end
 
 	if log then
