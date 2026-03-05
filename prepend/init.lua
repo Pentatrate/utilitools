@@ -297,13 +297,13 @@ modlog = function(mod, ...)
 
 	local text = ""
 
-	if type(...) == table then
+	if type(... or nil) == "table" then
 		for i, t in ipairs(...) do
 			if i ~= 1 and type(t) ~= "string" and type((...)[i - 1]) ~= string then text = text .. " " end
 			text = text .. tostring(t)
 		end
 	else
-		text = tostring(...)
+		text = tostring(... or nil)
 	end
 
 	if log then
@@ -317,13 +317,13 @@ modwarn = function(mod, ...)
 
 	local text = ""
 
-	if type(...) == table then
+	if type(... or nil) == "table" then
 		for i, t in ipairs(...) do
 			if i ~= 1 and type(t) ~= "string" and type((...)[i - 1]) ~= string then text = text .. " " end
 			text = text .. tostring(t)
 		end
 	else
-		text = tostring(...)
+		text = tostring(... or nil)
 	end
 
 	if log then
