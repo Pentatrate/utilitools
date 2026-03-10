@@ -62,5 +62,12 @@ return {
 		branch = {
 			main = true
 		}
+	},
+	lemontweaks = {
+		organisation = "lemonade-js",
+		repository = "lemontweaks",
+		branch = {
+			main = true
+		}
 	}
 }

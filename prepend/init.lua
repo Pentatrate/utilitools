@@ -292,18 +292,15 @@ utilitools = {
 }
 
 forceprint = print
-modlog = function(mod, ...)
+function modlog(mod, ...)
 	local modLabel = tostring(mod and mod.id or "unknown-mod")
+	local args = { ... }
 
 	local text = ""
 
-	if type(... or nil) == "table" then
-		for i, t in ipairs(...) do
-			if i ~= 1 and type(t) ~= "string" and type((...)[i - 1]) ~= string then text = text .. " " end
-			text = text .. tostring(t)
-		end
-	else
-		text = tostring(... or nil)
+	for i, t in ipairs(args) do
+		if i ~= 1 and type(t) ~= "string" and type(args[i - 1]) ~= string then text = text .. " " end
+		text = text .. tostring(t)
 	end
 
 	if log then
@@ -312,24 +309,23 @@ modlog = function(mod, ...)
 		forceprint("[" .. modLabel .. "] " .. text)
 	end
 end
-modwarn = function(mod, ...)
+function modwarn(mod, ...)
 	local modLabel = tostring(mod and mod.id or "unknown-mod")
+	local args = { ... }
 
 	local text = ""
 
-	if type(... or nil) == "table" then
-		for i, t in ipairs(...) do
-			if i ~= 1 and type(t) ~= "string" and type((...)[i - 1]) ~= string then text = text .. " " end
-			text = text .. tostring(t)
-		end
-	else
-		text = tostring(... or nil)
+	for i, t in ipairs(args) do
+		if i ~= 1 and type(t) ~= "string" and type(args[i - 1]) ~= string then text = text .. " " end
+		text = text .. tostring(t)
 	end
 
+	text = debug.traceback(text)
+
 	if log then
-		log(debug.traceback(text), modLabel)
+		log(text, modLabel)
 	else
-		forceprint(debug.traceback("[" .. modLabel .. "] " .. text))
+		forceprint("[" .. modLabel .. "] " .. text)
 	end
 end
 print = function(...)
