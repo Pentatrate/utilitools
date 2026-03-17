@@ -256,8 +256,8 @@ end
 configHelpers.treeNode = function(...) utilitools.imguiHelpers.treeNode(...) end
 configHelpers.setMod = function(mod2)
 	mod = mod2
-	utilitools.fileManager[mod.id].configOptions.load()
-	utilitools.fileManager[mod.id].documentation.load()
+	if utilitools.fileManager[mod.id].configOptions then utilitools.fileManager[mod.id].configOptions.load() end
+	if utilitools.fileManager[mod.id].documentation then utilitools.fileManager[mod.id].documentation.load() end
 	configOptions = utilitools.files[mod.id].configOptions
 	docs = utilitools.files[mod.id].documentation
 end
