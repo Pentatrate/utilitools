@@ -1,7 +1,7 @@
 [manifest]
-dump_lua = true
+dump_lua = true 
 priority = 2147483645 # 2147483647 - 2
-version = "1.0.0"
+version = "1.0.0" 
 
 # Logging ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -122,5 +122,26 @@ end
 utilitools.keybinds.checkBindsEnd()
 if utilitools.doRelaunch then utilitools.relaunch(true) end
 '''
+position = "after"
+target = "main.lua"
+
+# Mouse imgui scrolling ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "if (not project.useImgui) or (not imgui.love.GetWantCaptureMouse()) then"
+payload = '''
+if project.useImgui then
+	utilitools.imgui.mouse.sx, utilitools.imgui.mouse.sy = x, y
+end
+'''
+position = "before"
+target = "main.lua"
+
+[[patches]]
+[patches.pattern]
+match_indent = true
+pattern = "mouse:cleanup()"
+payload = '''utilitools.imgui.mouse.prevSx, utilitools.imgui.mouse.prevSy, utilitools.imgui.mouse.sx, utilitools.imgui.mouse.sy = utilitools.imgui.mouse.sx, utilitools.imgui.mouse.sy, 0, 0'''
 position = "after"
 target = "main.lua"

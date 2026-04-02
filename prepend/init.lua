@@ -193,7 +193,11 @@ utilitools = {
 		end
 	},
 	imgui = {
-		color = function(...) return imgui.ColorConvertFloat4ToU32(imgui.ImVec4_Float(...)) end
+		color = function(...) return imgui.ColorConvertFloat4ToU32(imgui.ImVec4_Float(...)) end,
+		mouse = {
+			sx = 0, sy = 0,
+			prevSx = 0, prevSy = 0
+		}
 	},
 	doRelaunch = false,
 	relaunch = function(crash)
