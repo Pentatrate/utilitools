@@ -2,7 +2,7 @@
 	"dependencies": {},
 	"incompatibilities": {
 		"beattools": {
-			"versions": [["fromTil", "3.0.0", "3.2.16"]],
+			"versions": [["fromTil", "3.0.0", "3.7.2"]],
 			"reason": "You need to update this mod."
 		}
 	},
@@ -52,6 +52,16 @@
 			"call": true
 		},
 		"modLinks": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"internet": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
+		"git": {
 			"extension": "lua",
 			"load": true,
 			"call": true

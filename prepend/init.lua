@@ -5,14 +5,19 @@ utilitools = {
 	incompatibilities = {},
 	modChecks = { general = false, dependencies = false, incompatibilities = false },
 	folderManager = {
-		ignoreFiles = { [".git"] = true, [".gitignore"] = true, [".vscode"] = true, [".lovelyignore"] = true, [".nolovelyignore"] = true, ["config.json"] = true, unused = true },
-		copy = function(to, from, isMod, hasGit)
+		ignoreFiles = { [".git"] = true, [".gitignore"] = true, [".vscode"] = true, [".lovelyignore"] = true, [".nolovelyignore"] = true, ["config.json"] = true, unused = true --[[ Beattools and Utilitools ]], LvlData = true --[[ Detailed Accuracy by thatguytheman ]], customsounds = true --[[ Lemontweaks by gooberlemonade ]] },
+		isIgnored = function(fileName, isMod, ignore)
+			if not isMod then return false end
+			if utilitools.folderManager.ignoreFiles[fileName] then return true end
+			return ignore and ignore[fileName]
+		end,
+		copy = function(to, from, isMod, hasGit, ignore)
 			if isMod and not hasGit and mods.utilitools.config.gitFix and love.filesystem.exists(to .. "/.git") then hasGit = true forceprint("Has git") end
 			for i, fileName in ipairs(love.filesystem.getDirectoryItems(from)) do
 				local toFile = to .. "/" .. fileName
 				local fromFile = from .. "/" .. fileName
 				local fromFileInfo = love.filesystem.getInfo(fromFile)
-				if fromFileInfo and (not isMod or not utilitools.folderManager.ignoreFiles[fileName]) then
+				if fromFileInfo and not utilitools.folderManager.isIgnored(fileName, isMod, ignore) then
 					if fromFileInfo.type == "file" then
 						local fileExtention
 						if isMod then
@@ -31,16 +36,16 @@ utilitools = {
 						love.filesystem.write(toFile, fromFileData)
 					elseif fromFileInfo.type == "directory" then
 						love.filesystem.createDirectory(toFile)
-						utilitools.folderManager.copy(toFile, fromFile, isMod, hasGit)
+						utilitools.folderManager.copy(toFile, fromFile, isMod, hasGit, ignore)
 					end
 				end
 			end
 		end,
-		delete = function(path, isMod)
+		delete = function(path, isMod, ignore)
 			for _, fileName in ipairs(love.filesystem.getDirectoryItems(path)) do
 				local filePath = path .. "/" .. fileName
 				local fileInfo = love.filesystem.getInfo(filePath)
-				if fileInfo and (not isMod or not utilitools.folderManager.ignoreFiles[fileName]) then
+				if fileInfo and not utilitools.folderManager.isIgnored(fileName, isMod, ignore) then
 					if fileInfo.type == "file" then
 						if not love.filesystem.remove(filePath) then forceprint("failed to delete " .. filePath) end
 					elseif fileInfo.type == "directory" then
@@ -50,7 +55,7 @@ utilitools = {
 			end
 			if not love.filesystem.remove(path) then forceprint("failed to delete " .. path) end
 		end,
-		compare = function(path, path2, isMod, prints)
+		compare = function(path, path2, isMod, prints, ignore)
 			if love.filesystem.getInfo(path) == nil then if prints then forceprint("No directory: " .. tostring(path)) end return false end
 			if love.filesystem.getInfo(path2) == nil then if prints then forceprint("No directory: " .. tostring(path2)) end return false end
 
@@ -59,7 +64,7 @@ utilitools = {
 				local fileInfo = love.filesystem.getInfo(filePath)
 				local filePath2 = path2 .. "/" .. fileName
 				local fileInfo2 = love.filesystem.getInfo(filePath2)
-				if fileInfo and (not isMod or not utilitools.folderManager.ignoreFiles[fileName]) then
+				if fileInfo and not utilitools.folderManager.isIgnored(fileName, isMod, ignore) then
 					if fileInfo2 == nil then if prints then forceprint("No file: " .. tostring(filePath2)) end return false end
 					if fileInfo.type ~= fileInfo2.type then if prints then forceprint("Different file types: " .. tostring(fileInfo.type) .. " " .. tostring(fileInfo2.type)) end return false end
 
@@ -110,9 +115,10 @@ utilitools = {
 		end,
 		search = {}
 	},
-	try = function(mod, func)
+	try = function(mod, func, silent)
 		local success, e = pcall(func)
-		if not success then modwarn(mod, e) end
+		if not success and not silent then modwarn(mod, e) end
+		return success
 	end,
 	table = {
 		keysToValues = function(t)
@@ -129,6 +135,12 @@ utilitools = {
 			if type(t) ~= "table" then return false end
 			for _, _ in pairs(t) do return false end
 			return true
+		end,
+		tableAmount = function(t)
+			if type(t) ~= "table" then return -1 end
+			local i = 0
+			for _, _ in pairs(t) do i = i  + 1 end
+			return i
 		end
 	},
 	string = {
@@ -149,6 +161,30 @@ utilitools = {
 			love.system.setClipboardText(t)
 			if cs and cs.p and cs.p.hurtPulse then cs.p:hurtPulse() end
 			utilitools.prompts.custom({ title = "Copied to clipboard!", message = t })
+		end,
+		concat = function(...)
+			local args = { ... }
+
+			local text = ""
+
+			for i, t in ipairs(args) do
+				if i ~= 1 then text = text .. " | " end
+				if type(t) == "table" then
+					if utilitools.table.emptyTable(t) then
+						text = text .. "{}"
+					elseif not utilitools.try(mod, function() text = text .. json.encode(t) end, true) then
+						text = text .. tostring(t)
+					end
+				else
+					text = text .. tostring(t)
+				end
+			end
+
+			return text
+		end,
+		capitalise = function(s)
+			if type(s) ~= "string" then return "" end
+			return s == "" and s or s:sub(1, 1):upper() .. s:sub(2)
 		end
 	},
 	number = {
@@ -158,107 +194,6 @@ utilitools = {
 	},
 	imgui = {
 		color = function(...) return imgui.ColorConvertFloat4ToU32(imgui.ImVec4_Float(...)) end
-	},
-	internet = {
-		cache = {},
-		httpCodes = {
-			[1] = { "Info", {
-				[0] = "Continue",
-				[1] = "Switching Protocols",
-				[2] = "Processing",
-				[3] = "Early Hints"
-			} },
-			[2] = { "Success", {
-				[0] = "Ok",
-				[1] = "Created",
-				[2] = "Accepted",
-				[3] = "Non-Authoritative Info",
-				[4] = "No Content",
-				[5] = "Reset Content",
-				[6] = "Partial Content",
-				[7] = "Multi Status",
-				[8] = "Already Reported",
-				[26] = "IM used"
-			} },
-			[3] = { "Redirect", {
-				[0] = "Multiple Choices",
-				[1] = "Moved Permanently",
-				[2] = "Found",
-				[3] = "See Other",
-				[4] = "Not Modified",
-				[5] = "Use Proxy (deprecated)",
-				[6] = "(unused)",
-				[7] = "Temporary Redirect",
-				[8] = "Permanent Redirect"
-			} },
-			[4] = { "Client Error", {
-				[0] = "Bad Request",
-				[1] = "Unauthorized",
-				[2] = "Payment Required",
-				[3] = "Forbidden",
-				[4] = "Not Found",
-				[5] = "Method Not Allowed",
-				[6] = "Not Acceptible",
-				[7] = "Proxy Authentification Required",
-				[8] = "Request Timeout",
-				[9] = "Conflict",
-				[10] = "Gone",
-				[11] = "Length Required",
-				[12] = "Precondition Failed",
-				[13] = "Content Too Large",
-				[14] = "URI Too Long",
-				[15] = "Unsupported Media Type",
-				[16] = "Range Not Satisfiable",
-				[17] = "Expectation Failed",
-				[18] = "I'm a teapot",
-				[21] = "Misdirected Request",
-				[22] = "Unprocessable Content",
-				[23] = "Locked",
-				[24] = "Failed Dependency",
-				[25] = "Too Early",
-				[26] = "Upgrade Required",
-				[28] = "Precondition Required",
-				[29] = "Too Many Requests",
-				[31] = "Request Header Fields Too Large",
-				[51] = "Unavaliable For Legal Reasons"
-			} },
-			[5] = { "Server Error", {
-				[0] = "Internal Server Error",
-				[1] = "Not Implemented",
-				[2] = "Bad Gateway",
-				[3] = "Service Unavaliable",
-				[4] = "Gateway Timeout",
-				[5] = "HTTP Version Not Supported",
-				[6] = "Variant Also Negotiates",
-				[7] = "Insufficient Storage",
-				[8] = "Loop Detected",
-				[10] = "Not Extended",
-				[11] = "Network Authentification Required",
-			} }
-		},
-		request = function(url, type, rerequest)
-			local code, body, time
-			local usedCache = false
-			if not rerequest and utilitools.internet.cache[url] and (utilitools.internet.cache[url][1] == 200 or love.timer.getTime() - utilitools.internet.cache[url][3] < 60) then
-				code, body, time = utilitools.internet.cache[url][1], utilitools.internet.cache[url][2], utilitools.internet.cache[url][3]
-				usedCache = true
-			else
-				code, body = require("https").request(url, { headers = { ["User-Agent"] = "utilitools/" .. mods.utilitools.version } })
-				-- code = 418 body = nil
-				time = love.timer.getTime()
-			end
-
-			utilitools.internet.cache[url] = { code, body, time }
-			if code == 200 then
-				if type == "json" then
-					return json.decode(body)
-				else
-					return body
-				end
-			elseif not usedCache then
-				modlog(mod, "Request error: http code " .. tostring(code) .. ": " .. (utilitools.internet.httpCodes[math.floor(code / 100)] or { code })[1] .. ": " .. (((utilitools.internet.httpCodes[math.floor(code / 100)] or {})[2] or {})[code % 100] or "not found") .. " | url: " .. tostring(url) .. " | ")
-			end
-		end
 	},
 	doRelaunch = false,
 	relaunch = function(crash)
@@ -294,14 +229,7 @@ utilitools = {
 forceprint = print
 function modlog(mod, ...)
 	local modLabel = tostring(mod and mod.id or "unknown-mod")
-	local args = { ... }
-
-	local text = ""
-
-	for i, t in ipairs(args) do
-		if i ~= 1 and type(t) ~= "string" and type(args[i - 1]) ~= string then text = text .. " " end
-		text = text .. tostring(t)
-	end
+	local text = utilitools.string.concat(...)
 
 	if log then
 		log(text, modLabel)
@@ -310,23 +238,11 @@ function modlog(mod, ...)
 	end
 end
 function modwarn(mod, ...)
-	local modLabel = tostring(mod and mod.id or "unknown-mod")
-	local args = { ... }
-
-	local text = ""
-
-	for i, t in ipairs(args) do
-		if i ~= 1 and type(t) ~= "string" and type(args[i - 1]) ~= string then text = text .. " " end
-		text = text .. tostring(t)
-	end
+	local text = utilitools.string.concat(...)
 
 	text = debug.traceback(text)
 
-	if log then
-		log(text, modLabel)
-	else
-		forceprint("[" .. modLabel .. "] " .. text)
-	end
+	modlog(mod, text)
 end
 print = function(...)
 	if mods and mods.utilitools and mods.utilitools.config then
@@ -380,7 +296,7 @@ local function utilitoolsRegisterMods()
 				if modsData[mod.id] == nil then modsData[mod.id] = dpf.loadJson(path .. "/utilitools.json") end
 				utilitools.mods[mod.id] = utilitools.mods[mod.id] or {}
 				if onlyCompat then
-					for _, v in ipairs({ "config", "cullConfig" }) do
+					for _, v in ipairs({ "config", "cullConfig", "ignore" }) do
 						utilitools.mods[mod.id][v] = modsData[mod.id][v]
 					end
 					if modsData[mod.id].files and type(modsData[mod.id].files) == "table" then

@@ -23,7 +23,9 @@ keybinds = {
 		category = "",
 		keyId = "",
 		keysPressed = {}
-	}
+	},
+	lastPressed = false,
+	keyBindsPressed = {}
 }
 
 keybinds.raw.setKey = function(category, keyId, binds, dontSave)
@@ -154,19 +156,62 @@ keybinds.pressed = function(mod, keyName, hold)
 			end
 		end
 		if holding and ((not hold and maininput:pressed("utilitools_" .. v[2])) or (hold and maininput:down("utilitools_" .. v[2]))) then
-			return true
+			return true, utilitools.table.tableAmount(v[1])
 		end
 	end
 	return false
 end
 
-keybinds.checkBinds = function(mod, binds, hold)
+function keybinds.checkBindsStart()
+	if keybinds.listening.listening then return end
+	keybinds.keyBindsPressed = {}
+end
+function keybinds.checkBinds(mod, binds)
 	if type(binds) ~= "table" then return end
+	if keybinds.listening.listening then return end
+
 	for key, func in pairs(binds) do
-		if utilitools.keybinds.pressed(mod, key, hold) then
-			if type(func) == "function" then func() end
+		if type(func) == "function" then
+			local pressed, amount = utilitools.keybinds.pressed(mod, key, key == keybinds.lastPressed)
+			if pressed then
+				table.insert(keybinds.keyBindsPressed, key == keybinds.lastPressed and 1 or #keybinds.keyBindsPressed + 1, { key = key, amount = amount, func = func })
+			end
 		end
 	end
+end
+function keybinds.checkBindsEnd()
+	if keybinds.listening.listening then return end
+	if #keybinds.keyBindsPressed == 0 then keybinds.lastPressed = false return end
+	if keybinds.keyBindsPressed[1] and keybinds.keyBindsPressed[1].key == keybinds.lastPressed then return end
+
+	local highest = keybinds.keyBindsPressed[1]
+	for _, keybind in ipairs(keybinds.keyBindsPressed) do
+		if keybind.amount > highest.amount then highest = keybind end
+	end
+
+	highest.func()
+	keybinds.lastPressed = highest.key
+end
+
+function keybinds.generateText(category, keyId, modded, group)
+	local keyLabel = ""
+	local amount = 0
+	for _, v in ipairs(modded and (utilitools.keybinds.mod.getKeybinds(category, keyId) or {}) or savedata.options.bindings[category][keyId]) do
+		if keyLabel ~= "" then keyLabel = keyLabel .. " or " end
+		if modded then
+			local first = true
+			for k, _ in pairs(v[1]) do
+				keyLabel = keyLabel .. (first and "" or " + ") .. utilitools.string.capitalise(k:sub(#"key:" + 1))
+				first = false
+			end
+			keyLabel = keyLabel .. (first and "" or " + ") .. utilitools.string.capitalise(v[2]:sub(#"key:" + 1))
+		else
+			keyLabel = keyLabel .. utilitools.string.capitalise(v:sub(#"key:" + 1))
+		end
+		amount = amount + 1
+	end
+	if group and amount > 1 then keyLabel = "(" .. keyLabel .. ")" end
+	return keyLabel
 end
 
 return keybinds

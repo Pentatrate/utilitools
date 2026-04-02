@@ -16,8 +16,7 @@ local function load(mod, file, reload)
 					if e then
 						modlog(mod, "Error while loading file " .. path .. " of " .. mod.name .. ":\n" .. e)
 					else
-						utilitools.files[mod.id][file.name] = setfenv(chunk,
-							setmetatable({ mod = mod }, { __index = _G }))
+						utilitools.files[mod.id][file.name] = setfenv(chunk, setmetatable({ mod = mod }, { __index = _G }))
 						if file.call then
 							utilitools.files[mod.id][file.name] = utilitools.files[mod.id][file.name]()
 						end

@@ -9,16 +9,24 @@ modUpdater.getSub = function(mod)
 end
 modUpdater.releaseData = function(mod, redownload)
 	if type(mod) ~= "table" then error("modUpdater.releaseData: expected table for mod") end
+	if mod.config.dontUseInternet then return {} end
 
-	local url = "https://api.github.com/repos/" .. modUpdater.getSub(mod) .. "/releases/latest"
+	local url = "https://api.github.com/repos/" .. modUpdater.getSub(mod) .. "/releases"
 
-	local rawData = utilitools.internet.request(url, "json", redownload)
-	if rawData == nil then return {} end
+	local success, rawData = utilitools.internet.request(url, "json", redownload, { ["User-Agent"] = "Pentatrate/utilitools (" .. mods.utilitools.version .. ")" })
+
+	if not success or not rawData or rawData == "null" or type(rawData) ~= "table" or #rawData == 0 then return {} end
+
+	url = "https://api.github.com/repos/" .. modUpdater.getSub(mod) .. "/releases/latest"
+
+	success, rawData = utilitools.internet.request(url, "json", redownload, { ["User-Agent"] = "Pentatrate/utilitools (" .. mods.utilitools.version .. ")" })
+	if not success or not rawData then return {} end
 
 	return rawData
 end
 modUpdater.branch = function(mod, branch)
 	if type(mod) ~= "table" then error("modUpdater.branch: expected table for mod") end
+	if mod.config.dontUseInternet then return branch end
 
 	branch = branch or mods.utilitools.config.branches[mod.id]
 	if branch and ((branch == "Latest Release## " and modUpdater.releaseData(mod) and modUpdater.releaseData(mod).name ~= nil) or (branch ~= "Latest Release## " and utilitools.modLinks[mod.id]["branch"][branch])) then return branch end
@@ -30,7 +38,7 @@ modUpdater.branch = function(mod, branch)
 end
 
 modUpdater.getModInfo = function(mod, recheck)
-	if type(mod) ~= "table" then error("modUpdater.checkModVersion: expected table for mod") end
+	if type(mod) ~= "table" then error("modUpdater.getModInfo: expected table for mod") end
 
 	if recheck or modUpdater.fileCache[mod.id] == nil then
 		modUpdater.fileCache[mod.id] = dpf.loadJson(utilitools.folderManager.modPath(mod) .. "/mod.json")
@@ -41,17 +49,20 @@ end
 -- downloading
 modUpdater.changeMessage = function(mod, branch, redownload)
 	if type(mod) ~= "table" then error("modUpdater.downloadLink: expected table for mod") end
+	if mod.config.dontUseInternet then return end
 	branch = modUpdater.branch(mod, branch)
 
 	if branch == "Latest Release## " then
 		if modUpdater.releaseData(mod, redownload) == nil then return end
 		return modUpdater.releaseData(mod).name .. "\n" .. modUpdater.releaseData(mod).body
 	else
-		return utilitools.internet.request("https://api.github.com/repos/" .. modUpdater.getSub(mod) .. "/commits/" .. branch, "json", redownload).commit.message
+		local success, data = utilitools.internet.request("https://api.github.com/repos/" .. modUpdater.getSub(mod) .. "/commits/" .. branch, "json", redownload, { ["User-Agent"] = "Pentatrate/utilitools (" .. mods.utilitools.version .. ")" })
+		return data.commit.message
 	end
 end
 modUpdater.downloadLink = function(mod, branch)
 	if type(mod) ~= "table" then error("modUpdater.downloadLink: expected table for mod") end
+	if mod.config.dontUseInternet then return end
 	branch = modUpdater.branch(mod, branch)
 
 	if branch == "Latest Release## " then
@@ -68,17 +79,17 @@ modUpdater.downloadLink = function(mod, branch)
 end
 modUpdater.directDownloadMod = function(mod, url, onlyCompare, force, redownload, message)
 	if type(mod) ~= "table" then error("modUpdater.directDownloadMod: expected table for mod") end
+	if mod.config.dontUseInternet then return end
 
-	local rawData = utilitools.internet.request(url, nil, redownload)
-	if rawData == nil then return end
+	local success, rawData = utilitools.internet.request(url, nil, redownload, { ["User-Agent"] = "Pentatrate/utilitools (" .. mods.utilitools.version .. ")" })
+	if not success or not rawData then return end
 
 	local fileData = love.filesystem.newFileData(rawData, "modZip.zip")
 	love.filesystem.mount(fileData, "modZip")
 	for _, fileName in pairs(love.filesystem.getDirectoryItems("modZip")) do
 		local path = utilitools.folderManager.modPath(mod)
 		local downloadPath = "modZip/" .. fileName
-		local newConfigs
-		if not force then newConfigs = dpf.loadJson(downloadPath .. "/mod.json") end
+		local newConfigs = dpf.loadJson(downloadPath .. "/mod.json")
 		if force or utilitools.versions.greaterThan(newConfigs.version, modUpdater.getModInfo(mod).version) then
 			if onlyCompare then
 				modlog(mod, "Comparing " .. mod.name .. " (" .. modUpdater.getModInfo(mod).version .. ") by " .. mod.author)
@@ -93,7 +104,7 @@ modUpdater.directDownloadMod = function(mod, url, onlyCompare, force, redownload
 					message = message
 				}
 				utilitools.folderManager.delete(path, true)
-				utilitools.folderManager.copy(path, downloadPath, true)
+				utilitools.folderManager.copy(path, downloadPath, true, false, utilitools.mods[mod.id] and utilitools.mods[mod.id].ignore)
 				modUpdater.fileCache[mod.id] = nil
 				if not beatblockPlus2_0Update then
 					newConfigs = dpf.loadJson(path .. "/mod.json")
@@ -110,6 +121,7 @@ modUpdater.directDownloadMod = function(mod, url, onlyCompare, force, redownload
 	love.filesystem.unmount("modZip.zip")
 end
 modUpdater.downloadMod = function(mod, branch, onlyCompare, force, redownload)
+	if mod.config.dontUseInternet then return end
 	if type(mod) ~= "table" then error("modUpdater.downloadMod: expected table for mod") end
 	branch = modUpdater.branch(mod, branch)
 	modUpdater.directDownloadMod(mod, modUpdater.downloadLink(mod, branch), onlyCompare, force, redownload, modUpdater.changeMessage(mod, branch, redownload))
@@ -118,20 +130,22 @@ end
 -- scanning
 modUpdater.getModVersion = function (mod, branch, redownload)
 	if type(mod) ~= "table" then error("modUpdater.getModVersion: expected table for mod") end
+	if mod.config.dontUseInternet then return mod.version end
 	branch = modUpdater.branch(mod, branch)
 
 	if branch ~= "Latest Release## " then
 		local url = "https://raw.githubusercontent.com/" .. modUpdater.getSub(mod) .. "/refs/heads/" .. branch .. "/mod.json"
 
-		local rawData = utilitools.internet.request(url, "json", redownload)
-		if rawData == nil then return mod.version end
+		local success, rawData = utilitools.internet.request(url, "json", redownload, { ["User-Agent"] = "Pentatrate/utilitools (" .. mods.utilitools.version .. ")" })
+		if not success or not rawData then return mod.version end
 		return rawData.version
 	else
-		if modUpdater.releaseData(mod) == nil then return mod.version end
+		if not modUpdater.releaseData(mod) then return mod.version end
 		return modUpdater.releaseData(mod).tag_name
 	end
 end
 modUpdater.checkModVersion = function (mod, branch, redownload)
+	if mod.config.dontUseInternet then return false end
 	if type(mod) ~= "table" then error("modUpdater.checkModVersion: expected table for mod") end
 	branch = modUpdater.branch(mod, branch)
 
@@ -140,6 +154,7 @@ modUpdater.checkModVersion = function (mod, branch, redownload)
 	return utilitools.versions.greaterThan(version, modUpdater.getModInfo(mod).version)
 end
 modUpdater.checkModVersions = function(redownload)
+	if mod.config.dontUseInternet then return false end
 	local r1 = false
 	local r2 = {}
 	for modId, mod in pairs(mods) do
@@ -154,12 +169,13 @@ modUpdater.checkModVersions = function(redownload)
 	return r1, r2
 end
 modUpdater.updateMods = function(redownload)
+	if mod.config.dontUseInternet then return false end
 	if mod.config.autoUpdate == false then
 		modlog(mod, "modUpdater.updateMods: autoUpdate is false")
 	end
 	local outdated, outdatedMods = modUpdater.checkModVersions(redownload)
 	local close = false
-	if outdated then
+	if outdated and outdatedMods then
 		for modId, _ in pairs(outdatedMods) do
 			if mod.config.autoUpdate == false then
 				modlog(mod, "modUpdater.updateMods: Requesting to update " .. modId)

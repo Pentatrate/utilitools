@@ -69,5 +69,12 @@ return {
 		branch = {
 			main = true
 		}
+	},
+	DetailedAcc = {
+		organisation = "Thatguytheman",
+		repository = "Detailed-Accuracy",
+		branch = {
+			main = true
+		}
 	}
 }

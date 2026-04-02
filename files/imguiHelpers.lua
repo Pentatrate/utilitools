@@ -149,12 +149,12 @@ imguiHelpers.inputKey = function(label, category, keyId, tooltip, modded)
 		if modded then
 			local first = true
 			for k, _ in pairs(v[1]) do
-				keyLabel = keyLabel .. (first and "" or " + ") .. k:sub(#"key:" + 1)
+				keyLabel = keyLabel .. (first and "" or " + ") .. utilitools.string.capitalise(k:sub(#"key:" + 1))
 				first = false
 			end
-			keyLabel = keyLabel .. (first and "" or " + ") .. v[2]:sub(#"key:" + 1)
+			keyLabel = keyLabel .. (first and "" or " + ") .. utilitools.string.capitalise(v[2]:sub(#"key:" + 1))
 		else
-			keyLabel = v:sub(#"key:" + 1)
+			keyLabel = utilitools.string.capitalise(v:sub(#"key:" + 1))
 		end
 		if imgui.Button(keyLabel .. "##" .. label) then
 			if modded then

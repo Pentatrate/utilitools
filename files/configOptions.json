@@ -175,5 +175,20 @@
 		"type": "hidden",
 		"name": "[internal] updated",
 		"default": {}
+	},
+	"dontUseInternet": {
+		"type": "bool",
+		"name": "Dont Use Internet",
+		"tooltips": {
+			"short": "Refuses all internet requests"
+		},
+		"default": false,
+		"off": true
+	},
+	"askDontUseInternet": {
+		"type": "bool",
+		"name": "[internal] askDontUseInternet",
+		"default": true,
+		"off": false
 	}
 }

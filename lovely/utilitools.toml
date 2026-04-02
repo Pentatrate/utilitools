@@ -44,31 +44,40 @@ utilitools.backwardsCompat()
 if beatblockPlus2_0Update then
 	if mods.utilitools.config.askUpdate then
 		if not mods.utilitools.config.autoUpdate then
-			local buttonPressed = love.window.showMessageBox("Utilitools", "Welcome to Utilitools!\nDo you want to enable auto updating for mods?", { "Proceed", "No, dont ask again" })
+			local buttonPressed = love.window.showMessageBox("Utilitools", "Welcome to Utilitools!\nDo you want to enable auto updating for mods?\n\n(You will be able to change this in the configs)", { "Yes, proceed", "No, dont ask again" })
 			if buttonPressed == 1 then
 				mods.utilitools.config.autoUpdate = true
 			elseif buttonPressed == 2 then
-				mods.utilitools.config.askUpdate = false
-				utilitools.config.save(mods.utilitools)
-			end
+				-- nothing, already false
+			else error("You thought you were slick... (Tried to escape the dialogue)") end
 		end
 		if mods.utilitools.config.autoUpdate then
-			local buttonPressed = love.window.showMessageBox("Utilitools", "Auto updating will require internet access.\nMods will *not* be scanned for viruses.\nAre you sure?", { "Enable", "Nevermind" })
+			local buttonPressed = love.window.showMessageBox("Utilitools", "Auto updating will require internet access.\nMods will *not* be scanned for viruses.\nAre you sure?\n\n(You will be able to change this in the configs)", { "Yes, enable", "Nevermind, don't enable" })
 			if buttonPressed == 1 then
-				mods.utilitools.config.askUpdate = false
-				utilitools.config.save(mods.utilitools)
+				-- nothing, already true
 			elseif buttonPressed == 2 then
 				mods.utilitools.config.autoUpdate = false
-				mods.utilitools.config.askUpdate = false
-				utilitools.config.save(mods.utilitools)
-			end
+			else error("You thought you were slick... (Tried to escape the dialogue)") end
 		end
+		mods.utilitools.config.askUpdate = false
+		utilitools.config.save(mods.utilitools)
 	end
-else
+elseif mods.utilitools.config.askUpdate or mods.utilitools.config.autoUpdate then
 	mods.utilitools.config.autoUpdate = false
 	mods.utilitools.config.askUpdate = false
+	utilitools.config.save(mods.utilitools)
 end
-if utilitools.modUpdater.updateMods() then
+if mods.utilitools.askDontUseInternet and not mods.utilitools.config.dontUseInternet then
+	local buttonPressed = love.window.showMessageBox("Utilitools", "You have disabled autoupdating.\nDo you want to be reminded of an update instead so you can update it manually?\n\n(You will be able to change this in the configs)", { "Yes, enable", "No, don't ask again" })
+	if buttonPressed == 1 then
+		-- nothing, already false
+	elseif buttonPressed == 2 then
+		mods.utilitools.dontUseInternet = true
+	else error("You thought you were slick... (Tried to escape the dialogue)") end
+	mods.utilitools.askDontUseInternet = false
+	utilitools.config.save(mods.utilitools)
+end
+if not mods.utilitools.config.dontUseInternet and utilitools.modUpdater.updateMods() then
 	utilitools.doRelaunch = true
 	utilitools.config.save(mods.utilitools)
 	cs = bs.load("UtilitoolsEmpty")
@@ -104,11 +113,13 @@ target = "main.lua"
 match_indent = true
 pattern = "PopupManager.update(dt)"
 payload = '''
+utilitools.keybinds.checkBindsStart()
 for modId, modFiles in pairs(utilitools.files) do
 	if modFiles.keys then
 		utilitools.keybinds.checkBinds(mods[modId], modFiles.keys)
 	end
 end
+utilitools.keybinds.checkBindsEnd()
 if utilitools.doRelaunch then utilitools.relaunch(true) end
 '''
 position = "after"

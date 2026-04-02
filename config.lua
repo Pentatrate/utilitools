@@ -6,6 +6,7 @@ configHelpers.treeNode("Menu Options", function()
 	imgui.Separator()
 	configHelpers.presets.menuButtons()
 	imgui.Separator()
+	configHelpers.input("dontUseInternet")
 	if beatblockPlus2_0Update then configHelpers.input("autoUpdate") end
 end, 2 ^ 5)
 configHelpers.treeNode("Advanced", function()
@@ -50,11 +51,12 @@ if beatblockPlus2_0Update then
 					if not utilitools.versions.equalTo(utilitools.modUpdater.getModInfo(mod).version, mod.version) then
 						imgui.TextWrapped("Restart to finish mod version update to " .. utilitools.modUpdater.getModInfo(mod).version)
 					end
-					if not utilitools.versions.equalTo(utilitools.modUpdater.getModVersion(mod), utilitools.modUpdater.getModInfo(mod).version) or mods.utilitools.config.showForceMod then
+					utilitools.try(mod, function()
+					if not mod.config.dontUseInternet and utilitools.modUpdater.getModVersion(mod) and not utilitools.versions.equalTo(utilitools.modUpdater.getModVersion(mod), utilitools.modUpdater.getModInfo(mod).version) or mods.utilitools.config.showForceMod then
 						imgui.AlignTextToFramePadding()
 						imgui.TextWrapped("Latest version: " .. utilitools.modUpdater.getModVersion(mod))
 						imgui.SameLine()
-						if utilitools.modUpdater.checkModVersion(mod) then
+						if not mod.config.dontUseInternet and utilitools.modUpdater.checkModVersion(mod) then
 							if imgui.Button("Update Version##" .. mod.id) then
 								utilitools.modUpdater.downloadMod(mod)
 								utilitools.config.save(mod)
@@ -65,7 +67,8 @@ if beatblockPlus2_0Update then
 							end
 						end
 					end
-					if mods.utilitools.config.showCompareMod and imgui.Button("Compare Files##" .. mod.id) then
+					end)
+					if not mod.config.dontUseInternet and mods.utilitools.config.showCompareMod and imgui.Button("Compare Files##" .. mod.id) then
 						utilitools.modUpdater.downloadMod(mod, nil, true, true)
 					end
 					local space = imgui.GetContentRegionAvail().x
