@@ -144,17 +144,19 @@ imguiHelpers.inputList = function(label, current, default, tooltip, flags, temp,
 	return rv[1], rv[2]
 end
 imguiHelpers.inputKey = function(label, category, keyId, tooltip, modded)
-	for _, v in ipairs(modded and (utilitools.keybinds.mod.getKeybinds(category, keyId) or {}) or savedata.options.bindings[category][keyId]) do
+	if category == "controltable" then return end
+
+	for _, v in ipairs(utilitools.keybinds.getKeybinds(category, keyId, modded)) do
 		local keyLabel = ""
 		if modded then
 			local first = true
 			for k, _ in pairs(v[1]) do
-				keyLabel = keyLabel .. (first and "" or " + ") .. utilitools.string.capitalise(k:sub(#"key:" + 1))
+				keyLabel = keyLabel .. (first and "" or " + ") .. utilitools.keybinds.text.keyLabel(k)
 				first = false
 			end
-			keyLabel = keyLabel .. (first and "" or " + ") .. utilitools.string.capitalise(v[2]:sub(#"key:" + 1))
+			keyLabel = keyLabel .. (first and "" or " + ") .. utilitools.keybinds.text.keyLabel(v[2])
 		else
-			keyLabel = utilitools.string.capitalise(v:sub(#"key:" + 1))
+			keyLabel = keyLabel .. utilitools.keybinds.text.keyLabel(v)
 		end
 		if imgui.Button(keyLabel .. "##" .. label) then
 			if modded then

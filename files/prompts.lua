@@ -61,7 +61,7 @@ prompts.key = function(category, keyId, modded)
 			local temp = ""
 			local first = true
 			for k, _ in pairs(utilitools.keybinds.listening.keysPressed) do
-				temp = temp .. (first and "" or " + ") .. k:sub(#"key:" + 1)
+				temp = temp .. (first and "" or " + ") .. utilitools.keybinds.text.keyLabel(k)
 				first = false
 			end
 			imgui.Text(temp)

@@ -1,7 +1,7 @@
 [manifest]
-dump_lua = true 
+dump_lua = true
 priority = 2147483645 # 2147483647 - 2
-version = "1.0.0" 
+version = "1.0.0"
 
 # Logging ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -113,13 +113,13 @@ target = "main.lua"
 match_indent = true
 pattern = "PopupManager.update(dt)"
 payload = '''
-utilitools.keybinds.checkBindsStart()
+utilitools.keybinds.mod.checkBindsStart()
 for modId, modFiles in pairs(utilitools.files) do
 	if modFiles.keys then
-		utilitools.keybinds.checkBinds(mods[modId], modFiles.keys)
+		utilitools.keybinds.mod.checkBinds(mods[modId], modFiles.keys)
 	end
 end
-utilitools.keybinds.checkBindsEnd()
+utilitools.keybinds.mod.checkBindsEnd()
 if utilitools.doRelaunch then utilitools.relaunch(true) end
 '''
 position = "after"
