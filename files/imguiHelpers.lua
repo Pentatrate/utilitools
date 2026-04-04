@@ -3,17 +3,17 @@ imguiHelpers.visibleLabel = function(label)
 	return tostring(label):sub(1, (tostring(label):find("##", nil, true) or 0) - 1)
 end
 imguiHelpers.tooltip = function(tooltip)
-	if imgui.IsItemHovered() and tooltip ~= nil and (type(tooltip) ~= "string" or tooltip:len() > 0) then
+	if imgui.IsItemHovered() and tooltip ~= nil and (type(tooltip) ~= "string" or #tooltip > 0) then
 		imgui.PushTextWrapPos(imgui.GetFontSize() * 7 / 13 * 65)
 		imgui.SetItemTooltip(tostring(tooltip))
 		imgui.PopTextWrapPos()
 	end
 end
 imguiHelpers.getWidth = function(label)
-	if label == nil or imguiHelpers.visibleLabel(label):len() == 0 then
+	if label == nil or #imguiHelpers.visibleLabel(label) == 0 then
 		return -1 ^ -9
 	else
-		return -imgui.GetFontSize() * 7 / 13 * imguiHelpers.visibleLabel(label):len() - imgui.GetStyle().ItemInnerSpacing.x
+		return -imgui.GetFontSize() * 7 / 13 * #imguiHelpers.visibleLabel(label) - imgui.GetStyle().ItemInnerSpacing.x
 	end
 end
 imguiHelpers.setWidth = function(label)
@@ -146,7 +146,17 @@ end
 imguiHelpers.inputKey = function(label, category, keyId, tooltip, modded)
 	if category == "controltable" then return end
 
-	for _, v in ipairs(utilitools.keybinds.getKeybinds(category, keyId, modded)) do
+	local first2 = true
+	local function sameLine(text, padding)
+		if not first2 then
+			imgui.SameLine()
+			local space = imgui.GetContentRegionAvail().x
+			space = space - (imgui.GetFontSize() * 7 / 13 * #imguiHelpers.visibleLabel(text) + (padding and imgui.GetStyle().FramePadding.x * 2 or 0))
+			if space < 0 then imgui.NewLine() end
+		end
+		first2 = false
+	end
+	for i, v in ipairs(utilitools.keybinds.getKeybinds(category, keyId, modded)) do
 		local keyLabel = ""
 		if modded then
 			local first = true
@@ -158,6 +168,7 @@ imguiHelpers.inputKey = function(label, category, keyId, tooltip, modded)
 		else
 			keyLabel = keyLabel .. utilitools.keybinds.text.keyLabel(v)
 		end
+		sameLine(keyLabel .. "##" .. label, true)
 		if imgui.Button(keyLabel .. "##" .. label) then
 			if modded then
 				utilitools.keybinds.mod.removeKeybind(category, keyId, v)
@@ -166,13 +177,19 @@ imguiHelpers.inputKey = function(label, category, keyId, tooltip, modded)
 			end
 		end
 		imguiHelpers.tooltip(tooltip)
-		imgui.SameLine()
 	end
+	sameLine("Add##" .. label, true)
 	if imgui.Button("Add##" .. label) then
 		utilitools.prompts.key(category, keyId, modded)
 	end
+	sameLine("Reset##" .. label, true)
+	if modded and imgui.Button("Reset##" .. label) then
+		modlog(category, utilitools.files[category.id].configOptions[keyId].default)
+		utilitools.keybinds.register.newKey(category, keyId, utilitools.files[category.id].configOptions[keyId].default, true)
+		utilitools.keybinds.register.finish()
+	end
 	imguiHelpers.tooltip(tooltip)
-	imgui.SameLine()
+	sameLine(label, true)
 	imgui.Text(imguiHelpers.visibleLabel(label))
 	imguiHelpers.tooltip(tooltip)
 end

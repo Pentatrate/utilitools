@@ -5,6 +5,14 @@ if savedata.options.bindings.utilitools == nil then savedata.options.bindings.ut
 local gameKeys = savedata.options.bindings
 local keybinds = {}
 local keys = savedata.utilitools.bindings
+local categories = {}
+for category, data in pairs(gameKeys) do
+	for keyId, _ in pairs(data) do
+		if keyId:sub(1, #"utilitools_") ~= "utilitools_" then
+			categories[keyId] = category
+		end
+	end
+end
 
 local function saveControls()
 	modlog(mod, "Saving controls...")
@@ -80,10 +88,11 @@ function keybinds.mod.getKeybinds(mod, keyId)
 	return assert(keybinds.mod.getKeys(mod)[keybinds.mod.getId(mod, keyId)], "keybinds.mod.getKeybinds: no key: " .. tostring(mod) .. " " .. tostring(keyId))
 end
 
-function keybinds.mod.addKeybind(mod, keyId, bind, dontSave)
-	local already = false
-	for i = #keybinds.mod.getKeybinds(mod, keyId), 1, -1 do
-		local v = keybinds.mod.getKeybinds(mod, keyId)[i]
+function keybinds.mod.sameKeybind(mod, keyId, bind, multiple)
+	local matches = {}
+	local binds = keybinds.mod.getKeybinds(mod, keyId)
+	for i = #binds, 1, -1 do
+		local v = binds[i]
 		local same = true
 		for k, _ in pairs(v[1]) do
 			if bind[1][k] == nil then same = false break end
@@ -91,9 +100,12 @@ function keybinds.mod.addKeybind(mod, keyId, bind, dontSave)
 		for k, _ in pairs(bind[1]) do
 			if v[1][k] == nil then same = false break end
 		end
-		if same and v[2] == bind[2] then already = true break end
+		if same and v[2] == bind[2] then table.insert(matches, i) if not multiple then break end end
 	end
-	if not already then table.insert(keybinds.mod.getKeybinds(mod, keyId), bind) end
+	return #matches > 0 and matches or nil
+end
+function keybinds.mod.addKeybind(mod, keyId, bind, dontSave)
+	if not keybinds.mod.sameKeybind(mod, keyId, bind, false) then table.insert(keybinds.mod.getKeybinds(mod, keyId), bind) end
 
 	for k, _ in pairs(bind[1]) do
 		keybinds.raw.setKey("utilitools", "utilitools_" .. k, { k }, true)
@@ -103,30 +115,37 @@ function keybinds.mod.addKeybind(mod, keyId, bind, dontSave)
 	if not dontSave then saveControls() end
 end
 function keybinds.mod.removeKeybind(mod, keyId, bind, dontSave)
-	for i = #keybinds.mod.getKeybinds(mod, keyId), 1, -1 do
-		local v = keybinds.mod.getKeybinds(mod, keyId)[i]
-		local same = true
-		for k, _ in pairs(v[1]) do
-			if bind[1][k] == nil then same = false break end
+	local matches = keybinds.mod.sameKeybind(mod, keyId, bind, true)
+	if matches then
+		for _, i in ipairs(matches) do
+			table.remove(keybinds.mod.getKeybinds(mod, keyId), i)
 		end
-		for k, _ in pairs(bind[1]) do
-			if v[1][k] == nil then same = false break end
-		end
-		if same and v[2] == bind[2] then table.remove(keybinds.mod.getKeybinds(mod, keyId), i) end
+		if not dontSave then saveControls() end
 	end
-	if not dontSave then saveControls() end
 end
 
+function keybinds.mod.singleKeyPressed(key, hold)
+	if key:sub(1, #"bind:") == "bind:" then
+		key = key:sub(#"bind:" + 1)
+	else
+		key = "utilitools_" .. key
+	end
+	if hold then
+		return maininput:down(key)
+	else
+		return maininput:pressed(key)
+	end
+end
 function keybinds.mod.pressed(mod, keyId, hold)
 	for _, v in ipairs(keybinds.mod.getKeybinds(mod, keyId)) do
 		local holding = true
 		for k, _ in pairs(v[1]) do
-			if not maininput:down("utilitools_" .. k) then
+			if not keybinds.mod.singleKeyPressed(k, true) then
 				holding = false
 				break
 			end
 		end
-		if holding and ((not hold and maininput:pressed("utilitools_" .. v[2])) or (hold and maininput:down("utilitools_" .. v[2]))) then
+		if holding and keybinds.mod.singleKeyPressed(v[2], hold) then
 			return true, utilitools.table.tableAmount(v[1])
 		end
 	end
@@ -171,10 +190,10 @@ function keybinds.mod.checkBindsEnd()
 	keybinds.mod.lastPressed = highest.key
 end
 
-function keybinds.register.newKey(mod, keyId, binds)
+function keybinds.register.newKey(mod, keyId, binds, override)
 	if keys[keybinds.mod.getCategory(mod)] == nil then keys[keybinds.mod.getCategory(mod)] = {} end
-	if keybinds.mod.getKeys(mod)[keybinds.mod.getId(mod, keyId)] == nil then
-		keybinds.mod.getKeys(mod)[keybinds.mod.getId(mod, keyId)] = binds
+	if keybinds.mod.getKeys(mod)[keybinds.mod.getId(mod, keyId)] == nil or override then
+		keybinds.mod.getKeys(mod)[keybinds.mod.getId(mod, keyId)] = helpers.copy(binds)
 		keybinds.register.registered = true
 
 		for _, bind in ipairs(binds) do
@@ -182,6 +201,29 @@ function keybinds.register.newKey(mod, keyId, binds)
 				keybinds.raw.setKey("utilitools", "utilitools_" .. k, { k }, true)
 			end
 			keybinds.raw.setKey("utilitools", "utilitools_" .. bind[2], { bind[2] }, true)
+		end
+	end
+	binds = keybinds.mod.getKeybinds(mod, keyId)
+	for check, _ in pairs({ ctrl = true, alt = true, shift = true }) do
+		local i = 1
+		while binds[i] do
+			local bind = binds[i]
+			if bind[1]["key:l" .. check] and not bind[1]["key:r" .. check] then
+				local bind2 = helpers.copy(bind)
+				bind2[1]["key:l" .. check] = nil
+				bind2[1]["key:r" .. check] = true
+				local matches = keybinds.mod.sameKeybind(mod, keyId, bind2, true)
+				if matches then
+					keybinds.register.registered = true
+					for _, j in ipairs(matches) do
+						table.remove(keybinds.mod.getKeybinds(mod, keyId), j)
+					end
+					bind[1]["key:l" .. check] = nil
+					bind[1]["bind:" .. check] = true
+					modlog(mod, "Merging", check, "of", keyId, #matches)
+				end
+			end
+			i = i + 1
 		end
 	end
 end
@@ -220,10 +262,11 @@ function keybinds.listening.listen(category, keyId, modded)
 				keybinds.listening.keysPressed["key:" .. key] = true
 			else
 				keybinds.raw.addKeybind(keybinds.listening.category, keybinds.listening.keyId, "key:" .. key)
-				keybinds.listening.listening = false
-				if utilitools.prompts.listening then
-					utilitools.prompts.close()
-				end
+				-- commenting this out to prevent bug where setting the keybind will press the keybind, not good, will have to make a hackyfix later
+				-- keybinds.listening.listening = false
+				-- if utilitools.prompts.listening then
+				-- 	utilitools.prompts.close()
+				-- end
 			end
 		end
 	end
@@ -248,15 +291,30 @@ function keybinds.listening.stop() keybinds.listening.listening = false keybinds
 
 
 
-function keybinds.text.keyLabel(keyId)
+function keybinds.text.keyLabel(keyId, dontZoom)
 	if keybinds.text.replace[keyId] then
 		return keybinds.text.replace[keyId]
 	elseif keyId:sub(1, #"key:") == "key:" then
 		return utilitools.string.capitalise(keyId:sub(#"key:" + 1))
+	elseif keyId:sub(1, #"bind:") == "bind:" then
+		local keybind = controltable[keyId:sub(#"bind:" + 1)]
+		if not dontZoom and keybind and #keybind == 1 then
+			return keybinds.text.keyLabel(keybind[1], true)
+		end
+		if categories[keyId:sub(#"bind:" + 1)] then
+			return utilitools.string.capitalise(loc.get(keyId:sub(#"bind:" + 1)))
+		end
+		return utilitools.string.capitalise(keyId:sub(#"bind:" + 1))
 	end
 	return keyId
 end
-function keybinds.text.generate(category, keyId, modded, group)
+function keybinds.text.generate(category, keyId, modded, group, sum)
+	if not modded and category == "controltable" and ({ ctrl = true, alt = true, shift = true })[keyId] then
+		return keybinds.text.keyLabel("bind:" .. keyId)
+	end
+	if not modded and sum then
+		return keybinds.text.keyLabel("bind:" .. keyId)
+	end
 	local keyLabel = ""
 	local amount = 0
 	for _, v in ipairs(keybinds.getKeybinds(category, keyId, modded)) do

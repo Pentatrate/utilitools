@@ -71,7 +71,6 @@ if beatblockPlus2_0Update then
 					if not mod.config.dontUseInternet and mods.utilitools.config.showCompareMod and imgui.Button("Compare Files##" .. mod.id) then
 						utilitools.modUpdater.downloadMod(mod, nil, true, true)
 					end
-					local space = imgui.GetContentRegionAvail().x
 					mods.utilitools.config.branches[mod.id] = utilitools.imguiHelpers.inputBranch(mods[modId], configHelpers.tooltip("branches"))
 					imgui.SameLine()
 					mods.utilitools.config.updates[mod.id] = utilitools.imguiHelpers.inputBool(
