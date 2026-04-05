@@ -44,9 +44,9 @@ keybinds = {
 			["key:,"] = "Comma",
 			["key:/"] = "Slash",
 			["key:return"] = "Enter",
-			mouse1 = "LMB",
-			mouse2 = "RMB",
-			mouse3 = "MMB"
+			["bind:mouse1"] = "LMB",
+			["bind:mouse2"] = "RMB",
+			["bind:mouse3"] = "MMB"
 		}
 	}
 }
