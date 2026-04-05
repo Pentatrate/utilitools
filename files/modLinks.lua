@@ -76,5 +76,12 @@ return {
 		branch = {
 			main = true
 		}
+	},
+	ExtraStuff = {
+		organisation = "lolcerdef",
+		repository = "ExtraStuff",
+		branch = {
+			main = true
+		}
 	}
 }
