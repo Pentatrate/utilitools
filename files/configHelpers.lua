@@ -331,7 +331,7 @@ configHelpers.presets = {
 		if mod.config.search ~= "" and prevSearch ~= mod.config.search then
 			utilitools.config.search[mod.id] = { {}, {}, {}, {}, {} }
 			local function find(s)
-				return s:lower():find(mod.config.search:lower(), nil, true)
+				return s and s:lower():find(mod.config.search:lower(), nil, true) or nil
 			end
 			for k, v in pairs(configOptions) do
 				if configHelpers.exists(k) and k ~= "search" then

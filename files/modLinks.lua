@@ -83,5 +83,12 @@ return {
 		branch = {
 			main = true
 		}
+	},
+	overdetailed_events_golden = {
+		organisation = "Pentatrate",
+		repository = "overdetailed_events_golden",
+		branch = {
+			main = true
+		}
 	}
 }
