@@ -81,7 +81,7 @@ return {
 		organisation = "lolcerdef",
 		repository = "ExtraStuff",
 		branch = {
-			main = true
+			master = true
 		}
 	},
 	overdetailed_events_golden = {

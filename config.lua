@@ -54,7 +54,7 @@ if beatblockPlus2_0Update then
 					utilitools.try(mod, function()
 					if not mod.config.dontUseInternet and utilitools.modUpdater.getModVersion(mod) and not utilitools.versions.equalTo(utilitools.modUpdater.getModVersion(mod), utilitools.modUpdater.getModInfo(mod).version) or mods.utilitools.config.showForceMod then
 						imgui.AlignTextToFramePadding()
-						imgui.TextWrapped("Latest version: " .. utilitools.modUpdater.getModVersion(mod))
+						imgui.TextWrapped("Latest version: " .. tostring(utilitools.modUpdater.getModVersion(mod)))
 						imgui.SameLine()
 						if not mod.config.dontUseInternet and utilitools.modUpdater.checkModVersion(mod) then
 							if imgui.Button("Update Version##" .. mod.id) then

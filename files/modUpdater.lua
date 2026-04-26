@@ -32,9 +32,15 @@ modUpdater.branch = function(mod, branch)
 	if branch and ((branch == "Latest Release## " and modUpdater.releaseData(mod) and modUpdater.releaseData(mod).name ~= nil) or (branch ~= "Latest Release## " and utilitools.modLinks[mod.id]["branch"][branch])) then return branch end
 	local defaultBranch = mod.config.branch or mods.utilitools.config.defaultBranch
 	if defaultBranch == "Latest Release## " and (modUpdater.releaseData(mod) == nil or modUpdater.releaseData(mod).name == nil) then
-		return "main"
+		defaultBranch = "main"
 	end
-	return mod.config.branch or mods.utilitools.config.defaultBranch
+	if defaultBranch and ((defaultBranch == "Latest Release## " and modUpdater.releaseData(mod) and modUpdater.releaseData(mod).name ~= nil) or (defaultBranch ~= "Latest Release## " and utilitools.modLinks[mod.id]["branch"][defaultBranch])) then return defaultBranch end
+	if utilitools.table.tableAmount(utilitools.modLinks[mod.id]["branch"]) >= 1 then
+		local array = utilitools.table.keysToValues(utilitools.modLinks[mod.id]["branch"])
+		table.sort(array)
+		defaultBranch = array[1]
+	end
+	return defaultBranch
 end
 
 modUpdater.getModInfo = function(mod, recheck)
