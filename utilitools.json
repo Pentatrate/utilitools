@@ -2,7 +2,7 @@
 	"dependencies": {},
 	"incompatibilities": {
 		"beattools": {
-			"versions": [["fromTil", "3.0.0", "3.7.9"]],
+			"versions": [["fromTil", "3.0.0", "3.8.0"]],
 			"reason": "You need to update this mod."
 		}
 	},

@@ -116,8 +116,8 @@ utilitools = {
 		search = {}
 	},
 	try = function(mod, func, silent)
-		local success, e = pcall(func)
-		if not success and not silent then modwarn(mod, e) end
+		local success, e = xpcall(func, function(error) modwarn(mod, error) end)
+		-- if not success and not silent then modwarn(mod, e) end
 		return success
 	end,
 	table = {
@@ -198,6 +198,16 @@ utilitools = {
 			sx = 0, sy = 0,
 			prevSx = 0, prevSy = 0
 		}
+	},
+	color = {
+		hsvToRgb = function(h, s, v)
+			-- https://en.wikipedia.org/wiki/HSL_and_HSV#Color_conversion_formulae
+			local function f(n)
+				local k = (n + h / 60) % 6
+				return v - v * s * math.max(0, math.min(k, 4 - k, 1))
+			end
+			return f(5), f(3), f(1)
+		end
 	},
 	doRelaunch = false,
 	relaunch = function(crash)
