@@ -329,7 +329,7 @@ configHelpers.presets = {
 		local prevSearch = mod.config.search
 		configHelpers.input("search")
 		if mod.config.search ~= "" and prevSearch ~= mod.config.search then
-			utilitools.config.search[mod.id] = { {}, {}, {}, {}, {} }
+			mod.config.searches = { {}, {}, {}, {}, {} }
 			local function find(s)
 				return s and s:lower():find(mod.config.search:lower(), nil, true) or nil
 			end
@@ -359,15 +359,15 @@ configHelpers.presets = {
 						end)()
 					}) do
 						if v2 then
-							table.insert(utilitools.config.search[mod.id][i], k)
+							table.insert(mod.config.searches[i], k)
 							break
 						end
 					end
 				end
 			end
 		end
-		if utilitools.config.search[mod.id] ~= nil then
-			for i, v in ipairs(utilitools.config.search[mod.id]) do
+		if mod.config.searches ~= nil then
+			for i, v in ipairs(mod.config.searches) do
 				if #v > 0 then
 					imgui.SeparatorText(({ "Match Start", "Match Name", "Match Value", "Match Tooltip", "Match Value Tooltip" })
 						[i])
