@@ -108,7 +108,11 @@ utilitools = {
 		foldAll = false,
 		save = function(mod)
 			if beatblockPlus2_0Update then
-				dpf.saveJson(mod.path .. "/config.json", mod.config)
+				if utils and utils.saveConfig then
+					utils.saveConfig(mod.id)
+				else
+					dpf.saveJson(mod.path .. "/config.json", mod.config)
+				end
 			else
 				dpf.saveJson(utilitools.folderManager.modPath(mod) .. "/mod.json", { id = mod.id, name = mod.name, author = mod.author, description = mod.description, version = mod.version, enabled = mod.enabled, config = mod.config })
 			end

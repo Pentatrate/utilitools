@@ -77,8 +77,8 @@ local internet = {
 	},
 	failureRerequestTime = 120, -- 2 minutes
 	types = {
-		json = function()
-			if utilitools.table.emptyTable(t) then return {} end
+		json = function(body)
+			if utilitools.table.emptyTable(body) then return {} end
 			return json.encode(body)
 		end
 	}
@@ -96,7 +96,7 @@ function internet.decode(body, type)
 	local r
 	if internet.types[type] then
 		if utilitools.try(mod, function()
-			r = internet.types[type]()
+			r = internet.types[type](body)
 		end) then
 			return r
 		end

@@ -238,7 +238,7 @@ function keybinds.getKeybinds(category, keyId, modded)
 		if category ~= "controltable" then
 			return keybinds.raw.getKeybinds(category, keyId)
 		else
-			return assert(controltable[keyId], "keybinds.getKeybinds: no key: " .. tostring(categorymod) .. " " .. tostring(keyId))
+			return assert(controltable[keyId], "keybinds.getKeybinds: no key: " .. tostring(category) .. " " .. tostring(keyId))
 		end
 	end
 end
