@@ -168,19 +168,27 @@ utilitools = {
 		end,
 		concat = function(...)
 			local args = { ... }
+			local maxIndex = 0
+
+			for i, _ in pairs(args) do if i > maxIndex then maxIndex = i end end
 
 			local text = ""
 
-			for i, t in ipairs(args) do
-				if i ~= 1 then text = text .. " | " end
-				if type(t) == "table" then
-					if utilitools.table.emptyTable(t) then
-						text = text .. "{}"
-					elseif not utilitools.try(mod, function() text = text .. json.encode(t) end, true) then
+			if #args == 0 then
+				text = "nil"
+			else
+				for i = 1, maxIndex do
+					local t = args[i]
+					if i ~= 1 then text = text .. " | " end
+					if type(t) == "table" then
+						if utilitools.table.emptyTable(t) then
+							text = text .. "{}"
+						elseif not utilitools.try(mod, function() text = text .. json.encode(t) end, true) then
+							text = text .. tostring(t)
+						end
+					else
 						text = text .. tostring(t)
 					end
-				else
-					text = text .. tostring(t)
 				end
 			end
 
