@@ -1,6 +1,5 @@
 {
-	"version": "1.2.45",
-	"enabled": true,
+	"version": "1.2.46",
 	"config": {
 		"branches": {
 			"beattools": "main",

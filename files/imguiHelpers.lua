@@ -3,17 +3,24 @@ imguiHelpers.visibleLabel = function(label)
 	return tostring(label):sub(1, (tostring(label):find("##", nil, true) or 0) - 1)
 end
 imguiHelpers.tooltip = function(tooltip)
-	if imgui.IsItemHovered() and tooltip ~= nil and (type(tooltip) ~= "string" or #tooltip > 0) then
+	if imgui.IsItemHovered() and tooltip ~= nil and (type(tooltip) ~= "string" or imguiHelpers.stringLength(tooltip) > 0) then
 		imgui.PushTextWrapPos(imgui.GetFontSize() * 7 / 13 * 65)
 		imgui.SetItemTooltip(tostring(tooltip))
 		imgui.PopTextWrapPos()
 	end
 end
+imguiHelpers.stringLength = function(label)
+	local length = 0
+	for s in label:gmatch("[^\n]+") do
+		length = math.max(length, #s)
+	end
+	return length
+end
 imguiHelpers.getWidth = function(label)
-	if label == nil or #imguiHelpers.visibleLabel(label) == 0 then
+	if label == nil or imguiHelpers.stringLength(imguiHelpers.visibleLabel(label)) == 0 then
 		return -1 ^ -9
 	else
-		return -imgui.GetFontSize() * 7 / 13 * #imguiHelpers.visibleLabel(label) - imgui.GetStyle().ItemInnerSpacing.x
+		return -imgui.GetFontSize() * 7 / 13 * imguiHelpers.stringLength(imguiHelpers.visibleLabel(label)) - imgui.GetStyle().ItemInnerSpacing.x
 	end
 end
 imguiHelpers.setWidth = function(label)
@@ -42,17 +49,21 @@ imguiHelpers.inputFloat = function(label, current, default, tooltip, flags, step
 	imguiHelpers.tooltip(tooltip)
 	return v[0]
 end
-imguiHelpers.inputText = function(label, current, default, tooltip, flags, size)
+imguiHelpers.inputText = function(label, current, default, tooltip, flags, size, overrideWidth)
 	if current == nil then current = default end
 	size = size or (2 ^ 16)
 	local v = ffi.new("char[?]", size)
 	ffi.copy(v, current, #current)
-	imguiHelpers.setWidth(label)
+	if overrideWidth then
+		imgui.SetNextItemWidth(overrideWidth)
+	else
+		imguiHelpers.setWidth(label)
+	end
 	imgui.InputText(label, v, size, flags or (2 ^ 12))
 	imguiHelpers.tooltip(tooltip)
 	return ffi.string(v)
 end
-imguiHelpers.inputMultiline = function(label, current, default, tooltip, flags, size)
+imguiHelpers.inputMultiline = function(label, current, default, tooltip, flags, size, overrideWidth)
 	if current == nil then current = default end
 	size = size or (2 ^ 16)
 
@@ -60,7 +71,7 @@ imguiHelpers.inputMultiline = function(label, current, default, tooltip, flags, 
 	for _ in current:gmatch("\n") do
 		lines = lines + 1
 	end
-	local size2d = imgui.ImVec2_Float(imguiHelpers.getWidth(label), imgui.GetFontSize() * lines + 6)
+	local size2d = imgui.ImVec2_Float(overrideWidth or imguiHelpers.getWidth(label), imgui.GetFontSize() * lines + 6)
 
 	local v = ffi.new("char[?]", size)
 	ffi.copy(v, current, #current)
@@ -151,7 +162,7 @@ imguiHelpers.inputKey = function(label, category, keyId, tooltip, modded)
 		if not first2 then
 			imgui.SameLine()
 			local space = imgui.GetContentRegionAvail().x
-			space = space - (imgui.GetFontSize() * 7 / 13 * #imguiHelpers.visibleLabel(text) + (padding and imgui.GetStyle().FramePadding.x * 2 or 0))
+			space = space - (imgui.GetFontSize() * 7 / 13 * imguiHelpers.stringLength(imguiHelpers.visibleLabel(text)) + (padding and imgui.GetStyle().FramePadding.x * 2 or 0))
 			if space < 0 then imgui.NewLine() end
 		end
 		first2 = false
