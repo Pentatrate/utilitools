@@ -112,11 +112,6 @@ modUpdater.directDownloadMod = function(mod, url, onlyCompare, force, redownload
 				utilitools.folderManager.delete(path, true)
 				utilitools.folderManager.copy(path, downloadPath, true, false, utilitools.mods[mod.id] and utilitools.mods[mod.id].ignore)
 				modUpdater.fileCache[mod.id] = nil
-				if not beatblockPlus2_0Update then
-					newConfigs = dpf.loadJson(path .. "/mod.json")
-					newConfigs.config = mod.config
-					dpf.saveJson(path .. "/mod.json", newConfigs)
-				end
 				modlog(mod, "Downloaded mod " .. mod.id)
 			end
 		else

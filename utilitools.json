@@ -1,9 +1,13 @@
 {
 	"dependencies": {},
 	"incompatibilities": {
+		"beatblock-plus": {
+			"versions": [["<", "2.0.0"]],
+			"reason": "Outdated. You need to update this mod."
+		},
 		"beattools": {
 			"versions": [["fromTil", "3.0.0", "3.9.1"]],
-			"reason": "You need to update this mod."
+			"reason": "Outdated. You need to update this mod."
 		}
 	},
 	"files": {

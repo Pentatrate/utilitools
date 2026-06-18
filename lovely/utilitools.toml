@@ -16,20 +16,9 @@ target = "main.lua"
 match_indent = true
 pattern = "cs = bs.load(project.initState)"
 payload = '''
-beatblockPlus2_0Update = tableContains == nil
 if log then
 	log:defineEnvironment("unknown-mod", 2, 2)
 	log:defineEnvironment("utilitools", 2, 2)
-end
-if not beatblockPlus2_0Update then -- Check for unrenamed folders of commit downloads
-	for _, modId in ipairs({ "utilitools", "beattools", "beatblock-plus", "beatblock-plus-launcher" }) do
-		for _, v in ipairs({ "main", "dev", "devPenta" }) do
-			if mods[modId] and love.filesystem.exists(utilitools.folderManager.modPath(mods[modId]) .. "-" .. v) then
-				utilitools.folderManager.copy(utilitools.folderManager.modPath(mods[modId]), utilitools.folderManager.modPath(mods[modId]) .. "-" .. v)
-				utilitools.folderManager.delete(utilitools.folderManager.modPath(mods[modId]) .. "-" .. v)
-			end
-		end
-	end
 end
 if true then -- Utilitools file loader
 	local chunk, e = love.filesystem.load(utilitools.folderManager.modPath(mods.utilitools) .. "/files/fileManager.lua")
@@ -41,29 +30,23 @@ if true then -- Utilitools file loader
 end
 utilitoolsRegisterMods()
 utilitools.backwardsCompat()
-if beatblockPlus2_0Update then
-	if mods.utilitools.config.askUpdate then
-		if not mods.utilitools.config.autoUpdate then
-			local buttonPressed = love.window.showMessageBox("Utilitools", "Welcome to Utilitools!\nDo you want to enable auto updating for mods?\n\n(You will be able to change this in the configs)", { "Yes, proceed", "No, dont ask again" })
-			if buttonPressed == 1 then
-				mods.utilitools.config.autoUpdate = true
-			elseif buttonPressed == 2 then
-				-- nothing, already false
-			else error("You thought you were slick... (Tried to escape the dialogue)") end
-		end
-		if mods.utilitools.config.autoUpdate then
-			local buttonPressed = love.window.showMessageBox("Utilitools", "Auto updating will require internet access.\nMods will *not* be scanned for viruses.\nAre you sure?\n\n(You will be able to change this in the configs)", { "Yes, enable", "Nevermind, don't enable" })
-			if buttonPressed == 1 then
-				-- nothing, already true
-			elseif buttonPressed == 2 then
-				mods.utilitools.config.autoUpdate = false
-			else error("You thought you were slick... (Tried to escape the dialogue)") end
-		end
-		mods.utilitools.config.askUpdate = false
-		utilitools.config.save(mods.utilitools)
+if mods.utilitools.config.askUpdate then
+	if not mods.utilitools.config.autoUpdate then
+		local buttonPressed = love.window.showMessageBox("Utilitools", "Welcome to Utilitools!\nDo you want to enable auto updating for mods?\n\n(You will be able to change this in the configs)", { "Yes, proceed", "No, dont ask again" })
+		if buttonPressed == 1 then
+			mods.utilitools.config.autoUpdate = true
+		elseif buttonPressed == 2 then
+			-- nothing, already false
+		else error("You thought you were slick... (Tried to escape the dialogue)") end
 	end
-elseif mods.utilitools.config.askUpdate or mods.utilitools.config.autoUpdate then
-	mods.utilitools.config.autoUpdate = false
+	if mods.utilitools.config.autoUpdate then
+		local buttonPressed = love.window.showMessageBox("Utilitools", "Auto updating will require internet access.\nMods will *not* be scanned for viruses.\nAre you sure?\n\n(You will be able to change this in the configs)", { "Yes, enable", "Nevermind, don't enable" })
+		if buttonPressed == 1 then
+			-- nothing, already true
+		elseif buttonPressed == 2 then
+			mods.utilitools.config.autoUpdate = false
+		else error("You thought you were slick... (Tried to escape the dialogue)") end
+	end
 	mods.utilitools.config.askUpdate = false
 	utilitools.config.save(mods.utilitools)
 end

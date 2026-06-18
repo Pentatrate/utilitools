@@ -28,11 +28,6 @@ utilitools = {
 						if isMod and fileExtention and hasGit then
 							fromFileData = fromFileData:gsub(string.char(13) .. string.char(10), string.char(10)):gsub(string.char(10), string.char(13) .. string.char(10))
 						end
-						if isMod and not beatblockPlus2_0Update and fromFile == "mod.json" then
-							fromFileData = json.decode(fromFileData)
-							fromFileData.config = mod.config
-							fromFileData = json.encode(fromFileData)
-						end
 						love.filesystem.write(toFile, fromFileData)
 					elseif fromFileInfo.type == "directory" then
 						love.filesystem.createDirectory(toFile)
@@ -90,31 +85,16 @@ utilitools = {
 			return true
 		end,
 		modPath = function(mod)
-			if beatblockPlus2_0Update then
-				return mod.path
-			else
-				local remap = {
-					["beatblock-plus"] = "BeatblockPlus",
-					["beatblock-plus-launcher"] = "BeatblockPlusLauncher"
-				}
-				if remap[mod.id] then
-					return (mods.utilitools.config.modPath or "Mods") .. "/" .. remap[mod.id]
-				end
-				return (mods.utilitools.config.modPath or "Mods") .. "/" .. mod.id
-			end
+			return mod.path
 		end
 	},
 	config = {
 		foldAll = false,
 		save = function(mod)
-			if beatblockPlus2_0Update then
-				if utils and utils.saveConfig then
-					utils.saveConfig(mod.id)
-				else
-					dpf.saveJson(mod.path .. "/config.json", mod.config)
-				end
+			if utils and utils.saveConfig then
+				utils.saveConfig(mod.id)
 			else
-				dpf.saveJson(utilitools.folderManager.modPath(mod) .. "/mod.json", { id = mod.id, name = mod.name, author = mod.author, description = mod.description, version = mod.version, enabled = mod.enabled, config = mod.config })
+				dpf.saveJson(mod.path .. "/config.json", mod.config)
 			end
 		end,
 		search = {}
@@ -284,7 +264,6 @@ print = function(...)
 end
 
 local function utilitoolsRegisterMods()
-	if not beatblockPlus2_0Update and not love.filesystem.getInfo(mods.utilitools.config.modPath or "Mods", "directory") then return end
 	local modsData = {}
 
 	local function checkForMod(modId, data)

@@ -190,5 +190,10 @@
 		"name": "[internal] askDontUseInternet",
 		"default": true,
 		"off": false
+	},
+	"bindings": {
+		"type": "hidden",
+		"name": "[internal] bindings",
+		"default": {}
 	}
 }

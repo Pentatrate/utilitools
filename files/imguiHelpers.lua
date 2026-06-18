@@ -217,7 +217,7 @@ imguiHelpers.inputBranch = function(mod, tooltip)
 	end
 
 	for k, _ in pairs(utilitools.modLinks[mod.id].branch) do
-		if not (beatblockPlus2_0Update and bbp.utils.tableContains or tableContains)(values, branchPrefix .. k) then
+		if not bbp.utils.tableContains(values, branchPrefix .. k) then
 			table.insert(values, branchPrefix .. k)
 			table.insert(valueTooltips, "Use the latest commit on the " .. k .. " branch")
 		end

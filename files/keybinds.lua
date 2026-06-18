@@ -1,10 +1,7 @@
-if savedata.utilitools == nil then savedata.utilitools = {} end
-if savedata.utilitools.bindings == nil then savedata.utilitools.bindings = {} end
 if savedata.options.bindings.utilitools == nil then savedata.options.bindings.utilitools = {} end
 
 local gameKeys = savedata.options.bindings
 local keybinds = {}
-local keys = savedata.utilitools.bindings
 local categories = {}
 for category, data in pairs(gameKeys) do
 	for keyId, _ in pairs(data) do
@@ -15,11 +12,22 @@ for category, data in pairs(gameKeys) do
 end
 
 local function saveControls()
-	modlog(mod, "Saving controls...")
-	keybinds.register.registered = false
+	if keybinds.register then keybinds.register.registered = false end
 	sdfunc.save()
 	updateControls()
+	utilitools.config.save(mod)
 end
+
+local keys
+
+if savedata.utilitools and savedata.utilitools.bindings then
+	mod.config.bindings = savedata.utilitools.bindings
+	savedata.utilitools = nil
+	saveControls()
+	modlog(mod, "keybinds: Moving modded keybinds from main.sav to mod configs")
+end
+
+keys = mod.config.bindings
 
 
 keybinds = {
