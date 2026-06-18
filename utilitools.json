@@ -2,7 +2,7 @@
 	"dependencies": {},
 	"incompatibilities": {
 		"beatblock-plus": {
-			"versions": [["<", "2.0.0"]],
+			"versions": [[">=", "2.0.0"]],
 			"reason": "Outdated. You need to update this mod."
 		},
 		"beattools": {
