@@ -27,7 +27,7 @@ if savedata.utilitools and savedata.utilitools.bindings then
 	modlog(mod, "keybinds: Moving modded keybinds from main.sav to mod configs")
 end
 
-keys = mod.config.bindings
+keys = mod.config.bindings or {}
 
 
 keybinds = {
