@@ -12,27 +12,40 @@ suggest.suggest = function(current, list)
 		if imgui.IsItemEdited() or imgui.IsItemActivated() then
 			suggest.index = 1
 			suggest.list = {}
-			if #current > 0 then
-				for _, v in ipairs(list) do
-					local find = v:lower():find(current:lower(), nil, true)
-					if find then
-						table.insert(suggest.list, { v, find == 1 })
-					end
+			for _, v in ipairs(list) do
+				local find = #current > 0 and v:lower():find(current:lower(), nil, true)
+				if #current <= 0 or find then
+					table.insert(suggest.list, { v, find == 1 })
 				end
 			end
 			table.sort(suggest.list, function(a, b)
 				if a[2] ~= b[2] then return a[2] end
+				if a[1]:lower() ~= b[1]:lower() then return a[1]:lower() < b[1]:lower() end
 				return a[1] < b[1]
 			end)
 		end
 		if #suggest.list > 0 then
-			if imgui.BeginTooltip() then
-				imgui.SeparatorText("Suggestions")
-				for i, v in ipairs(suggest.list) do
-					imgui.Selectable_Bool(v[1], i == suggest.index)
-				end
-				imgui.EndTooltip()
+			local x, y, offset
+			if mods["imgui-scale-fix"] and mods["imgui-scale-fix"].enabled then
+				x = imgui.GetIO().MousePos.x
+				y = imgui.GetIO().MousePos.y
+			else
+				x = mouse.rx * imgui.canvasScale
+				y = mouse.ry * imgui.canvasScale
 			end
+
+			offset = 0
+			if mouse.rx > 400 then
+				offset = 1
+			end
+			imgui.SetNextWindowPos(imgui.ImVec2_Float(x, y), imgui.ImGuiCond_Appearing, imgui.ImVec2_Float(offset, 0.5))
+
+			imgui.BeginTooltip()
+			imgui.SeparatorText("Suggestions")
+			for i, v in ipairs(suggest.list) do
+				imgui.Selectable_Bool(v[1], i == suggest.index)
+			end
+			imgui.EndTooltip()
 		end
 		if imgui.IsKeyPressed(imgui.ImGuiKey_UpArrow, false) or imgui.IsKeyPressed(imgui.ImGuiKey_Keypad8, false) or utilitools.imgui.mouse.prevSy > 0 then -- up
 			suggest.index = suggest.index - 1

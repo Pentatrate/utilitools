@@ -4,9 +4,28 @@ imguiHelpers.visibleLabel = function(label)
 end
 imguiHelpers.tooltip = function(tooltip)
 	if imgui.IsItemHovered() and tooltip ~= nil and (type(tooltip) ~= "string" or imguiHelpers.stringLength(tooltip) > 0) then
+		local x, y, offset
+		if mods["imgui-scale-fix"] and mods["imgui-scale-fix"].enabled then
+			x = imgui.GetIO().MousePos.x
+			y = imgui.GetIO().MousePos.y
+		else
+			x = mouse.rx * imgui.canvasScale
+			y = mouse.ry * imgui.canvasScale
+		end
+
+		offset = 0
+		if mouse.rx > 400 then
+			offset = 1
+		end
+		imgui.SetNextWindowPos(imgui.ImVec2_Float(x, y), imgui.ImGuiCond_Appearing, imgui.ImVec2_Float(offset, 0.5))
+
+		imgui.BeginTooltip()
+
 		imgui.PushTextWrapPos(imgui.GetFontSize() * 7 / 13 * 65)
-		imgui.SetItemTooltip(tostring(tooltip))
+		imgui.TextUnformatted(tostring(tooltip))
 		imgui.PopTextWrapPos()
+
+		imgui.EndTooltip()
 	end
 end
 imguiHelpers.stringLength = function(label)
