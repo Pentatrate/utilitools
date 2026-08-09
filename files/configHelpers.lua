@@ -164,6 +164,17 @@ configHelpers.inputMultiline = function(key)
 		configOptions[key].size
 	)
 end
+configHelpers.inputWrapped = function(key)
+	if not configHelpers.exists(key) then
+		imgui.Text("Failed.")
+		return
+	end
+	mod.config[key] = utilitools.imguiHelpers.inputWrapped(
+		configHelpers.convertLabel(key), mod.config[key], configOptions[key].default,
+		configHelpers.tooltip(key), configOptions[key].flags,
+		configOptions[key].size
+	)
+end
 configHelpers.inputCombo = function(key)
 	if not configHelpers.exists(key) then
 		imgui.Text("Failed.")

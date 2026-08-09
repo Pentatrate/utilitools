@@ -1,4 +1,7 @@
-local imguiHelpers = {}
+local imguiHelpers = {
+	wrappedFocus = nil,
+	wrappedBool = false
+}
 imguiHelpers.visibleLabel = function(label)
 	return tostring(label):sub(1, (tostring(label):find("##", nil, true) or 0) - 1)
 end
@@ -90,13 +93,75 @@ imguiHelpers.inputMultiline = function(label, current, default, tooltip, flags, 
 	for _ in current:gmatch("\n") do
 		lines = lines + 1
 	end
-	local size2d = imgui.ImVec2_Float(overrideWidth or imguiHelpers.getWidth(label), imgui.GetFontSize() * lines + 6)
+	local size2d = imgui.ImVec2_Float(overrideWidth or imguiHelpers.getWidth(label), imgui.GetFontSize() * lines + imgui.GetStyle().FramePadding.y * 2)
 
 	local v = ffi.new("char[?]", size)
 	ffi.copy(v, current, #current)
 	imgui.InputTextMultiline(label, v, size, size2d, flags)
 	imguiHelpers.tooltip(tooltip)
 	return ffi.string(v)
+end
+imguiHelpers.inputWrapped = function(label, current, default, tooltip, flags, size, overrideWidth) -- unfinished
+	if current == nil then current = default end
+	size = size or (2 ^ 16)
+	if imguiHelpers.wrappedBool then
+		label = tostring(label) .. "##"
+	end
+	overrideWidth = overrideWidth or imguiHelpers.getWidth(label)
+
+	local space = overrideWidth < 0 and imgui.GetContentRegionAvail().x + overrideWidth - imgui.GetStyle().ItemInnerSpacing.x or overrideWidth
+	local maxAmount = math.max(1, math.floor(space / (imgui.GetFontSize() * 7 / 13)))
+
+	--[[ local temp = ""
+
+	if #current > maxAmount then
+		local amount = math.ceil((#current) / maxAmount) - 1
+		for j = 1, amount do
+			current = current:sub(1, maxAmount * j + j - 1) .. "\n" .. current:sub(1 + maxAmount * j + j - 1)
+		end
+	end ]]
+
+	local textSize = imgui.ImVec2_Float(0, 0)
+	utilitools.try(mod, function()
+		textSize = imgui.CalcTextSize(current, current, false, space)
+	end)
+
+	local lines = 1
+	for _ in current:gmatch("\n") do
+		lines = lines + 1
+	end
+	local size2d = imgui.ImVec2_Float(overrideWidth, imgui.GetFontSize() * lines + imgui.GetStyle().FramePadding.y * 2)
+
+	if imguiHelpers.wrappedFocus ~= nil then
+		imgui.SetKeyboardFocusHere()
+	end
+
+	local v = ffi.new("char[?]", size)
+	ffi.copy(v, current, #current)
+	imgui.PushTextWrapPos(imgui.GetFontSize() * 7 / 13 * 10)
+	imgui.InputTextMultiline(label, v, size, size2d, flags or imgui.ImGuiInputTextFlags_EnterReturnsTrue)
+	imgui.PopTextWrapPos()
+	imguiHelpers.tooltip(tooltip .. "\n" .. utilitools.string.concat(imguiHelpers.stringLength(current), textSize.x, textSize.y))
+
+	if imguiHelpers.wrappedBool then
+		imguiHelpers.wrappedBool = false
+	end
+	if imgui.IsItemEdited() and not imgui.IsItemDeactivated() then
+		imguiHelpers.wrappedBool = true
+		imguiHelpers.wrappedFocus = true
+	else
+		if imguiHelpers.wrappedFocus then
+			imguiHelpers.wrappedFocus = false
+		else
+			imguiHelpers.wrappedFocus = nil
+		end
+	end
+
+	utilitools.try(mod, function()
+		imguiHelpers.inputTextWrapped(label, current, size, size2d, flags, tooltip)
+	end)
+
+	return ffi.string(v):gsub("\n", "")
 end
 imguiHelpers.inputCombo = function(label, current, default, tooltip, flags, values, tooltips)
 	if current == nil then current = default end
@@ -319,5 +384,42 @@ imguiHelpers.treeNode = function(label, func, flags)
 			imgui.TreePop()
 		end
 	end
+end
+
+function imguiHelpers.inputTextWrapped(label, current, size, size2d, flags, tooltip) -- unfinished
+	local drawList = imgui.GetWindowDrawList()
+	local avail = imgui.GetContentRegionAvail()
+	local v = ffi.new("char[?]", size)
+	ffi.copy(v, current, #current)
+
+	local windowPos = imgui.GetCursorScreenPos()
+	local endPos = imgui.ImVec2_Float(windowPos.x + size2d.x + (size2d.x < 0 and avail.x or 0), windowPos.y + size2d.y + (size2d.y < 0 and avail.y or 0))
+	local color = imgui.ImGuiCol_FrameBg
+	local padding = imgui.GetStyle().FramePadding
+
+	imgui.InvisibleButton(label .. "##", size2d)
+	imguiHelpers.tooltip(tooltip)
+
+	if imgui.IsItemHovered() then
+		color = imgui.ImGuiCol_FrameBgHovered
+		imgui.SetMouseCursor(imgui.ImGuiMouseCursor_TextInput)
+	end
+	if imgui.IsItemActive() then
+		color = imgui.ImGuiCol_FrameBgActive
+	end
+
+	drawList:AddRectFilled(windowPos, endPos, imgui.GetColorU32_Col(color), imgui.GetStyle().FrameRounding)
+	drawList:AddText_Vec2(imgui.ImVec2_Float(windowPos.x + padding.x, windowPos.y + padding.y), imgui.GetColorU32_Col(imgui.ImGuiCol_Text), v, nil)
+
+	function drawCursor(offset)
+		local xPos = windowPos.x + padding.x + offset * imgui.GetFontSize() * 7 / 13
+		local yPosMin = windowPos.y + padding.y + 1
+		drawList:AddLine(imgui.ImVec2_Float(xPos, yPosMin), imgui.ImVec2_Float(xPos, yPosMin + imgui.GetFontSize() - 2), imgui.GetColorU32_Col(imgui.ImGuiCol_Text), 1)
+	end
+
+	imgui.SameLine()
+	imgui.AlignTextToFramePadding()
+	imgui.Text(imguiHelpers.visibleLabel(label))
+	imguiHelpers.tooltip(tooltip)
 end
 return imguiHelpers
