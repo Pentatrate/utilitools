@@ -104,5 +104,47 @@ return {
 		branch = {
 			main = true
 		}
+	},
+	cprof = {
+		organisation = "redsti-github",
+		repository = "Beatblock-cprof",
+		branch = {
+			main = true
+		}
+	},
+	customjsondata = {
+		organisation = "lemonade-js",
+		repository = "customjsondata",
+		branch = {
+			main = true
+		}
+	},
+	redacted = {
+		organisation = "ImPurplez",
+		repository = "redacted-texturepack",
+		branch = {
+			main = true
+		}
+	},
+	colorful = {
+		organisation = "ImPurplez",
+		repository = "Colorful",
+		branch = {
+			main = true
+		}
+	},
+	wideblock = {
+		organisation = "ImPurplez",
+		repository = "wideblock",
+		branch = {
+			main = true
+		}
+	},
+	["1080purpz"] = {
+		organisation = "ImPurplez",
+		repository = "1080purpz",
+		branch = {
+			main = true
+		}
 	}
 }
