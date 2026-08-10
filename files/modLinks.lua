@@ -90,5 +90,19 @@ return {
 		branch = {
 			main = true
 		}
+	},
+	["custom-events-api"] = {
+		organisation = "redsti-github",
+		repository = "BeatblockMod-Custom-Events-API",
+		branch = {
+			main = true
+		}
+	},
+	keyed = {
+		organisation = "lolcerdef",
+		repository = "keyed",
+		branch = {
+			main = true
+		}
 	}
 }

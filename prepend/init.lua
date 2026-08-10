@@ -91,8 +91,8 @@ utilitools = {
 	config = {
 		foldAll = false,
 		save = function(mod)
-			if utils and utils.saveConfig then
-				utils.saveConfig(mod.id)
+			if bbp and bbp.utils and bbp.utils.saveConfig then
+				bbp.utils.saveConfig(mod.id)
 			else
 				dpf.saveJson(mod.path .. "/config.json", mod.config)
 			end
