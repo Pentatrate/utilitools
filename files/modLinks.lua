@@ -28,6 +28,13 @@ return {
 			main = true
 		}
 	},
+	["quick-playtest"] = {
+		organisation = "Pentatrate",
+		repository = "quick-playtest",
+		branch = {
+			main = true
+		}
+	},
 	themeable = {
 		organisation = "ImPurplez",
 		repository = "Themeable",
