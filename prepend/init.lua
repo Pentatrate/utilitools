@@ -13,6 +13,7 @@ utilitools = {
 		end,
 		copy = function(to, from, isMod, hasGit, ignore)
 			if isMod and not hasGit and mods.utilitools.config.gitFix and love.filesystem.exists(to .. "/.git") then hasGit = true forceprint("Has git") end
+			love.filesystem.createDirectory(to)
 			for i, fileName in ipairs(love.filesystem.getDirectoryItems(from)) do
 				local toFile = to .. "/" .. fileName
 				local fromFile = from .. "/" .. fileName

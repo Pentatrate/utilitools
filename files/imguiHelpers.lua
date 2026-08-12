@@ -73,7 +73,7 @@ imguiHelpers.inputFloat = function(label, current, default, tooltip, flags, step
 end
 imguiHelpers.inputText = function(label, current, default, tooltip, flags, size, overrideWidth)
 	if current == nil then current = default end
-	size = size or (2 ^ 16)
+	size = size or (2 ^ 10)
 	local v = ffi.new("char[?]", size)
 	ffi.copy(v, current, #current)
 	if overrideWidth then
@@ -87,7 +87,7 @@ imguiHelpers.inputText = function(label, current, default, tooltip, flags, size,
 end
 imguiHelpers.inputMultiline = function(label, current, default, tooltip, flags, size, overrideWidth)
 	if current == nil then current = default end
-	size = size or (2 ^ 16)
+	size = size or (2 ^ 10)
 
 	local lines = 1
 	for _ in current:gmatch("\n") do
@@ -103,7 +103,7 @@ imguiHelpers.inputMultiline = function(label, current, default, tooltip, flags, 
 end
 imguiHelpers.inputWrapped = function(label, current, default, tooltip, flags, size, overrideWidth) -- unfinished
 	if current == nil then current = default end
-	size = size or (2 ^ 16)
+	size = size or (2 ^ 10)
 	if imguiHelpers.wrappedBool then
 		label = tostring(label) .. "##"
 	end
@@ -218,7 +218,7 @@ end
 imguiHelpers.inputList = function(label, current, default, tooltip, flags, temp, size)
 	if current == nil then current = default end
 	local formatted = table.concat(current, ", ")
-	size = size or (2 ^ 16)
+	size = size or (2 ^ 10)
 	local v = ffi.new("char[?]", size)
 	ffi.copy(v, formatted, #formatted)
 	imguiHelpers.setWidth(label)

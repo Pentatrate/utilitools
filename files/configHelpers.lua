@@ -64,51 +64,44 @@ configHelpers.off = function()
 		end
 	end
 end
+function configHelpers.shortOrLong(value, config, force)
+	if not value then return end
+	if not force and (config == false or config == "none") then return end
+
+	if type(value) == "string" then return value end
+
+	if type(value) ~= "table" then return end
+	if not (value.long or value.short or value[1] or value[2]) then return end
+
+	local long, short = value.long or value[1], value.short or value[2]
+	if (force and (config == false or config == "none")) or config == "short" then
+		return tostring(short or long)
+	end
+	return tostring(long or short)
+end
 configHelpers.doc = function(key, force, noSep)
-	if key == nil then return end
-	if mod == nil then return end
-	if docs == nil then return end
-	if docs[key] == nil then return end
+	if not key or not mod or not docs or not docs[key] then return end
+	if not force and (mod.config.documentation == false or mod.config.documentation == "none") then return end
 
-	if not force and (mod.config.documentation == nil or mod.config.documentation == "none") then return end
+	local v = configHelpers.shortOrLong(docs[key], mod.config.documentation, force)
+	if not v then return end
 
-	local v = docs[key]
-	if type(v) == "table" then
-		if mod.config.documentation == "short" or v.long == nil then
-			v = v.short
-		else
-			v = v.long
-		end
-	end
-	if v then
-		imgui.TextWrapped(tostring(v))
-		if not noSep then imgui.Separator() end
-	end
+	imgui.TextWrapped(tostring(v))
+	if not noSep then imgui.Separator() end
 end
 configHelpers.convertLabel = function(key)
 	return configOptions[key].name .. "##" .. mod.id .. "Config_" .. key
 end
 configHelpers.tooltip = function(key, index)
 	if not configHelpers.exists(key) then return end
-	if mod.config.tooltips == nil or mod.config.tooltips == "none" then return end
+	if mod.config.tooltips == false or mod.config.tooltips == "none" then return end
 
 	local tooltip
-	if index and configOptions[key].valueTooltips then
-		tooltip = configOptions[key].valueTooltips[index]
-	end
-	if tooltip == nil then tooltip = configOptions[key].tooltips end
-	if tooltip then
-		if type(tooltip) == "table" then
-			if mod.config.tooltips == "short" or tooltip.long == nil then
-				tooltip = tooltip.short
-			else
-				tooltip = tooltip.long
-			end
-		end
-		if tooltip then
-			return tostring(tooltip)
-		end
-	end
+	if index and configOptions[key].valueTooltips then tooltip = configOptions[key].valueTooltips[index] end
+	if not tooltip then tooltip = configOptions[key].tooltips end
+
+	tooltip = configHelpers.shortOrLong(tooltip, mod.config.tooltips)
+	return tooltip
 end
 configHelpers.inputBool = function(key)
 	if not configHelpers.exists(key) then
