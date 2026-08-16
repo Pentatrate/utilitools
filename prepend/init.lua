@@ -12,7 +12,7 @@ utilitools = {
 			return ignore and ignore[fileName]
 		end,
 		copy = function(to, from, isMod, hasGit, ignore)
-			if isMod and not hasGit and mods.utilitools.config.gitFix and love.filesystem.exists(to .. "/.git") then hasGit = true forceprint("Has git") end
+			if isMod and not hasGit and mods.utilitools.config.gitFix and love.filesystem.exists(to .. "/.git") then hasGit = true modlog(mod, "Has git") end
 			love.filesystem.createDirectory(to)
 			for i, fileName in ipairs(love.filesystem.getDirectoryItems(from)) do
 				local toFile = to .. "/" .. fileName
@@ -37,19 +37,23 @@ utilitools = {
 				end
 			end
 		end,
-		delete = function(path, isMod, ignore)
-			for _, fileName in ipairs(love.filesystem.getDirectoryItems(path)) do
-				local filePath = path .. "/" .. fileName
-				local fileInfo = love.filesystem.getInfo(filePath)
-				if fileInfo and not utilitools.folderManager.isIgnored(fileName, isMod, ignore) then
-					if fileInfo.type == "file" then
-						if not love.filesystem.remove(filePath) then forceprint("failed to delete " .. filePath) end
-					elseif fileInfo.type == "directory" then
-						utilitools.folderManager.delete(filePath, isMod)
+		delete = function(path, isMod, ignore, info)
+			info = info or love.filesystem.getInfo(path)
+			if not info then modwarn(mod, "utilitools.folderManager.delete: doesnt exist", path) return end
+			if info.type == "directory" then
+				for _, fileName in ipairs(love.filesystem.getDirectoryItems(path)) do
+					local filePath = path .. "/" .. fileName
+					local fileInfo = love.filesystem.getInfo(filePath)
+					if fileInfo and not utilitools.folderManager.isIgnored(fileName, isMod, ignore) then
+						if fileInfo.type == "file" then
+							if not love.filesystem.remove(filePath) then modwarn(mod, "utilitools.folderManager.delete: failed to delete 2", filePath) end
+						elseif fileInfo.type == "directory" then
+							utilitools.folderManager.delete(filePath, isMod, ignore, fileInfo)
+						end
 					end
 				end
 			end
-			if not love.filesystem.remove(path) then forceprint("failed to delete " .. path) end
+			if not love.filesystem.remove(path) then modwarn(mod, "utilitools.folderManager.delete: failed to delete 1", path) end
 		end,
 		compare = function(path, path2, isMod, prints, ignore)
 			if love.filesystem.getInfo(path) == nil then if prints then forceprint("No directory: " .. tostring(path)) end return false end
