@@ -2,6 +2,8 @@ local suggest = {
 	list = {},
 	index = 1,
 	last = "",
+	lastActive = nil,
+	acceptSuggest = false,
 	radius = 64,
 	lineThickness = 2,
 	dials = {}
@@ -56,16 +58,24 @@ suggest.suggest = function(current, list)
 		if imgui.IsKeyPressed(imgui.ImGuiKey_DownArrow, false) or imgui.IsKeyPressed(imgui.ImGuiKey_Keypad2, false) or utilitools.imgui.mouse.prevSy < 0 then -- down
 			suggest.index = (suggest.index % #suggest.list) + 1
 		end
-		if imgui.IsKeyPressed(imgui.ImGuiKey_Tab, false) and #suggest.list > 0 then -- tab
-			suggest.last = suggest.list[suggest.index][1]
-			return suggest.list[suggest.index][1]
-		end
-		-- if imgui.IsKeyPressed(imgui.ImGuiKey_MouseWheelY, false) then modlog(mod, mouse.rx) end
-		-- if utilitools.imgui.mouse.sy ~= 0 then modlog(mod, "SCROLLED SY", utilitools.imgui.mouse.sy) end
-	elseif imgui.IsItemDeactivated() and suggest.last ~= "" then
-		local temp = suggest.last
+		--acceptSuggest
 		suggest.last = ""
-		return temp
+		if #suggest.list > 0 then
+			suggest.last = suggest.list[suggest.index][1]
+			suggest.lastActive = imgui.GetItemID()
+			if imgui.IsKeyPressed(imgui.ImGuiKey_Tab, false) or imgui.IsKeyPressed(imgui.ImGuiKey_Enter) then
+				suggest.acceptSuggest = true
+				return suggest.last
+			end
+		end
+	elseif imgui.IsItemDeactivated() and suggest.last ~= "" and suggest.lastActive and suggest.lastActive == imgui.GetItemID() then
+		if imgui.IsKeyPressed(imgui.ImGuiKey_Tab, false) or imgui.IsKeyPressed(imgui.ImGuiKey_Enter) or suggest.acceptSuggest then
+			local temp = suggest.last
+			suggest.last = ""
+			suggest.lastActive = nil
+			suggest.acceptSuggest = false
+			return temp
+		end
 	end
 	return current
 end

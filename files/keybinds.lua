@@ -261,6 +261,7 @@ function keybinds.listening.listen(category, keyId, modded)
 	keybinds.listening.keyId = keyId
 	keybinds.listening.keysPressed = {}
 
+	---@diagnostic disable-next-line: duplicate-set-field
 	function love.keypressed(key)
 		if project.useImgui then
 			imgui.love.KeyPressed(key)
@@ -278,6 +279,7 @@ function keybinds.listening.listen(category, keyId, modded)
 			end
 		end
 	end
+	---@diagnostic disable-next-line: duplicate-set-field
 	function love.keyreleased(key)
 		if project.useImgui then
 			imgui.love.KeyReleased(key)
