@@ -78,8 +78,11 @@ local internet = {
 	failureRerequestTime = 120, -- 2 minutes
 	types = {
 		json = function(body)
-			if utilitools.table.emptyTable(body) then return {} end
-			return json.encode(body)
+			if type(body) == "table" then return body end -- what are you doing lol
+			if type(body) == "string" then
+				return json.decode(body)
+			end
+			error(utilitools.string.concat("tried to convert data of type", type(body), body))
 		end
 	}
 }
@@ -92,18 +95,20 @@ function internet.requestError(url, code, body)
 	local minorMeaning = meaning and meaning[2] and meaning[2][minor] or nil
 	return utilitools.string.concat("Request error: http code ", code, ": ", majorMeaning, ": ", minorMeaning or "not found", " || url: ", url, " || response: ", body)
 end
-function internet.decode(body, type)
+function internet.decode(body, type2)
 	local r
-	if internet.types[type] then
+	if internet.types[type2] then
 		if utilitools.try(mod, function()
-			r = internet.types[type](body)
+			r = internet.types[type2](body)
 		end) then
 			return r
+		else
+			modwarn(mod, "internet.decode: faild to decode json", type2, body)
 		end
 	end
 	return body
 end
-function internet.request(url, type, rerequest, headers, method)
+function internet.request(url, type2, rerequest, headers, method)
 	if mod.config.dontUseInternet then return false end
 	local code, body, headersRecieved, time
 	local usedCache = false
@@ -120,7 +125,7 @@ function internet.request(url, type, rerequest, headers, method)
 		modlog(mod, "URL", url)
 		-- modlog(mod, "URL", url, headers, code, body, headersRecieved)
 		if code == 200 then
-			body = internet.decode(body, type)
+			body = internet.decode(body, type2)
 			headersRecieved = internet.decode(headersRecieved, "json")
 		elseif not usedCache then
 			modwarn(mod, internet.requestError(url, code, body))

@@ -295,7 +295,7 @@ imguiHelpers.inputBranch = function(mod, tooltip)
 
 	local values = { branchPrefix .. "main" }
 	local valueTooltips = { "Use the latest commit on the main branch" }
-	if (utilitools.modUpdater.releaseData(mod) or {}).name ~= nil then
+	if false and (utilitools.modUpdater.releaseData(mod) or {}).name ~= nil then
 		table.insert(values, 1, "Latest Release## ")
 		table.insert(valueTooltips, 1, "Use the latest release")
 	end

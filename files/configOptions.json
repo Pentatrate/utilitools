@@ -126,7 +126,6 @@
 			"short": "Default for different ways to get different versions"
 		},
 		"values": [
-			"Latest Release## ",
 			"main"
 		],
 		"valueTooltips": [
@@ -137,7 +136,7 @@
 				"short": "Use the latest commit on the main branch"
 			}
 		],
-		"default": "Latest Release## "
+		"default": "main"
 	},
 	"showCompareMod": {
 		"type": "bool",

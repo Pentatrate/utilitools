@@ -15,12 +15,18 @@ modUpdater.releaseData = function(mod, redownload)
 
 	local success, rawData = utilitools.internet.request(url, "json", redownload, { ["User-Agent"] = "Pentatrate/utilitools (" .. mods.utilitools.version .. ")" })
 
-	if not success or not rawData or rawData == "null" or type(rawData) ~= "table" or #rawData == 0 then return {} end
+	if not success or not rawData or rawData == "null" or type(rawData) ~= "table" or #rawData == 0 then
+		modlog(mod, "modUpdater.releaseData: request for releases failed for", mod.id, redownload)
+		return {}
+	end
 
 	url = "https://api.github.com/repos/" .. modUpdater.getSub(mod) .. "/releases/latest"
 
 	success, rawData = utilitools.internet.request(url, "json", redownload, { ["User-Agent"] = "Pentatrate/utilitools (" .. mods.utilitools.version .. ")" })
-	if not success or not rawData then return {} end
+	if not success or not rawData then
+		modlog(mod, "modUpdater.releaseData: request for latest release failed for", mod.id, redownload)
+		return {}
+	end
 
 	return rawData
 end
@@ -29,12 +35,24 @@ modUpdater.branch = function(mod, branch)
 	if mod.config.dontUseInternet then return branch end
 
 	branch = branch or mods.utilitools.config.branches[mod.id]
-	if branch and ((branch == "Latest Release## " and modUpdater.releaseData(mod) and modUpdater.releaseData(mod).name ~= nil) or (branch ~= "Latest Release## " and utilitools.modLinks[mod.id]["branch"][branch])) then return branch end
+	if branch and (
+		(
+			false and branch == "Latest Release## " and modUpdater.releaseData(mod) and modUpdater.releaseData(mod).name ~= nil
+		) or (
+			branch ~= "Latest Release## " and utilitools.modLinks[mod.id]["branch"][branch] -- branch exists
+		)
+	) then return branch end
 	local defaultBranch = mod.config.branch or mods.utilitools.config.defaultBranch
-	if defaultBranch == "Latest Release## " and (modUpdater.releaseData(mod) == nil or modUpdater.releaseData(mod).name == nil) then
+	if false and defaultBranch == "Latest Release## " and (modUpdater.releaseData(mod) == nil or modUpdater.releaseData(mod).name == nil) then
 		defaultBranch = "main"
 	end
-	if defaultBranch and ((defaultBranch == "Latest Release## " and modUpdater.releaseData(mod) and modUpdater.releaseData(mod).name ~= nil) or (defaultBranch ~= "Latest Release## " and utilitools.modLinks[mod.id]["branch"][defaultBranch])) then return defaultBranch end
+	if defaultBranch and (
+		(
+			false and defaultBranch == "Latest Release## " and modUpdater.releaseData(mod) and modUpdater.releaseData(mod).name ~= nil
+		) or (
+			defaultBranch ~= "Latest Release## " and utilitools.modLinks[mod.id]["branch"][defaultBranch]
+		)
+	) then return defaultBranch end
 	if utilitools.table.tableAmount(utilitools.modLinks[mod.id]["branch"]) >= 1 then
 		local array = utilitools.table.keysToValues(utilitools.modLinks[mod.id]["branch"])
 		table.sort(array)
@@ -58,7 +76,7 @@ modUpdater.changeMessage = function(mod, branch, redownload)
 	if mod.config.dontUseInternet then return end
 	branch = modUpdater.branch(mod, branch)
 
-	if branch == "Latest Release## " then
+	if false and branch == "Latest Release## " then
 		if modUpdater.releaseData(mod, redownload) == nil then return end
 		return modUpdater.releaseData(mod).name .. "\n" .. modUpdater.releaseData(mod).body
 	else
@@ -71,7 +89,7 @@ modUpdater.downloadLink = function(mod, branch)
 	if mod.config.dontUseInternet then return end
 	branch = modUpdater.branch(mod, branch)
 
-	if branch == "Latest Release## " then
+	if false and branch == "Latest Release## " then
 		if modUpdater.releaseData(mod) == nil then return end
 		for _, v in ipairs(modUpdater.releaseData(mod).assets) do
 			if v.name:sub(-#".zip") == ".zip" then
@@ -134,25 +152,34 @@ modUpdater.getModVersion = function (mod, branch, redownload)
 	if mod.config.dontUseInternet then return mod.version end
 	branch = modUpdater.branch(mod, branch)
 
-	if branch ~= "Latest Release## " then
+	if true or branch ~= "Latest Release## " then
 		local url = "https://raw.githubusercontent.com/" .. modUpdater.getSub(mod) .. "/refs/heads/" .. branch .. "/mod.json"
 
 		local success, rawData = utilitools.internet.request(url, "json", redownload, { ["User-Agent"] = "Pentatrate/utilitools (" .. mods.utilitools.version .. ")" })
-		if not success or not rawData then return mod.version end
+		if not success or not rawData then
+			modlog(mod, "modUpdater.getModVersion: no head for", mod.id, branch, redownload)
+			return mod.version
+		end
 		return rawData.version
 	else
-		if not modUpdater.releaseData(mod) then return mod.version end
-		return modUpdater.releaseData(mod).tag_name
+		local release = modUpdater.releaseData(mod)
+		if not release then
+			modlog(mod, "modUpdater.getModVersion: no release for", mod.id, branch, redownload)
+			return mod.version
+		end
+		return release.tag_name
 	end
 end
-modUpdater.checkModVersion = function (mod, branch, redownload)
+modUpdater.checkModVersion = function (mod, branch, redownload, log)
 	if mod.config.dontUseInternet then return false end
 	if type(mod) ~= "table" then error("modUpdater.checkModVersion: expected table for mod") end
 	branch = modUpdater.branch(mod, branch)
 
 	local version = modUpdater.getModVersion(mod, branch, redownload)
-	if version == nil then return end
-	return utilitools.versions.greaterThan(version, modUpdater.getModInfo(mod).version)
+	if version == nil then modlog(mod, "modUpdater.checkModVersion: failed to get mod version for", mod.id, branch, redownload, version) return end
+	local currentVersion = modUpdater.getModInfo(mod).version
+	if log then modlog(mod, "modUpdater.checkModVersion: latest version", version, "current version", currentVersion) end
+	return utilitools.versions.greaterThan(version, currentVersion)
 end
 modUpdater.checkModVersions = function(redownload)
 	if mod.config.dontUseInternet then return false end
@@ -160,10 +187,12 @@ modUpdater.checkModVersions = function(redownload)
 	local r2 = {}
 	for modId, mod in pairs(mods) do
 		if utilitools.modLinks[modId] then
-			if mods.utilitools.config.updates[modId] ~= false and modUpdater.checkModVersion(mod, nil, redownload) then
-				modlog(mod, modId .. " is outdated")
-				r1 = true
-				r2[modId] = true
+			if mods.utilitools.config.updates[modId] ~= false then
+				if modUpdater.checkModVersion(mod, nil, redownload, true) then
+					modlog(mod, modId .. " is outdated")
+					r1 = true
+					r2[modId] = true
+				end
 			end
 		end
 	end

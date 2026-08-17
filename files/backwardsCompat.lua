@@ -4,9 +4,17 @@ for k, v in pairs(mod.config.branches) do
 		mod.config.branches[k] = "Latest Release## "
 		changesToConfig = true
 	end
+	if v == "Latest Release## " then
+		mod.config.branches[k] = "main"
+		changesToConfig = true
+	end
 end
 if mod.config.defaultBranch == "      " then
 	mod.config.defaultBranch = "Latest Release## "
+	changesToConfig = true
+end
+if mod.config.defaultBranch == "Latest Release## " then
+	mod.config.defaultBranch = "main"
 	changesToConfig = true
 end
 if changesToConfig then
