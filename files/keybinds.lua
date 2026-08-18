@@ -56,7 +56,8 @@ keybinds = {
 			["bind:mouse2"] = "RMB",
 			["bind:mouse3"] = "MMB"
 		}
-	}
+	},
+	ready = false
 }
 
 function keybinds.raw.getKeys(category)
@@ -165,6 +166,7 @@ function keybinds.mod.checkBindsStart()
 	keybinds.mod.keyBindsPressed = {}
 end
 function keybinds.mod.checkBinds(mod, binds)
+	if not keybinds.ready then return end
 	if project.useImgui and imgui.love.GetWantCaptureKeyboard() then return end
 	if type(binds) ~= "table" then return end
 	if keybinds.listening.listening then return end
@@ -235,7 +237,7 @@ function keybinds.register.newKey(mod, keyId, binds, override)
 		end
 	end
 end
-function keybinds.register.finish() if keybinds.register.registered then saveControls() end end
+function keybinds.register.finish() keybinds.ready = true if keybinds.register.registered then saveControls() end end
 
 
 
