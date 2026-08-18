@@ -60,6 +60,10 @@ keybinds = {
 	ready = false
 }
 
+function keybinds.loaded(mod, file, reload)
+	if reload then keybinds.ready = true end
+end
+
 function keybinds.raw.getKeys(category)
 	return assert(gameKeys[category], "keybinds.raw.getKeys: no category: " .. tostring(category))
 end

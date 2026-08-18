@@ -19,6 +19,9 @@ local function load(mod, file, reload)
 						utilitools.files[mod.id][file.name] = setfenv(chunk, setmetatable({ mod = mod }, { __index = _G }))
 						if file.call then
 							utilitools.files[mod.id][file.name] = utilitools.files[mod.id][file.name]()
+							if type(utilitools.files[mod.id][file.name]) == "table" and type(utilitools.files[mod.id][file.name].loaded) == "function" then
+								utilitools.files[mod.id][file.name].loaded(mod, file, reload)
+							end
 						end
 						if mod == mods.utilitools and not ({ configOptions = true, documentation = true })[file.name] then
 							utilitools[file.name] = utilitools.files.utilitools[file.name]
