@@ -39,6 +39,7 @@ keybinds = {
 	register = { registered = false },
 	listening = {
 		listening = false,
+		finished = false,
 		category = "",
 		keyId = "",
 		keysPressed = {}
@@ -166,13 +167,12 @@ function keybinds.mod.pressed(mod, keyId, hold)
 end
 
 function keybinds.mod.checkBindsStart()
-	if keybinds.listening.listening then return end
 	keybinds.mod.keyBindsPressed = {}
 end
 function keybinds.mod.checkBinds(mod, binds)
+	if type(binds) ~= "table" then return end
 	if not keybinds.ready then return end
 	if project.useImgui and imgui.love.GetWantCaptureKeyboard() then return end
-	if type(binds) ~= "table" then return end
 	if keybinds.listening.listening then return end
 
 	for key, func in pairs(binds) do
@@ -185,7 +185,10 @@ function keybinds.mod.checkBinds(mod, binds)
 	end
 end
 function keybinds.mod.checkBindsEnd()
+	if not keybinds.ready then return end
+	if project.useImgui and imgui.love.GetWantCaptureKeyboard() then return end
 	if keybinds.listening.listening then return end
+
 	if #keybinds.mod.keyBindsPressed == 0 then keybinds.mod.lastPressed = false return end
 	if keybinds.mod.keyBindsPressed[1] and keybinds.mod.keyBindsPressed[1].key == keybinds.mod.lastPressed then return end
 
@@ -262,6 +265,7 @@ end
 function keybinds.listening.listen(category, keyId, modded)
 	if category == "controltable" then return end
 
+	keybinds.listening.finished = false
 	keybinds.listening.listening = true
 	keybinds.listening.category = category
 	keybinds.listening.keyId = keyId
@@ -276,12 +280,7 @@ function keybinds.listening.listen(category, keyId, modded)
 			if modded then
 				keybinds.listening.keysPressed["key:" .. key] = true
 			else
-				keybinds.raw.addKeybind(keybinds.listening.category, keybinds.listening.keyId, "key:" .. key)
-				-- commenting this out to prevent bug where setting the keybind will press the keybind, not good, will have to make a hackyfix later
-				-- keybinds.listening.listening = false
-				-- if utilitools.prompts.listening then
-				-- 	utilitools.prompts.close()
-				-- end
+				keybinds.listening.finish("key:" .. key, modded)
 			end
 		end
 	end
@@ -290,17 +289,34 @@ function keybinds.listening.listen(category, keyId, modded)
 		if project.useImgui then
 			imgui.love.KeyReleased(key)
 		end
-		utilitools.try(mod, function()
-			if modded and keybinds.listening.listening and keybinds.listening.keysPressed["key:" .. key] then
-				keybinds.listening.keysPressed["key:" .. key] = nil
-				local formattedKey = { keybinds.listening.keysPressed, "key:" .. key }
-				keybinds.mod.addKeybind(keybinds.listening.category, keybinds.listening.keyId, formattedKey)
-				keybinds.listening.listening = false
-				if utilitools.prompts.listening then
-					utilitools.prompts.close()
-				end
-			end
-		end)
+		if modded then
+			keybinds.listening.finish("key:" .. key, modded)
+		end
+	end
+end
+function keybinds.listening.finish(bind, modded)
+	if not keybinds.listening.listening then return end
+	local justPressed
+	if modded then
+		if not keybinds.listening.keysPressed[bind] then return end
+
+		keybinds.listening.keysPressed[bind] = nil
+		local formattedKey = { keybinds.listening.keysPressed, bind }
+		keybinds.mod.addKeybind(keybinds.listening.category, keybinds.listening.keyId, formattedKey)
+		justPressed = keybinds.mod.pressed(keybinds.listening.category, keybinds.listening.keyId, false)
+	else
+		local key = bind
+		if key:sub(1, #"bind:") == "bind:" then
+			key = key:sub(#"bind:" + 1)
+		end
+		keybinds.raw.addKeybind(keybinds.listening.category, keybinds.listening.keyId, key)
+		justPressed = utilitools.keybinds.mod.singleKeyPressed(bind, false)
+	end
+	-- need to prevent bug where setting the keybind will press the keybind, not good, will have to make a better hackyfix later
+	keybinds.listening.finished = true
+	if not justPressed then
+		keybinds.listening.listening = false
+		if utilitools.prompts.listening then utilitools.prompts.close() end
 	end
 end
 function keybinds.listening.stop() keybinds.listening.listening = false keybinds.listening.keysPressed = {} end

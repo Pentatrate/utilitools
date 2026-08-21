@@ -1,7 +1,7 @@
 [manifest]
-dump_lua = true 
+dump_lua = true
 priority = 2147483645 # 2147483647 - 2
-version = "1.0.0" 
+version = "1.0.0"
 
 # Logging ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 [[patches]]
@@ -106,6 +106,7 @@ times = 1
 match_indent = true
 pattern = "PopupManager.update(dt)"
 payload = '''
+utilitools.config.foldAll = false
 utilitools.keybinds.mod.checkBindsStart()
 for modId, modFiles in pairs(utilitools.files) do
 	if modFiles.keys then

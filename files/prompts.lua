@@ -53,20 +53,54 @@ prompts.buttons = function(message, buttons)
 	prompts.buttonsTable = buttons
 end
 prompts.key = function(category, keyId, modded)
+	local keybinds = utilitools.keybinds
 	prompts.randomize()
 	prompts.func = function()
 		local pressed = false
-		if modded then for k, _ in pairs(utilitools.keybinds.listening.keysPressed) do pressed = true break end end
+		if modded then for k, _ in pairs(keybinds.listening.keysPressed) do pressed = true break end end
 		if pressed then
 			local temp = ""
 			local first = true
-			for k, _ in pairs(utilitools.keybinds.listening.keysPressed) do
-				temp = temp .. (first and "" or " + ") .. utilitools.keybinds.text.keyLabel(k)
+			for k, _ in pairs(keybinds.listening.keysPressed) do
+				temp = temp .. (first and "" or " + ") .. keybinds.text.keyLabel(k)
 				first = false
 			end
 			imgui.Text(temp)
 		else
 			imgui.Text("Listening for key...")
+		end
+		local function doBinds(mode)
+			if not modded then return end
+
+			local first = true
+			local function doBind(bind)
+				if keybinds.listening.keysPressed[bind] then return end
+				if not first then imgui.SameLine() end
+				if imgui.Button(mode .. " " .. keybinds.text.keyLabel(bind)) then
+					if modded then
+						keybinds.listening.keysPressed[bind] = true
+						if mode == "Press" then keybinds.listening.finish(bind, modded) end
+					else
+						keybinds.listening.finish(bind, modded)
+					end
+				end
+				first = false
+			end
+
+			for _, bind in ipairs({ "bind:mouse1", "bind:mouse2", "bind:mouse3" }) do doBind(bind) end
+		end
+		for _, mode in ipairs({ "Hold", "Press" }) do doBinds(mode) end
+		if keybinds.listening.finished then
+			local justPressed
+			if modded then
+				justPressed = keybinds.mod.pressed(keybinds.listening.category, keybinds.listening.keyId, false)
+			else
+				justPressed = keybinds.mod.singleKeyPressed("bind:" .. keybinds.listening.keyId, false)
+			end
+			if not justPressed then
+				keybinds.listening.listening = false
+				if utilitools.prompts.listening then utilitools.prompts.close() end
+			end
 		end
 	end
     prompts.listening = {

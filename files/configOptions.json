@@ -78,6 +78,15 @@
 		"default": [],
 		"off": []
 	},
+	"foldHotkey": {
+		"type": "key",
+		"name": "Fold Hotkey",
+		"tooltips": {
+			"short": "Hotkey to fold nodes to default"
+		},
+		"default": [],
+		"off": []
+	},
 	"relaunchHotkey": {
 		"type": "key",
 		"name": "Relaunch Hotkey",
