@@ -1,10 +1,10 @@
 local st = Gamestate:new('UtilitoolsModCheck')
 
 st:setInit(function(self)
-	self.errorSprite = ez.newjson("assets/error/error"):instance()
+	self.updateSprite = ez.newjson(utilitools.folderManager.modPath(mod) .. "/assets/_animations/update/update"):instance()
+	-- self.updateSprite = animations.update.update:instance()
 	shuv.resetPal()
 	te.play("assets/music/fishing/fishinAmbient.ogg", "stream", "music")
-
 	local function addText(text) self.text = self.text .. text end
 	self.text = "Updated mods (press accept or back to continue):"
 	local amount = 0
@@ -26,8 +26,8 @@ st:setInit(function(self)
 end)
 
 st:setUpdate(function(self, dt)
-    self.errorSprite:update(dt)
-	if maininput:pressed("accept") or maininput:pressed("back")or self.continue then
+    self.updateSprite:update(dt)
+	if maininput:pressed("accept") or maininput:pressed("back") or self.continue then
 		utilitools.config.save(mods.utilitools)
 		te.stop('music')
 		if bs.states.Menu == nil then dofile('preload/states.lua') end
@@ -39,7 +39,7 @@ end)
 st:setBgDraw(function(self)
 	color()
 	love.graphics.rectangle('fill', 0, 0, project.res.x, project.res.y)
-	self.errorSprite:draw()
+	self.updateSprite:draw()
 	love.graphics.setFont(fonts.main)
     color(1)
 	-- text, x, y, font, xscale, yscale, colour, wrapLen, justification, ignoreColour, xSkew, ySkew, extraCharSpacing, rotation, fakeXSkew, fakeYSkew

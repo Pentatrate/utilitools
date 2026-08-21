@@ -147,7 +147,8 @@ function internet.request(url, type2, rerequest, headers, method)
 			modlog(mod, "REQUEST RATE LIMIT STATUS", url, rateLimitHeadersFound)
 		end
 		if headersRecieved["x-ratelimit-reset"] then
-			modlog(mod, "REQUEST RATE LIMIT RESET STATUS", headersRecieved["x-ratelimit-reset"], "IN", (headersRecieved["x-ratelimit-reset"] - os.time()) / 60, "SECONDS, OR", (headersRecieved["x-ratelimit-reset"] - os.time()) / 60 / 60, "HOURS")
+			local remaining = headersRecieved["x-ratelimit-reset"] - os.time()
+			modlog(mod, "REQUEST RATE LIMIT", "\nREMAINING", headersRecieved["x-ratelimit-remaining"], "\nRESET IN", remaining, "SECONDS, OR", remaining / 60, "MINUTES")
 		end
 		if headersRecieved["x-ratelimit-remaining"] and tonumber(headersRecieved["x-ratelimit-remaining"]) < 1 then
 			mod.config.dontUseInternet = true
