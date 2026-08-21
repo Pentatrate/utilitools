@@ -224,8 +224,9 @@ configHelpers.inputKey = function(key)
 		key, configHelpers.tooltip(key), true
 	)
 end
-configHelpers.inputBranch = function()
-	mods.utilitools.config.branches[mod.id] = utilitools.imguiHelpers.inputBranch(mod, configHelpers.tooltip("branches"))
+configHelpers.inputBranch = function(mod2)
+	mod2 = mod2 or mod
+	utilitools.imguiHelpers.inputBranch(mod2)
 end
 configHelpers.inputSliderInt = function(key)
 	if not configHelpers.exists(key) then
@@ -388,12 +389,13 @@ configHelpers.presets = {
 			end
 		end
 	end,
-	updateOptions = function()
-		mods.utilitools.config.updates[mod.id] = utilitools.imguiHelpers.inputBool(
-			"Update " .. mod.name .. "##" .. mod.id, mods.utilitools.config.updates[mod.id], true,
-			"Allow the version for only this mod to be autoupdated"
+	updateOptions = function(mod2)
+		mod2 = mod2 or mod
+		mods.utilitools.config.updates[mod2.id] = utilitools.imguiHelpers.inputBool(
+			"Update " .. mod2.name .. "##" .. mod2.id, mods.utilitools.config.updates[mod2.id], true,
+			"Allow the version for only this mod to be autoupdated.\n\nWhen set to true, it will still not update when the Auto Update config is off.\nWhen set to false, no automatic outdated notifications or updates will occur for this mod."
 		)
-		configHelpers.inputBranch()
+		configHelpers.inputBranch(mod2)
 	end
 }
 

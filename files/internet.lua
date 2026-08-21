@@ -110,12 +110,12 @@ function internet.decode(body, type2)
 end
 function internet.request(url, type2, rerequest, headers, method)
 	if mod.config.dontUseInternet then return false end
-	local code, body, headersRecieved, time
+	local code, body, headersRecieved, time, requestError
 	local usedCache = false
 
 	local cached = internet.cache[url]
 	if not rerequest and cached then
-		code, body, headersRecieved, time = cached.code, cached.body, cached.headers, cached.time
+		code, body, headersRecieved, time, requestError = cached.code, cached.body, cached.headers, cached.time, cached.requestError
 		usedCache = true
 	else
 		code, body, headersRecieved = require("https").request(url, { method = method, headers = headers })
@@ -128,7 +128,10 @@ function internet.request(url, type2, rerequest, headers, method)
 			body = internet.decode(body, type2)
 			headersRecieved = internet.decode(headersRecieved, "json")
 		elseif not usedCache then
-			modwarn(mod, internet.requestError(url, code, body))
+			requestError = internet.requestError(url, code, body)
+			modwarn(mod, requestError)
+			body = internet.decode(body, type2)
+			headersRecieved = internet.decode(headersRecieved, "json")
 		end
 
 		local rateLimitHeaders = {
@@ -140,17 +143,24 @@ function internet.request(url, type2, rerequest, headers, method)
 		local rateLimitHeadersFound = {}
 		local found = false
 		for k, _ in pairs(rateLimitHeaders) do if headersRecieved[k] then rateLimitHeadersFound[k] = headersRecieved[k] found = true end end
-		if found then modlog(mod, "REQUEST RATE LIMIT STATUS", url, rateLimitHeadersFound) end
-		if headersRecieved["x-ratelimit-reset"] then modlog(mod, "REQUEST RATE LIMIT RESET STATUS", headersRecieved["x-ratelimit-reset"], "IN", headersRecieved["x-ratelimit-reset"] - os.time(), "SECONDS, OR", (headersRecieved["x-ratelimit-reset"] - os.time()) / 60, "HOURS") end
-		if headersRecieved["x-ratelimit-remaining"] and tonumber(headersRecieved["x-ratelimit-remaining"]) < 1 then mod.config.dontUseInternet = true modwarn(mod, "\n\n\n!!!RATE LIMITED!!!\n\n") end
+		if found then
+			modlog(mod, "REQUEST RATE LIMIT STATUS", url, rateLimitHeadersFound)
+		end
+		if headersRecieved["x-ratelimit-reset"] then
+			modlog(mod, "REQUEST RATE LIMIT RESET STATUS", headersRecieved["x-ratelimit-reset"], "IN", (headersRecieved["x-ratelimit-reset"] - os.time()) / 60, "SECONDS, OR", (headersRecieved["x-ratelimit-reset"] - os.time()) / 60 / 60, "HOURS")
+		end
+		if headersRecieved["x-ratelimit-remaining"] and tonumber(headersRecieved["x-ratelimit-remaining"]) < 1 then
+			mod.config.dontUseInternet = true
+			modwarn(mod, "\n\n\n!!!RATE LIMITED!!!\n\n")
+		end
 	end
 
-	internet.cache[url] = { code = code, body = body, headers = headersRecieved, time = time }
+	internet.cache[url] = { code = code, body = body, headers = headersRecieved, time = time, requestError = requestError }
 
 	if code == 200 then
-		return true, body, headersRecieved
+		return true, body, headersRecieved, requestError
 	end
-	return false, body, headersRecieved
+	return false, body, headersRecieved, requestError
 end
 
 return internet

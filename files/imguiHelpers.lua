@@ -288,44 +288,78 @@ imguiHelpers.inputKey = function(label, category, keyId, tooltip, modded)
 	imgui.Text(imguiHelpers.visibleLabel(label))
 	imguiHelpers.tooltip(tooltip)
 end
-imguiHelpers.inputBranch = function(mod, tooltip)
+imguiHelpers.inputBranch = function(mod)
 	if utilitools.modLinks[mod.id] == nil then return end
 
+	local data = { utilitools.modUpdater2.getData(mod) } if not data[1] then return end
+	local _, branch, fork
+	_, _, _, branch, fork = unpack(data)
+
 	local branchPrefix = "Latest commit to "
-
-	local values = { branchPrefix .. "main" }
-	local valueTooltips = { "Use the latest commit on the main branch" }
-	if false and (utilitools.modUpdater.releaseData(mod) or {}).name ~= nil then
-		table.insert(values, 1, "Latest Release## ")
-		table.insert(valueTooltips, 1, "Use the latest release")
-	end
-
-	for k, _ in pairs(utilitools.modLinks[mod.id].branch) do
-		if not bbp.utils.tableContains(values, branchPrefix .. k) then
-			table.insert(values, branchPrefix .. k)
-			table.insert(valueTooltips, "Use the latest commit on the " .. k .. " branch")
+	local totalItems = {}
+	local current
+	local function add(data2, fork2)
+		local branches = data2.branch
+		local default = data2.default
+		local itemsSorted = {}
+		for branch2, _ in pairs(branches) do
+			local isDefault = branch2 == default
+			table.insert(itemsSorted, {
+				branch = branch2, fork = fork2,
+				label = "Latest commit to " .. (fork2 and fork2 .. "'s " or "") .. branch2,
+				default = isDefault,
+				tooltip = "Use the latest commit on the " .. branch2 .. " branch" .. (fork2 and " of " .. fork2 .. "'s fork" or "") .. (isDefault and "\nThis is the default branch of this " .. (fork2 and "fork" or "repository") or "")
+			})
+		end
+		table.sort(itemsSorted, function(a, b)
+			if a.branch == default or b.branch == default and a.branch ~= b.branch then
+				return a.branch == default
+			end
+			return a.branch < b.branch
+		end)
+		for _, item in ipairs(itemsSorted) do
+			if item.branch == branch and item.fork == fork then current = item end
+			table.insert(totalItems, item)
 		end
 	end
 
-	local temp3 = mods.utilitools.config.defaultBranch
-	local temp = mods.utilitools.config.branches[mod.id] or temp3
+	if fork then add(utilitools.modLinks[mod.id].fork[fork], fork) end
+	add(utilitools.modLinks[mod.id], nil)
+	if utilitools.modLinks[mod.id].fork then
+		local forksSorted = utilitools.table.keysToValues(utilitools.modLinks[mod.id].fork)
+		table.sort(forksSorted)
+		for _, fork2 in ipairs(forksSorted) do
+			if fork2 ~= fork then
+				add(utilitools.modLinks[mod.id].fork[fork2], fork2)
+			end
+		end
+	end
 
-	if temp ~= "Latest Release## " then
-		temp = branchPrefix .. temp
-	end
-	if temp3 ~= "Latest Release## " then
-		temp3 = branchPrefix .. temp
+	if #totalItems > 1 then
+		local label = "Branch##" .. mod.id .. "Config_branch"
+		local tooltip = "Different ways to get different versions of a mod"
+		local flags = utilitools.files.utilitools.configOptions.branches.flags -- currently nil, might change later on, maybe, or never at all
+
+		if flags then imguiHelpers.setWidth(label) end
+		local open = imgui.BeginCombo(label, current.label, flags or (2 ^ 4 + 2 ^ 5 + 2 ^ 7))
+		imguiHelpers.tooltip(tooltip)
+		if open then
+			for _, item in ipairs(totalItems) do
+				local selected = imgui.Selectable_Bool(item.label, item == current)
+				imguiHelpers.tooltip(item.tooltip)
+				if selected then
+					current = item
+				end
+			end
+			imgui.EndCombo()
+		end
 	end
 
-	local temp2 = utilitools.imguiHelpers.inputCombo(
-		"Branch##" .. mod.id .. "Config_branch", temp, temp3,
-		tooltip, utilitools.files.utilitools.configOptions.branches.flags,
-		values, valueTooltips
-	)
-	if temp2 ~= "Latest Release## " then
-		temp2 = temp2:sub(#branchPrefix + 1)
+	if current.fork ~= fork or current.branch ~= branch then
+		mods.utilitools.config.branches[mod.id] = current.branch
+		mods.utilitools.config.forks[mod.id] = current.fork
+		modlog(mods.utilitools, "set branch", current.branch, "fork", current.fork, "\n", mods.utilitools.config.branches)
 	end
-	return utilitools.modUpdater.branch(mod, temp2)
 end
 imguiHelpers.inputSliderInt = function(label, current, default, tooltip, flags, min, max, innerLabel)
 	if current == nil then current = default end

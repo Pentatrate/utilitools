@@ -60,7 +60,15 @@ if mods.utilitools.askDontUseInternet and not mods.utilitools.config.dontUseInte
 	mods.utilitools.askDontUseInternet = false
 	utilitools.config.save(mods.utilitools)
 end
-if not mods.utilitools.config.dontUseInternet and utilitools.modUpdater.updateMods() then
+
+local success, outdated
+if not mods.utilitools.config.dontUseInternet then
+	success, outdated = utilitools.modUpdater2.updateOutdatedMods()
+	if not success then
+		modlog(mods.utilitools, outdated)
+	end
+end
+if mods.utilitools.config.autoUpdate and success and outdated then
 	utilitools.doRelaunch = true
 	utilitools.config.save(mods.utilitools)
 	cs = bs.load("UtilitoolsEmpty")

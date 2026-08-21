@@ -157,9 +157,11 @@
 	"branches": {
 		"type": "hidden",
 		"name": "[internal] branches",
-		"tooltips": {
-			"short": "Different ways to get different versions"
-		},
+		"default": {}
+	},
+	"forks": {
+		"type": "hidden",
+		"name": "[internal] forks",
 		"default": {}
 	},
 	"updates": {

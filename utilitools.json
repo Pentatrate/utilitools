@@ -76,6 +76,11 @@
 			"load": true,
 			"call": true
 		},
+		"modUpdater2": {
+			"extension": "lua",
+			"load": true,
+			"call": true
+		},
 		"backwardsCompat": {
 			"extension": "lua",
 			"load": true
