@@ -1,8 +1,10 @@
 # Utilitools
 
-(EA Mod)
+EA Mod for the game Beatblock
 
 by Pentatrate
+
+![GitHub Downloads](https://img.shields.io/github/downloads/Pentatrate/utilitools/total)
 
 ## Info
 
