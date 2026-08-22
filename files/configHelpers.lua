@@ -237,7 +237,7 @@ configHelpers.inputSliderInt = function(key)
 		configHelpers.convertLabel(key), mod.config[key], configOptions[key].default,
 		configHelpers.tooltip(key), configOptions[key].flags,
 		configOptions[key].min, configOptions[key].max,
-		configOptions[key].innerLabel
+		configOptions[key].innerLabel, configOptions[key].colored
 	)
 end
 configHelpers.inputSliderFloat = function(key)

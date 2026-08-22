@@ -361,11 +361,28 @@ imguiHelpers.inputBranch = function(mod)
 		modlog(mods.utilitools, "set branch", current.branch, "fork", current.fork, "\n", mods.utilitools.config.branches)
 	end
 end
-imguiHelpers.inputSliderInt = function(label, current, default, tooltip, flags, min, max, innerLabel)
+imguiHelpers.inputSliderInt = function(label, current, default, tooltip, flags, min, max, innerLabel, colored)
 	if current == nil then current = default end
 	local v = ffi.new("int[1]", { current })
 	imguiHelpers.setWidth(label)
+	if colored and 0 <= current and current <= 7 then
+		local sliderColors = {
+			[0] = imgui.ImVec4_Float(1.0, 1.0, 1.0, 1.0),
+			[1] = imgui.ImVec4_Float(0.0, 0.0, 0.0, 1.0),
+			[2] = imgui.ImVec4_Float(1.0, 0.0, 0.0, 1.0),
+			[3] = imgui.ImVec4_Float(0.0, 0.0, 1.0, 1.0),
+			[4] = imgui.ImVec4_Float(0.0, 1.0, 0.0, 1.0),
+			[5] = imgui.ImVec4_Float(1.0, 1.0, 0.0, 1.0),
+			[6] = imgui.ImVec4_Float(1.0, 0.0, 1.0, 1.0),
+			[7] = imgui.ImVec4_Float(0.0, 1.0, 1.0, 1.0)
+		}
+		imgui.PushStyleColor_Vec4(imgui.ImGuiCol_SliderGrab, sliderColors[current])
+		imgui.PushStyleColor_Vec4(imgui.ImGuiCol_SliderGrabActive, sliderColors[current])
+	end
 	imgui.SliderInt(label, v, min, max, innerLabel, flags)
+	if colored and 0 <= current and current <= 7 then
+		imgui.PopStyleColor(2)
+	end
 	imguiHelpers.tooltip(tooltip)
 	return v[0]
 end
