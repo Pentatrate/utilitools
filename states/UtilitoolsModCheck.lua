@@ -1,7 +1,7 @@
 local st = Gamestate:new('UtilitoolsModCheck')
 
 st:setInit(function(self)
-	self.errorSprite = ez.newjson("assets/error/error"):instance()
+	self.incompatibleSprite = ez.newjson(utilitools.folderManager.modPath(mod) .. "/assets/_animations/incompatibility/incompatibility"):instance()
 	shuv.resetPal()
 	te.play("assets/music/caution.ogg", "stream", "music")
 
@@ -90,7 +90,7 @@ st:setInit(function(self)
 end)
 
 st:setUpdate(function(self, dt)
-    self.errorSprite:update(dt)
+    self.incompatibleSprite:update(dt)
 	if maininput:pressed("accept") or maininput:pressed("back")then
 		te.stop('music')
 		love.quit()
@@ -101,7 +101,7 @@ end)
 st:setBgDraw(function(self)
 	color()
 	love.graphics.rectangle('fill', 0, 0, project.res.x, project.res.y)
-	self.errorSprite:draw()
+	self.incompatibleSprite:draw()
 	love.graphics.setFont(fonts.main)
     color(1)
 	-- text, x, y, font, xscale, yscale, colour, wrapLen, justification, ignoreColour, xSkew, ySkew, extraCharSpacing, rotation, fakeXSkew, fakeYSkew
