@@ -374,17 +374,12 @@ configHelpers.presets = {
 		if mod.config.searches ~= nil then
 			for i, v in ipairs(mod.config.searches) do
 				if #v > 0 then
-					imgui.SeparatorText(({ "Match Start", "Match Name", "Match Value", "Match Tooltip", "Match Value Tooltip" })
-						[i])
+					imgui.SeparatorText(({ "Match Start", "Match Name", "Match Value", "Match Tooltip", "Match Value Tooltip" })[i])
 					table.sort(v, function(a, b)
-						if configOptions[a].name == configOptions[b].name then
-							return a < b
-						end
+						if configOptions[a].name == configOptions[b].name then return a < b end
 						return configOptions[a].name < configOptions[b].name
 					end)
-					for _, v2 in ipairs(v) do
-						configHelpers.input(v2)
-					end
+					for _, v2 in ipairs(v) do configHelpers.input(v2) end
 				end
 			end
 		end

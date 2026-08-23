@@ -42,7 +42,7 @@ imguiHelpers.getWidth = function(label)
 	if label == nil or imguiHelpers.stringLength(imguiHelpers.visibleLabel(label)) == 0 then
 		return -1 ^ -9
 	else
-		return -imgui.GetFontSize() * 7 / 13 * imguiHelpers.stringLength(imguiHelpers.visibleLabel(label)) - imgui.GetStyle().ItemInnerSpacing.x
+		return -imgui.CalcTextSize(label, nil, true, nil).x - imgui.GetStyle().ItemInnerSpacing.x
 	end
 end
 imguiHelpers.setWidth = function(label)
@@ -102,6 +102,7 @@ imguiHelpers.inputMultiline = function(label, current, default, tooltip, flags, 
 	return ffi.string(v)
 end
 imguiHelpers.inputWrapped = function(label, current, default, tooltip, flags, size, overrideWidth) -- unfinished
+	-- imgui.CalcTextSize(midString, nil, false, nil).x
 	if current == nil then current = default end
 	size = size or (2 ^ 10)
 	if imguiHelpers.wrappedBool then
@@ -246,7 +247,7 @@ imguiHelpers.inputKey = function(label, category, keyId, tooltip, modded)
 		if not first2 then
 			imgui.SameLine()
 			local space = imgui.GetContentRegionAvail().x
-			space = space - (imgui.GetFontSize() * 7 / 13 * imguiHelpers.stringLength(imguiHelpers.visibleLabel(text)) + (padding and imgui.GetStyle().FramePadding.x * 2 or 0))
+			space = space - (imgui.CalcTextSize(text, nil, true, nil).x + (padding and imgui.GetStyle().FramePadding.x * 2 or 0))
 			if space < 0 then imgui.NewLine() end
 		end
 		first2 = false
@@ -462,7 +463,7 @@ function imguiHelpers.inputTextWrapped(label, current, size, size2d, flags, tool
 	drawList:AddRectFilled(windowPos, endPos, imgui.GetColorU32_Col(color), imgui.GetStyle().FrameRounding)
 	drawList:AddText_Vec2(imgui.ImVec2_Float(windowPos.x + padding.x, windowPos.y + padding.y), imgui.GetColorU32_Col(imgui.ImGuiCol_Text), v, nil)
 
-	function drawCursor(offset)
+	local function drawCursor(offset)
 		local xPos = windowPos.x + padding.x + offset * imgui.GetFontSize() * 7 / 13
 		local yPosMin = windowPos.y + padding.y + 1
 		drawList:AddLine(imgui.ImVec2_Float(xPos, yPosMin), imgui.ImVec2_Float(xPos, yPosMin + imgui.GetFontSize() - 2), imgui.GetColorU32_Col(imgui.ImGuiCol_Text), 1)
