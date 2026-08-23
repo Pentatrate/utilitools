@@ -105,9 +105,7 @@ utilitools = {
 		search = {}
 	},
 	try = function(mod, func, silent)
-		local success, e = xpcall(func, function(error) modwarn(mod, error) end)
-		if not success and not silent then modwarn(mod, e) end
-		return success, e
+		return xpcall(func, function(error) if not silent then modwarn(mod, error) end end)
 	end,
 	table = {
 		keysToValues = function(t)
