@@ -57,6 +57,14 @@ return {
 		},
 		default = "main"
 	},
+	betterCostumes = {
+		organisation = "Pentatrate",
+		repository = "betterCostumes",
+		branch = {
+			main = true
+		},
+		default = "main"
+	},
 	themeable = {
 		organisation = "ImPurplez",
 		repository = "Themeable",
