@@ -298,6 +298,7 @@ local function utilitoolsRegisterMods()
 		end
 	end
 	local function registerMod(mod, onlyCompat)
+		if not mod.enabled then return end
 		local path = utilitools.folderManager.modPath(mod)
 		if love.filesystem.getInfo(path, "directory") then
 			if love.filesystem.getInfo(path .. "/utilitools.json", "file") then
