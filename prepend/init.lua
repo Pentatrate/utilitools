@@ -144,7 +144,7 @@ utilitools = {
 		end,
 		toClipboard = function(t)
 			t = tostring(t)
-			modlog(mods.beattools, "Copied to clipboard: ", t)
+			modlog(mods.utilitools, "Copied to clipboard: ", t)
 			love.system.setClipboardText(t)
 			if cs and cs.p and cs.p.hurtPulse then cs.p:hurtPulse() end
 			utilitools.prompts.custom({ title = "Copied to clipboard!", message = t })
