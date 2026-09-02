@@ -3,51 +3,48 @@ local configHelpers = {}
 configHelpers.convertType = function(type)
 	return "input" .. type:sub(1, 1):upper() .. type:sub(2)
 end
-configHelpers.exists = function(key)
-	if key == nil then return false end
-	if type(key) ~= "string" then return false end
-	if mod == nil then return false end
-	if configOptions == nil then return false end
-	if configOptions[key] == nil then return false end
-	if type(configOptions[key]) ~= "table" then return false end
-	if configOptions[key].name == nil then return false end
-	if configOptions[key].default == nil then return false end
-	if configOptions[key].type == nil or type(configOptions[key].type) ~= "string" then return false end
-	if configOptions[key].type == "hidden" then return false end
-	if configOptions[key].type == "" or configHelpers[configHelpers.convertType(configOptions[key].type)] == nil then return false end
-	return true
+function configHelpers.check()
+	if mod == nil then return false, "No mod" end
+	if configOptions == nil then return false, "No config options" end
+	return true, "Success"
 end
-configHelpers.failReason = function(key)
-	if key == nil then return "No key" end
-	if type(key) ~= "string" then return "Key not string" end
-	if mod == nil then return "No mod" end
-	if configOptions == nil then return "No config options" end
-	if configOptions[key] == nil then return "No setting" end
-	if type(configOptions[key]) ~= "table" then return "Setting not table" end
-	if configOptions[key].name == nil then return "No name" end
-	if configOptions[key].default == nil then return "No default" end
-	if configOptions[key].type == nil then return "No type" end
-	if type(configOptions[key].type) ~= "string" then return "Type not string" end
-	if configOptions[key].type == "hidden" then return "Hidden" end
+configHelpers.exists = function(key)
+	local success, reason = configHelpers.check()
+	if not success then return success, reason end
+	if key == nil then return false, "No key" end
+	if type(key) ~= "string" then return false, "Key not string" end
+	if configOptions[key] == nil then return false, "No setting" end
+	if type(configOptions[key]) ~= "table" then return false, "Setting not table" end
+	if configOptions[key].name == nil then return false, "No name" end
+	if configOptions[key].default == nil then return false, "No default" end
+	if configOptions[key].type == nil then return false, "No type" end
+	if type(configOptions[key].type) ~= "string" then return false, "Type not string" end
+	if configOptions[key].type == "hidden" then return false, "Hidden" end
 	if configOptions[key].type == "" or configHelpers[configHelpers.convertType(configOptions[key].type)] == nil then
-		return
-			"Invalid type: " .. configHelpers.convertType(configOptions[key].type)
+		return false, "Invalid type: " .. configHelpers.convertType(configOptions[key].type)
 	end
-	return "Success"
+	return true, "Success"
 end
 configHelpers.checkTemp = function(key)
-	if configHelpers.failReason(key) ~= "No setting" then return false end
+	if ({ configHelpers.exists(key) })[2] ~= "No setting" then return false end
 	if key:sub(-#"_temp") == "_temp" then
 		return configHelpers.exists(key:sub(1, -1 - #"_temp"))
 	else
 		return false
 	end
 end
-configHelpers.input = function(key)
-	if not configHelpers.exists(key) then
-		imgui.Text("Failed: " .. configHelpers.failReason(key))
-		return
+function configHelpers.check2(key)
+	local success, reason
+	if key then
+		success, reason = configHelpers.exists(key)
+	else
+		success, reason = configHelpers.check()
 	end
+	if not success then imgui.Text("Failed: " .. reason) end
+	return success, reason
+end
+configHelpers.input = function(key)
+	if not configHelpers.check2(key) then return end
 	configHelpers[configHelpers.convertType(configOptions[key].type)](key)
 end
 configHelpers.default = function()
@@ -93,7 +90,7 @@ configHelpers.convertLabel = function(key)
 	return configOptions[key].name .. "##" .. mod.id .. "Config_" .. key
 end
 configHelpers.tooltip = function(key, index)
-	if not configHelpers.exists(key) then return end
+	if not configHelpers.check2(key) then return end
 	if mod.config.tooltips == false or mod.config.tooltips == "none" then return end
 
 	local tooltip
@@ -104,20 +101,14 @@ configHelpers.tooltip = function(key, index)
 	return tooltip
 end
 configHelpers.inputBool = function(key)
-	if not configHelpers.exists(key) then
-		imgui.Text("Failed.")
-		return
-	end
+	if not configHelpers.check2(key) then return end
 	mod.config[key] = utilitools.imguiHelpers.inputBool(
 		configHelpers.convertLabel(key), mod.config[key], configOptions[key].default,
 		configHelpers.tooltip(key)
 	)
 end
 configHelpers.inputInt = function(key)
-	if not configHelpers.exists(key) then
-		imgui.Text("Failed.")
-		return
-	end
+	if not configHelpers.check2(key) then return end
 	mod.config[key] = utilitools.imguiHelpers.inputInt(
 		configHelpers.convertLabel(key), mod.config[key], configOptions[key].default,
 		configHelpers.tooltip(key), configOptions[key].flags,
@@ -125,10 +116,7 @@ configHelpers.inputInt = function(key)
 	)
 end
 configHelpers.inputFloat = function(key)
-	if not configHelpers.exists(key) then
-		imgui.Text("Failed.")
-		return
-	end
+	if not configHelpers.check2(key) then return end
 	mod.config[key] = utilitools.imguiHelpers.inputFloat(
 		configHelpers.convertLabel(key), mod.config[key], configOptions[key].default,
 		configHelpers.tooltip(key), configOptions[key].flags,
@@ -136,10 +124,7 @@ configHelpers.inputFloat = function(key)
 	)
 end
 configHelpers.inputText = function(key)
-	if not configHelpers.exists(key) then
-		imgui.Text("Failed.")
-		return
-	end
+	if not configHelpers.check2(key) then return end
 	mod.config[key] = utilitools.imguiHelpers.inputText(
 		configHelpers.convertLabel(key), mod.config[key], configOptions[key].default,
 		configHelpers.tooltip(key), configOptions[key].flags,
@@ -147,10 +132,7 @@ configHelpers.inputText = function(key)
 	)
 end
 configHelpers.inputMultiline = function(key)
-	if not configHelpers.exists(key) then
-		imgui.Text("Failed.")
-		return
-	end
+	if not configHelpers.check2(key) then return end
 	mod.config[key] = utilitools.imguiHelpers.inputMultiline(
 		configHelpers.convertLabel(key), mod.config[key], configOptions[key].default,
 		configHelpers.tooltip(key), configOptions[key].flags,
@@ -158,10 +140,7 @@ configHelpers.inputMultiline = function(key)
 	)
 end
 configHelpers.inputWrapped = function(key)
-	if not configHelpers.exists(key) then
-		imgui.Text("Failed.")
-		return
-	end
+	if not configHelpers.check2(key) then return end
 	mod.config[key] = utilitools.imguiHelpers.inputWrapped(
 		configHelpers.convertLabel(key), mod.config[key], configOptions[key].default,
 		configHelpers.tooltip(key), configOptions[key].flags,
@@ -169,10 +148,7 @@ configHelpers.inputWrapped = function(key)
 	)
 end
 configHelpers.inputCombo = function(key)
-	if not configHelpers.exists(key) then
-		imgui.Text("Failed.")
-		return
-	end
+	if not configHelpers.check2(key) then return end
 	local valueTooltips = {}
 	for i, _ in ipairs(configOptions[key].values) do
 		valueTooltips[i] = configHelpers.tooltip(key, i)
@@ -184,30 +160,21 @@ configHelpers.inputCombo = function(key)
 	)
 end
 configHelpers.inputEase = function(key)
-	if not configHelpers.exists(key) then
-		imgui.Text("Failed.")
-		return
-	end
+	if not configHelpers.check2(key) then return end
 	mod.config[key] = utilitools.imguiHelpers.inputEase(
 		configHelpers.convertLabel(key), mod.config[key], configOptions[key].default,
 		configHelpers.tooltip(key), configOptions[key].flags
 	)
 end
 configHelpers.inputColor = function(key)
-	if not configHelpers.exists(key) then
-		imgui.Text("Failed.")
-		return
-	end
+	if not configHelpers.check2(key) then return end
 	mod.config[key] = utilitools.imguiHelpers.inputColor(
 		configHelpers.convertLabel(key), mod.config[key], configOptions[key].default,
 		configHelpers.tooltip(key), configOptions[key].flags
 	)
 end
 configHelpers.inputList = function(key)
-	if not configHelpers.exists(key) then
-		imgui.Text("Failed.")
-		return
-	end
+	if not configHelpers.check2(key) then return end
 	mod.config[key], mod.config[key .. "_temp"] = utilitools.imguiHelpers.inputList(
 		configHelpers.convertLabel(key), mod.config[key], configOptions[key].default,
 		configHelpers.tooltip(key), configOptions[key].flags,
@@ -215,10 +182,7 @@ configHelpers.inputList = function(key)
 	)
 end
 configHelpers.inputKey = function(key)
-	if not configHelpers.exists(key) then
-		imgui.Text("Failed.")
-		return
-	end
+	if not configHelpers.check2(key) then return end
 	utilitools.imguiHelpers.inputKey(
 		configHelpers.convertLabel(key), mod,
 		key, configHelpers.tooltip(key), true
@@ -229,10 +193,7 @@ configHelpers.inputBranch = function(mod2)
 	utilitools.imguiHelpers.inputBranch(mod2)
 end
 configHelpers.inputSliderInt = function(key)
-	if not configHelpers.exists(key) then
-		imgui.Text("Failed.")
-		return
-	end
+	if not configHelpers.check2(key) then return end
 	mod.config[key] = utilitools.imguiHelpers.inputSliderInt(
 		configHelpers.convertLabel(key), mod.config[key], configOptions[key].default,
 		configHelpers.tooltip(key), configOptions[key].flags,
@@ -241,10 +202,7 @@ configHelpers.inputSliderInt = function(key)
 	)
 end
 configHelpers.inputSliderFloat = function(key)
-	if not configHelpers.exists(key) then
-		imgui.Text("Failed.")
-		return
-	end
+	if not configHelpers.check2(key) then return end
 	mod.config[key] = utilitools.imguiHelpers.inputSliderFloat(
 		configHelpers.convertLabel(key), mod.config[key], configOptions[key].default,
 		configHelpers.tooltip(key), configOptions[key].flags,
@@ -253,7 +211,7 @@ configHelpers.inputSliderFloat = function(key)
 	)
 end
 configHelpers.condTreeNode = function(label, key, target, same, func, flags)
-	if not configHelpers.exists(key) then return end
+	if not configHelpers.check2(key) then return end
 	utilitools.imguiHelpers.condTreeNode(
 		label, configOptions[key].name, mod.config[key], target, same, func, flags
 	)
@@ -261,10 +219,12 @@ end
 configHelpers.treeNode = function(...) utilitools.imguiHelpers.treeNode(...) end
 configHelpers.setMod = function(mod2)
 	mod = mod2
+	if not utilitools.fileManager[mod.id] then mod = nil imgui.Text(tostring(mod2 and mod2.name) .. " is disabled") return true end -- mod is disabled
 	if utilitools.fileManager[mod.id].configOptions then utilitools.fileManager[mod.id].configOptions.load() end
 	if utilitools.fileManager[mod.id].documentation then utilitools.fileManager[mod.id].documentation.load() end
 	configOptions = utilitools.files[mod.id].configOptions
 	docs = utilitools.files[mod.id].documentation
+	return false
 end
 configHelpers.registerMod = function(mod2)
 	if utilitools.fileManager[mod2.id] == nil then
@@ -284,9 +244,10 @@ configHelpers.registerMod = function(mod2)
 			load = false
 		})
 	end
-	configHelpers.setMod(mod2)
+	if configHelpers.setMod(mod2) then return end
 	for k, v in pairs(configOptions) do
-		if configHelpers.exists(k) or configHelpers.failReason(k) == "Hidden" then
+		local success, reason = configHelpers.exists(k)
+		if success or reason == "Hidden" then
 			if v.type == "key" then
 				utilitools.keybinds.register.newKey(mod, k, v.default)
 			elseif mod.config[k] == nil then
@@ -309,10 +270,12 @@ configHelpers.registerMod = function(mod2)
 end
 configHelpers.presets = {
 	menuOptions = function()
+		if not configHelpers.check2() then return end
 		configHelpers.input("documentation")
 		configHelpers.input("tooltips")
 	end,
 	menuButtons = function()
+		if not configHelpers.check2() then return end
 		if imgui.Button("Default") then
 			utilitools.prompts.confirm("You will reset all configs for this mod to default", configHelpers.default)
 		end
@@ -331,6 +294,7 @@ configHelpers.presets = {
 		end
 	end,
 	search = function()
+		if not configHelpers.check2() then return end
 		local prevSearch = mod.config.search
 		configHelpers.input("search")
 		if mod.config.search ~= "" and prevSearch ~= mod.config.search then
@@ -385,6 +349,7 @@ configHelpers.presets = {
 		end
 	end,
 	updateOptions = function(mod2)
+		if not configHelpers.check2() then return end
 		mod2 = mod2 or mod
 		mods.utilitools.config.updates[mod2.id] = utilitools.imguiHelpers.inputBool(
 			"Update " .. mod2.name .. "##" .. mod2.id, mods.utilitools.config.updates[mod2.id], true,

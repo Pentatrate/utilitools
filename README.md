@@ -272,7 +272,7 @@ For the following sections, unless otherwise stated, all filepaths provided are 
 			```lua
 			if not utilitools then imgui.Text("Utilitools is disabled") return end
 			local configHelpers = utilitools.configHelpers
-			configHelpers.setMod(mod)
+			if configHelpers.setMod(mod) then return end
 
 			-- real config start
 			configHelpers.input("editorMenu")
