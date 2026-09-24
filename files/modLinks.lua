@@ -51,7 +51,15 @@ return {
 	},
 	["quick-playtest"] = {
 		organisation = "Pentatrate",
-		repository = "quick-playtest",
+		repository = "quick_playtest",
+		branch = {
+			main = true
+		},
+		default = "main"
+	},
+	quick_playtest = {
+		organisation = "Pentatrate",
+		repository = "quick_playtest",
 		branch = {
 			main = true
 		},
@@ -59,7 +67,15 @@ return {
 	},
 	betterCostumes = {
 		organisation = "Pentatrate",
-		repository = "betterCostumes",
+		repository = "better_costumes",
+		branch = {
+			main = true
+		},
+		default = "main"
+	},
+	better_costumes = {
+		organisation = "Pentatrate",
+		repository = "better_costumes",
 		branch = {
 			main = true
 		},
