@@ -130,7 +130,7 @@ return {
 		default = "main"
 	},
 	DetailedAcc = {
-		organisation = "Thatguytheman",
+		organisation = "Thatguytheman", -- Mawl
 		repository = "Detailed-Accuracy",
 		branch = {
 			main = true

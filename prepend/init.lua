@@ -5,7 +5,7 @@ utilitools = {
 	incompatibilities = {},
 	modChecks = { general = false, dependencies = false, incompatibilities = false },
 	folderManager = {
-		ignoreFiles = { [".git"] = true, [".gitignore"] = true, [".vscode"] = true, [".lovelyignore"] = true, [".nolovelyignore"] = true, ["config.json"] = true, unused = true --[[ Beattools and Utilitools ]], LvlData = true --[[ Detailed Accuracy by thatguytheman ]], customsounds = true --[[ Lemontweaks by gooberlemonade ]] },
+		ignoreFiles = { [".git"] = true, [".gitignore"] = true, [".vscode"] = true, [".lovelyignore"] = true, [".nolovelyignore"] = true, ["config.json"] = true, unused = true --[[ Beattools and Utilitools ]], LvlData = true --[[ Detailed Accuracy by mawl ]], customsounds = true --[[ Lemontweaks by gooberlemonade ]] },
 		isIgnored = function(fileName, isMod, ignore)
 			if not isMod then return false end
 			if utilitools.folderManager.ignoreFiles[fileName] then return true end
