@@ -220,8 +220,6 @@ configHelpers.treeNode = function(...) utilitools.imguiHelpers.treeNode(...) end
 configHelpers.setMod = function(mod2)
 	mod = mod2
 	if not utilitools.fileManager[mod.id] then mod = nil imgui.Text(tostring(mod2 and mod2.name) .. " is disabled") return true end -- mod is disabled
-	if utilitools.fileManager[mod.id].configOptions then utilitools.fileManager[mod.id].configOptions.load() end
-	if utilitools.fileManager[mod.id].documentation then utilitools.fileManager[mod.id].documentation.load() end
 	configOptions = utilitools.files[mod.id].configOptions
 	docs = utilitools.files[mod.id].documentation
 	return false

@@ -1,13 +1,24 @@
 {
 	"dependencies": {
 		"beatblock-plus": {
-			"versions": [[">=", "2.0.0"]],
+			"versions": [
+				[
+					">=",
+					"2.0.0"
+				]
+			],
 			"reason": "Outdated. You need to update this mod."
 		}
 	},
 	"incompatibilities": {
 		"beattools": {
-			"versions": [["fromTil", "3.0.0", "3.9.48"]],
+			"versions": [
+				[
+					"fromTil",
+					"3.0.0",
+					"3.9.48"
+				]
+			],
 			"reason": "Outdated. You need to update this mod."
 		}
 	},
@@ -15,71 +26,79 @@
 		"imguiHelpers": {
 			"extension": "lua",
 			"load": true,
-			"call": true
+			"call": true,
+			"path": "imgui"
 		},
 		"configHelpers": {
 			"extension": "lua",
 			"load": true,
-			"call": true
-		},
-		"prompts": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"suggest": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"versions": {
-			"extension": "lua",
-			"load": true,
-			"call": true
-		},
-		"keybinds": {
-			"extension": "lua",
-			"load": true,
-			"call": true
+			"call": true,
+			"path": "config"
 		},
 		"configOptions": {
 			"extension": "json",
-			"load": true
+			"load": true,
+			"path": "config"
 		},
 		"documentation": {
 			"extension": "lua",
 			"load": true,
-			"call": true
+			"call": true,
+			"path": "config"
 		},
-		"keys": {
+		"prompts": {
 			"extension": "lua",
 			"load": true,
-			"call": true
+			"call": true,
+			"path": "imgui"
+		},
+		"suggest": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "imgui"
 		},
 		"modLinks": {
 			"extension": "lua",
 			"load": true,
-			"call": true
+			"call": true,
+			"path": "internet"
 		},
 		"internet": {
 			"extension": "lua",
 			"load": true,
-			"call": true
+			"call": true,
+			"path": "internet"
 		},
 		"git": {
 			"extension": "lua",
 			"load": true,
-			"call": true
-		},
-		"modUpdater": {
-			"extension": "lua",
-			"load": true,
-			"call": true
+			"call": true,
+			"path": "internet"
 		},
 		"modUpdater2": {
 			"extension": "lua",
 			"load": true,
-			"call": true
+			"call": true,
+			"path": "internet"
+		},
+		"versions": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "internet"
+		},
+		"keybinds": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "keys"
+		},
+		"keys": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "keys"
 		},
 		"backwardsCompat": {
 			"extension": "lua",

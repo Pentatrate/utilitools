@@ -347,7 +347,6 @@ local function utilitoolsRegisterMods()
 						log:defineEnvironment(mod.id, 2, 2)
 					end
 					if modsData[mod.id].config then
-						utilitools.fileManager.utilitools.configHelpers.load()
 						utilitools.configHelpers.registerMod(mod, modsData[mod.id].files)
 					end
 					modlog(mod, "Registering " .. mod.id)
