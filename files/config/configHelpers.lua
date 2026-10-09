@@ -228,19 +228,11 @@ configHelpers.registerMod = function(mod2)
 	if utilitools.fileManager[mod2.id] == nil then
 		utilitools.fileManager.registerMod(mod2, {})
 	end
-	if utilitools.fileManager[mod2.id].configOptions == nil then
-		utilitools.fileManager.registerFile(mod2, {
-			name = "configOptions",
-			extension = "json",
-			load = false
-		})
+	if utilitools.fileManager[mod2.id].configOptions == nil and utilitools.mods[mod2.id].files.configOptions then
+		utilitools.fileManager.registerFile(mod2, utilitools.mods[mod2.id].files.configOptions)
 	end
-	if utilitools.fileManager[mod2.id].documentation == nil then
-		utilitools.fileManager.registerFile(mod2, {
-			name = "documentation",
-			extension = "json",
-			load = false
-		})
+	if utilitools.fileManager[mod2.id].documentation == nil and utilitools.mods[mod2.id].files.documentation then
+		utilitools.fileManager.registerFile(mod2, utilitools.mods[mod2.id].files.documentation)
 	end
 	if configHelpers.setMod(mod2) then return end
 	for k, v in pairs(configOptions) do

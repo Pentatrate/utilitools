@@ -1,4 +1,4 @@
-local fileManager = {}
+local fileManager = { data = {} }
 
 local function load(mod, file, reload)
 	if file.name == "loadAll" then modwarn(mod, "fileManager: Tried to load loadAall") return end
@@ -48,42 +48,38 @@ local function load(mod, file, reload)
 end
 fileManager.registerFile = function(mod, file)
 	if file.name == "loadMultiple" then return end
-	fileManager[mod.id][file.name] = {
+	fileManager.data[mod.id][file.name] = {
 		name = file.name,
 		call = file.call,
 		load = function(reload) load(mod, file, reload) end
 	}
-	if file.load then fileManager[mod.id][file.name].load() end
+	fileManager[mod.id][file.name] = fileManager.data[mod.id][file.name]
+	if file.load then fileManager.data[mod.id][file.name].load() end
 end
 fileManager.registerMod = function(mod, files)
 	if ({ registerFile = true, registerMod = true, loadAll = true })[mod.id] then return end
 
-	if fileManager[mod.id] == nil then
-		fileManager[mod.id] = {
+	if fileManager.data[mod.id] == nil then
+		fileManager.data[mod.id] = {
 			loadMultiple = function(files2, reload)
 				local function loadFile(file)
-					if file.name ~= "loadMultiple" then
-						if file.load then file.load(reload) end
-					end
+					if file.name ~= "loadMultiple" and file.load then file.load(reload) end
 				end
-				if files2 == nil then -- load all
-					for fileName, file in pairs(fileManager[mod.id]) do
-						if fileName ~= "loadMultiple" then
-							loadFile(file)
-						end
+				if not files2 then -- load all
+					for fileName, file in pairs(fileManager.data[mod.id]) do
+						if fileName ~= "loadMultiple" then loadFile(file) end
 					end
 				else
 					for _, fileName in ipairs(files2) do
 						if fileName ~= "loadMultiple" then
-							local file = fileManager[mod.id][fileName]
-							if file then
-								loadFile(file)
-							end
+							local file = fileManager.data[mod.id][fileName]
+							if file then loadFile(file) end
 						end
 					end
 				end
 			end
 		}
+		fileManager[mod.id] = fileManager.data[mod.id]
 	end
 	for name, file in pairs(files) do
 		file.name = name
@@ -92,10 +88,8 @@ fileManager.registerMod = function(mod, files)
 end
 
 fileManager.loadAll = function(reload)
-	for modId, v in pairs(fileManager) do
-		if not ({ registerFile = true, registerMod = true, loadAll = true })[modId] then
-			v.loadMultiple(nil, reload)
-		end
+	for _, v in pairs(fileManager.data) do
+		v.loadMultiple(nil, reload)
 	end
 end
 

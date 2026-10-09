@@ -284,7 +284,7 @@ print = function(...)
 			forceprint(...)
 		end
 		if mods.utilitools.config.unknownPrints == true then
-			forceprint(debug.traceback(nil, 1))
+			forceprint(debug.traceback("Traceback", 1))
 		end
 	else
 		forceprint(...)
@@ -334,6 +334,7 @@ local function utilitoolsRegisterMods()
 						utilitools.mods[mod.id][v] = modsData[mod.id][v]
 					end
 					if modsData[mod.id].files and type(modsData[mod.id].files) == "table" then
+						utilitools.mods[mod.id].files = modsData[mod.id].files
 						utilitools.fileManager.registerMod(mod, modsData[mod.id].files)
 					end
 					if modsData[mod.id].dependencies and type(modsData[mod.id].dependencies) == "table" then

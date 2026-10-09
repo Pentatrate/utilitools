@@ -163,7 +163,7 @@ function keybinds.mod.pressed(mod, keyId, hold)
 			return true, utilitools.table.tableAmount(v[1])
 		end
 	end
-	return false
+	return false, 0
 end
 
 function keybinds.mod.checkBindsStart()
@@ -179,7 +179,7 @@ function keybinds.mod.checkBinds(mod, binds)
 		if type(func) == "function" then
 			local pressed, amount = keybinds.mod.pressed(mod, key, key == keybinds.mod.lastPressed)
 			if pressed then
-				table.insert(keybinds.mod.keyBindsPressed, key == keybinds.mod.lastPressed and 1 or #keybinds.mod.keyBindsPressed + 1, { key = key, amount = amount, func = func })
+				table.insert(keybinds.mod.keyBindsPressed, key == keybinds.mod.lastPressed and 1 or #keybinds.mod.keyBindsPressed + 1, { key = key, amount = amount, func = func, mod = mod })
 			end
 		end
 	end
@@ -193,13 +193,18 @@ function keybinds.mod.checkBindsEnd()
 	if keybinds.mod.keyBindsPressed[1] and keybinds.mod.keyBindsPressed[1].key == keybinds.mod.lastPressed then return end
 
 	local highest = keybinds.mod.keyBindsPressed[1]
-	for _, keybind in ipairs(keybinds.mod.keyBindsPressed) do
-		if keybind.amount > highest.amount then
-			highest = keybind
-		elseif keybind.amount < highest.amount then
-			-- nothing
-		elseif keybind.key > highest.key then
-			highest = keybind
+	for i, keybind in ipairs(keybinds.mod.keyBindsPressed) do
+		if i ~= 1 then
+			if keybind.amount > highest.amount then
+				highest = keybind
+			elseif keybind.amount < highest.amount then
+				-- nothing
+			else
+				if keybind.key > highest.key then
+					highest = keybind
+				end
+				modlog(highest.mod, "keybinds.mod.checkBindsEnd: Key conflict.", keybind.key, "overlaps with", highest.key, "Both have", highest.amount, "held keys")
+			end
 		end
 	end
 

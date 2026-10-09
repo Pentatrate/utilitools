@@ -49,6 +49,14 @@ return {
 		},
 		default = "main"
 	},
+	overdetailed_events_golden = {
+		organisation = "Pentatrate",
+		repository = "overdetailed_events_golden",
+		branch = {
+			main = true
+		},
+		default = "main"
+	},
 	["quick-playtest"] = {
 		organisation = "Pentatrate",
 		repository = "quick_playtest",
@@ -81,9 +89,25 @@ return {
 		},
 		default = "main"
 	},
-	themeable = {
-		organisation = "ImPurplez",
-		repository = "Themeable",
+	shut_up = {
+		organisation = "Pentatrate",
+		repository = "shut_up",
+		branch = {
+			main = true
+		},
+		default = "main"
+	},
+	["test-dummy"] = {
+		organisation = "Pentatrate",
+		repository = "test-dummy",
+		branch = {
+			main = true
+		},
+		default = "main"
+	},
+	customjsondata = {
+		organisation = "lemonade-js",
+		repository = "customjsondata",
 		branch = {
 			main = true
 		},
@@ -92,6 +116,14 @@ return {
 	customsounds = {
 		organisation = "lemonade-js",
 		repository = "customsounds",
+		branch = {
+			main = true
+		},
+		default = "main"
+	},
+	lemontweaks = {
+		organisation = "lemonade-js",
+		repository = "lemontweaks",
 		branch = {
 			main = true
 		},
@@ -113,22 +145,6 @@ return {
 		},
 		default = "main"
 	},
-	["test-dummy"] = {
-		organisation = "Pentatrate",
-		repository = "test-dummy",
-		branch = {
-			main = true
-		},
-		default = "main"
-	},
-	lemontweaks = {
-		organisation = "lemonade-js",
-		repository = "lemontweaks",
-		branch = {
-			main = true
-		},
-		default = "main"
-	},
 	DetailedAcc = {
 		organisation = "Thatguytheman", -- Mawl
 		repository = "Detailed-Accuracy",
@@ -145,9 +161,9 @@ return {
 		},
 		default = "master"
 	},
-	overdetailed_events_golden = {
-		organisation = "Pentatrate",
-		repository = "overdetailed_events_golden",
+	keyed = {
+		organisation = "lolcerdef",
+		repository = "keyed",
 		branch = {
 			main = true
 		},
@@ -161,14 +177,6 @@ return {
 		},
 		default = "main"
 	},
-	keyed = {
-		organisation = "lolcerdef",
-		repository = "keyed",
-		branch = {
-			main = true
-		},
-		default = "main"
-	},
 	cprof = {
 		organisation = "redsti-github",
 		repository = "Beatblock-cprof",
@@ -177,9 +185,17 @@ return {
 		},
 		default = "main"
 	},
-	customjsondata = {
-		organisation = "lemonade-js",
-		repository = "customjsondata",
+	["compute-shader-tools"] = {
+		organisation = "redsti-github",
+		repository = "BB-compute-shader-tools",
+		branch = {
+			main = true
+		},
+		default = "main"
+	},
+	themeable = {
+		organisation = "ImPurplez",
+		repository = "Themeable",
 		branch = {
 			main = true
 		},
@@ -212,14 +228,6 @@ return {
 	["1080purpz"] = {
 		organisation = "ImPurplez",
 		repository = "1080purpz",
-		branch = {
-			main = true
-		},
-		default = "main"
-	},
-	["compute-shader-tools"] = {
-		organisation = "redsti-github",
-		repository = "BB-compute-shader-tools",
 		branch = {
 			main = true
 		},
