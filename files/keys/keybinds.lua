@@ -34,7 +34,8 @@ keybinds = {
 	raw = {},
 	mod = {
 		lastPressed = false,
-		keyBindsPressed = {}
+		keyBindsPressed = {},
+		held = {}
 	},
 	register = { registered = false },
 	listening = {
@@ -150,7 +151,7 @@ function keybinds.mod.singleKeyPressed(key, hold)
 		return maininput:pressed(key)
 	end
 end
-function keybinds.mod.pressed(mod, keyId, hold)
+function keybinds.mod.pressed(mod, keyId, hold, getKeys)
 	for _, v in ipairs(keybinds.mod.getKeybinds(mod, keyId)) do
 		local holding = true
 		for k, _ in pairs(v[1]) do
@@ -158,8 +159,10 @@ function keybinds.mod.pressed(mod, keyId, hold)
 				holding = false
 				break
 			end
+			if getKeys then getKeys[k] = true end
 		end
 		if holding and keybinds.mod.singleKeyPressed(v[2], hold) then
+			if getKeys then getKeys[v[2]] = true end
 			return true, utilitools.table.tableAmount(v[1])
 		end
 	end
@@ -168,6 +171,7 @@ end
 
 function keybinds.mod.checkBindsStart()
 	keybinds.mod.keyBindsPressed = {}
+	keybinds.mod.held = {}
 end
 function keybinds.mod.checkBinds(mod, binds)
 	if type(binds) ~= "table" then return end
@@ -177,7 +181,7 @@ function keybinds.mod.checkBinds(mod, binds)
 
 	for key, func in pairs(binds) do
 		if type(func) == "function" then
-			local pressed, amount = keybinds.mod.pressed(mod, key, key == keybinds.mod.lastPressed)
+			local pressed, amount = keybinds.mod.pressed(mod, key, key == keybinds.mod.lastPressed, keybinds.mod.held)
 			if pressed then
 				table.insert(keybinds.mod.keyBindsPressed, key == keybinds.mod.lastPressed and 1 or #keybinds.mod.keyBindsPressed + 1, { key = key, amount = amount, func = func, mod = mod })
 			end
@@ -206,6 +210,12 @@ function keybinds.mod.checkBindsEnd()
 				modlog(highest.mod, "keybinds.mod.checkBindsEnd: Key conflict.", keybind.key, "overlaps with", highest.key, "Both have", highest.amount, "held keys")
 			end
 		end
+	end
+
+	local amount = utilitools.table.tableAmount(keybinds.mod.held)
+	if amount ~= highest.amount + 1 then
+		-- modlog(highest.mod, "keybinds.mod.checkBindsEnd: Key failed.", highest.key, "has", highest.amount, "held keys instead of", amount - 1)
+		return
 	end
 
 	highest.func()
