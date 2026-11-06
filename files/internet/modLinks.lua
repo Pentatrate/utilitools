@@ -97,6 +97,22 @@ return {
 		},
 		default = "main"
 	},
+	ordered_saving = {
+		organisation = "Pentatrate",
+		repository = "ordered_saving",
+		branch = {
+			main = true
+		},
+		default = "main"
+	},
+	more_fish = {
+		organisation = "Pentatrate",
+		repository = "we_will_add_more_fish",
+		branch = {
+			main = true
+		},
+		default = "main"
+	},
 	["test-dummy"] = {
 		organisation = "Pentatrate",
 		repository = "test-dummy",
