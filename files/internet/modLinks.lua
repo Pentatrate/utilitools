@@ -113,6 +113,14 @@ return {
 		},
 		default = "main"
 	},
+	crash_context = {
+		organisation = "Pentatrate",
+		repository = "crash_context",
+		branch = {
+			main = true
+		},
+		default = "main"
+	},
 	["test-dummy"] = {
 		organisation = "Pentatrate",
 		repository = "test-dummy",
