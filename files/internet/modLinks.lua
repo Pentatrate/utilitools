@@ -121,6 +121,14 @@ return {
 		},
 		default = "main"
 	},
+	audio_offset = {
+		organisation = "Pentatrate",
+		repository = "audio_offset",
+		branch = {
+			main = true
+		},
+		default = "main"
+	},
 	["test-dummy"] = {
 		organisation = "Pentatrate",
 		repository = "test-dummy",
