@@ -33,7 +33,7 @@ configHelpers.condTreeNode("Full Mod Description", "documentation", "none", fals
 end)
 --[[ configHelpers.treeNode("Version Manager", function()
 	utilitools.try(mod, function()
-		if imgui.Button("Relaunch Game") then utilitools.config.save(mod) utilitools.relaunch() end
+		if imgui.Button("Relaunch Game") then utilitools.config.save(mod) utilitools.relaunch.relaunch() end
 		if imgui.Button("Reload Mod Files") then utilitools.modUpdater.fileCache = {} end
 		configHelpers.doc("autoUpdate")
 		configHelpers.input("autoUpdate")
@@ -92,7 +92,7 @@ configHelpers.treeNode("Version Manager 2", function()
 	utilitools.try(mod, function()
 		local modUpdater2 = utilitools.modUpdater2
 		local data, _, bool
-		if imgui.Button("Relaunch Game") then utilitools.config.save(mod) utilitools.relaunch() end
+		if imgui.Button("Relaunch Game") then utilitools.config.save(mod) utilitools.relaunch.relaunch() end
 		configHelpers.doc("autoUpdate")
 		configHelpers.input("autoUpdate")
 		configHelpers.input("defaultBranch")

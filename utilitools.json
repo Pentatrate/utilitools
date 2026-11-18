@@ -16,7 +16,7 @@
 				[
 					"fromTil",
 					"3.0.0",
-					"3.9.48"
+					"3.10.2"
 				]
 			],
 			"reason": "Outdated. You need to update this mod."
@@ -103,6 +103,35 @@
 		"backwardsCompat": {
 			"extension": "lua",
 			"load": true
+		},
+		"number": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "helpers"
+		},
+		"imgui": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "imgui"
+		},
+		"color": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "helpers"
+		},
+		"timing": {
+			"extension": "lua",
+			"load": true,
+			"call": true,
+			"path": "helpers"
+		},
+		"update": {
+			"extension": "lua",
+			"load": true,
+			"call": true
 		}
 	},
 	"config": true,

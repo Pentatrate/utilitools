@@ -8,7 +8,7 @@ st:setInit(function(self)
 	local function addText(text) self.text = self.text .. text end
 	self.text = "Updated mods (press accept or back to continue):"
 	local amount = 0
-	for k, v in pairs(mods.utilitools.config.updated.mods or {}) do
+	for k, v in pairs(mod.config.updated.mods or {}) do
 		local mod = mods[k]
 		if mod and utilitools.versions.equalTo(v.version, mod.version) then
 			addText("\n\n- " .. mod.name .. " by " .. mod.author .. "\nupdated from " .. v.oldVersion .. " to " .. v.version)
@@ -20,15 +20,15 @@ st:setInit(function(self)
 			amount = amount + 1
 		end
 	end
-	if amount == 0 then forceprint("UHHHHHMMMMM WHY DIDNT ANYTHING UPDATE?") self.continue = true end
-	self.initState = mods.utilitools.config.updated.initState
-	mods.utilitools.config.updated = {}
+	if amount == 0 then modlog(mod, "UHHHHHMMMMM WHY DIDNT ANYTHING UPDATE?") self.continue = true end
+	self.initState = mod.config.updated.initState
+	mod.config.updated = {}
 end)
 
 st:setUpdate(function(self, dt)
     self.updateSprite:update(dt)
 	if maininput:pressed("accept") or maininput:pressed("back") or self.continue then
-		utilitools.config.save(mods.utilitools)
+		utilitools.config.save(mod)
 		te.stop('music')
 		if bs.states.Menu == nil then dofile('preload/states.lua') end
 		cs = bs.load(self.initState or project.initState)

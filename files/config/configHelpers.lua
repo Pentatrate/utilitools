@@ -218,22 +218,13 @@ configHelpers.condTreeNode = function(label, key, target, same, func, flags)
 end
 configHelpers.treeNode = function(...) utilitools.imguiHelpers.treeNode(...) end
 configHelpers.setMod = function(mod2)
+	if not utilitools.fileData[mod2.id] then imgui.Text(tostring(mod2 and mod2.name) .. " is disabled") mod = nil return true end -- mod is disabled
 	mod = mod2
-	if not utilitools.fileManager[mod.id] then mod = nil imgui.Text(tostring(mod2 and mod2.name) .. " is disabled") return true end -- mod is disabled
 	configOptions = utilitools.files[mod.id].configOptions
 	docs = utilitools.files[mod.id].documentation
 	return false
 end
 configHelpers.registerMod = function(mod2)
-	if utilitools.fileManager[mod2.id] == nil then
-		utilitools.fileManager.registerMod(mod2, {})
-	end
-	if utilitools.fileManager[mod2.id].configOptions == nil and utilitools.mods[mod2.id].files.configOptions then
-		utilitools.fileManager.registerFile(mod2, utilitools.mods[mod2.id].files.configOptions)
-	end
-	if utilitools.fileManager[mod2.id].documentation == nil and utilitools.mods[mod2.id].files.documentation then
-		utilitools.fileManager.registerFile(mod2, utilitools.mods[mod2.id].files.documentation)
-	end
 	if configHelpers.setMod(mod2) then return end
 	for k, v in pairs(configOptions) do
 		local success, reason = configHelpers.exists(k)
@@ -266,21 +257,13 @@ configHelpers.presets = {
 	end,
 	menuButtons = function()
 		if not configHelpers.check2() then return end
-		if imgui.Button("Default") then
-			utilitools.prompts.confirm("You will reset all configs for this mod to default", configHelpers.default)
-		end
+		if imgui.Button("Default") then utilitools.prompts.confirm("You will reset all configs for this mod to default", configHelpers.default) end
 		imgui.SameLine()
-		if imgui.Button("Off") then
-			utilitools.prompts.confirm("You will turn all mod features off", configHelpers.off)
-		end
+		if imgui.Button("Off") then utilitools.prompts.confirm("You will turn all toggleable mod features off", configHelpers.off) end
 		if mod == mods.utilitools then
-			if imgui.Button("Reload All Files") then
-				utilitools.fileManager.loadAll(true)
-			end
+			if imgui.Button("Reload All Files") then utilitools.fileManager.loadAll(true) end
 		else
-			if imgui.Button("Reload Mod Files") then
-				utilitools.fileManager[mod.id].loadMultiple(nil, true)
-			end
+			if imgui.Button("Reload Mod Files") then utilitools.fileLoaders[mod.id](nil, true) end
 		end
 	end,
 	search = function()
