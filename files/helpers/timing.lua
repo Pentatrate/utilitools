@@ -53,7 +53,6 @@ function timing.realMsToBeat(ms, initialBpm, timingPoints, rateMod)
 end
 function timing.getBeat(beat, ms, initialBpm, timingPoints, rateMod)
 	local newBeat = utilitools.timing.realMsToBeat(utilitools.timing.realBeatToMs(beat, initialBpm, timingPoints, rateMod) + ms, initialBpm, timingPoints, rateMod)
-	modlog(mod, cs and cs.rateMod or 1, newBeat - beat)
 	return newBeat
 end
 function timing.getActiveTiming()
