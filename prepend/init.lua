@@ -323,6 +323,7 @@ function utilitools.init.registerMods()
 
 	local function checkForMod(modId, data)
 		if not mods[modId] then return false end
+		if not mods[modId].enabled then return false end
 		if not data.versions then return true end
 		for _, v in ipairs(data.versions) do if utilitools.versions.compare(mods[modId].version, v[1], v[2], v[3]) then return true end end
 		return false

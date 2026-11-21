@@ -56,7 +56,10 @@ function timing.getBeat(beat, ms, initialBpm, timingPoints, rateMod)
 	return newBeat
 end
 function timing.getActiveTiming()
-	return cs and cs.timingInfo and cs.timingInfo.initial and cs.timingInfo.initial.bpm or cs.level and cs.level.bpm or 100, cs and cs.timingInfo and cs.timingInfo.timingPoints or {}, cs and cs.rateMod or 1
+	return cs and cs.timingInfo and cs.timingInfo.initial and cs.timingInfo.initial.bpm or cs.level and cs.level.bpm or 100, cs and cs.timingInfo and cs.timingInfo.timingPoints or {}, timing.getActiveRatemod()
+end
+function timing.getActiveRatemod()
+	return (cs and cs.rateMod or 1)
 end
 
 return timing
